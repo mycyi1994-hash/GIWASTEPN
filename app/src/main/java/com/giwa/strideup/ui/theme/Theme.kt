@@ -21,7 +21,8 @@ private val StrideUpDarkColors = darkColorScheme(
     surfaceContainerHigh = Surface2,
     error = NeonRed,
     onError = Night,
-    outline = TextSecondary,
+    outline = Stroke,
+    outlineVariant = Stroke,
 )
 
 /** StrideUp은 M2E 컨셉에 맞춰 항상 다크 테마를 사용한다. */

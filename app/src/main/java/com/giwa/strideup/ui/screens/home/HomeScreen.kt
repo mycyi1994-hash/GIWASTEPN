@@ -2,10 +2,12 @@ package com.giwa.strideup.ui.screens.home
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -17,11 +19,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.Bolt
-import androidx.compose.material.icons.filled.LocalFireDepartment
-import androidx.compose.material.icons.filled.Straighten
-import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.filled.Navigation
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -33,30 +34,40 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.giwa.strideup.data.local.DailyStepsEntity
-import com.giwa.strideup.domain.RewardEconomy
 import com.giwa.strideup.ui.StepPermissions
-import com.giwa.strideup.ui.components.EnergyBar
-import com.giwa.strideup.ui.components.IconBadge
+import com.giwa.strideup.ui.components.LineProgress
+import com.giwa.strideup.ui.components.ProfileBadge
 import com.giwa.strideup.ui.components.ProgressRing
-import com.giwa.strideup.ui.components.StatItem
+import com.giwa.strideup.ui.components.StartWalkButton
 import com.giwa.strideup.ui.components.StrideCard
-import com.giwa.strideup.ui.theme.NeonAmber
-import com.giwa.strideup.ui.theme.NeonCyan
+import com.giwa.strideup.ui.components.StrideUpWordmark
+import com.giwa.strideup.ui.components.TokenBadge
 import com.giwa.strideup.ui.theme.NeonGreen
-import com.giwa.strideup.ui.theme.NeonPurple
+import com.giwa.strideup.ui.theme.NeonGreenSoft
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory)) {
+fun HomeScreen(
+    onStartWalk: () -> Unit = {},
+    viewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory),
+) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
@@ -70,8 +81,7 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel(factory = HomeViewModel.Fact
         if (hasPermission) viewModel.onPermissionGranted()
     }
 
-    // 루트(StrideUpRoot)의 최초 권한 요청이나 시스템 설정에서 권한이 허용된 경우에도
-    // 카드가 남지 않도록, 화면이 재개될 때마다 권한 상태를 다시 확인한다.
+    // 루트/시스템 설정에서 권한이 허용된 경우에도 카드가 남지 않도록 재개 시 재확인.
     LifecycleResumeEffect(Unit) {
         val granted = StepPermissions.hasActivityRecognition(context)
         if (granted != hasPermission) {
@@ -83,23 +93,18 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel(factory = HomeViewModel.Fact
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(20.dp),
+        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        item {
-            HomeHeader(streak = state.streak)
-        }
+        item { HomeHeader(level = state.sneakerLevel) }
 
         if (!hasPermission) {
             item {
                 StrideCard {
                     Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Text("걸음 측정 권한이 필요해요", style = MaterialTheme.typography.titleMedium)
                         Text(
-                            "걸음 측정 권한이 필요해요",
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                        Text(
-                            "오늘의 걸음 수를 세고 SUP 포인트를 적립하려면 신체 활동 권한을 허용해 주세요.",
+                            "오늘의 걸음 수를 세고 SUP를 적립하려면 신체 활동 권한을 허용해 주세요.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -111,116 +116,14 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel(factory = HomeViewModel.Fact
             }
         }
 
-        item {
-            StrideCard {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(20.dp),
-                ) {
-                    ProgressRing(
-                        progress = if (state.goal > 0) state.todaySteps.toFloat() / state.goal else 0f,
-                        modifier = Modifier.size(220.dp),
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                "%,d".format(state.todaySteps),
-                                style = MaterialTheme.typography.displayMedium,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
-                            Text(
-                                "목표 %,d 걸음".format(state.goal),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        StatItem(
-                            icon = Icons.Filled.Straighten,
-                            tint = NeonCyan,
-                            label = "거리",
-                            value = "%.2f km".format(RewardEconomy.distanceMeters(state.todaySteps) / 1000),
-                        )
-                        StatItem(
-                            icon = Icons.Filled.LocalFireDepartment,
-                            tint = NeonAmber,
-                            label = "칼로리",
-                            value = "%.0f kcal".format(RewardEconomy.calories(state.todaySteps)),
-                        )
-                        StatItem(
-                            icon = Icons.Filled.TrendingUp,
-                            tint = NeonGreen,
-                            label = "달성률",
-                            value = "%d%%".format(
-                                if (state.goal > 0) (state.todaySteps * 100 / state.goal) else 0
-                            ),
-                        )
-                    }
-                }
-            }
-        }
+        item { TodayCard(state) }
+
+        item { RouteCard() }
+
+        item { EnergyTokenRow(state) }
 
         item {
-            StrideCard {
-                Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                Icons.Filled.Bolt,
-                                contentDescription = null,
-                                tint = NeonGreen,
-                                modifier = Modifier.size(20.dp),
-                            )
-                            Spacer(Modifier.size(6.dp))
-                            Text("에너지", style = MaterialTheme.typography.titleMedium)
-                        }
-                        Text(
-                            "%.1f / %.1f".format(state.energy, state.maxEnergy),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = NeonGreen,
-                        )
-                    }
-                    EnergyBar(current = state.energy, max = state.maxEnergy)
-                    Text(
-                        "에너지가 있는 동안 워킹 세션에서 SUP가 적립돼요. 매일 자정에 리필됩니다.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-        }
-
-        item {
-            StrideCard {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(14.dp),
-                ) {
-                    IconBadge(icon = Icons.Filled.AccountBalanceWallet, tint = NeonPurple)
-                    Column(Modifier.weight(1f)) {
-                        Text(
-                            "SUP 포인트",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Text(
-                            "%,.2f SUP".format(state.balance),
-                            style = MaterialTheme.typography.headlineMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                    }
-                }
-            }
+            StartWalkButton(text = "START WALK", onClick = onStartWalk)
         }
 
         item {
@@ -250,42 +153,207 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel(factory = HomeViewModel.Fact
 }
 
 @Composable
-private fun HomeHeader(streak: Int) {
-    val today = remember {
-        LocalDate.now().format(DateTimeFormatter.ofPattern("M월 d일 EEEE", Locale.KOREAN))
-    }
+private fun HomeHeader(level: Int) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column {
-            Text(
-                today,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Text("안녕하세요, 러너님 👋", style = MaterialTheme.typography.titleLarge)
-        }
-        if (streak > 0) {
+        StrideUpWordmark(fontSize = 26.sp)
+        ProfileBadge(level = level)
+    }
+}
+
+@Composable
+private fun TodayCard(state: HomeViewModel.UiState) {
+    val fraction = if (state.goal > 0) state.todaySteps.toFloat() / state.goal else 0f
+    StrideCard {
+        Column(Modifier.padding(22.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        "TODAY",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        letterSpacing = 1.5.sp,
+                    )
+                    Text(
+                        "%,d".format(state.todaySteps),
+                        fontSize = 52.sp,
+                        fontWeight = FontWeight.Black,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Text(
+                        "STEPS",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        letterSpacing = 2.sp,
+                    )
+                }
+                ProgressRing(
+                    progress = fraction,
+                    modifier = Modifier.size(96.dp),
+                    ringWidth = 10.dp,
+                ) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.DirectionsWalk,
+                        contentDescription = null,
+                        tint = NeonGreen,
+                        modifier = Modifier.size(34.dp),
+                    )
+                }
+            }
+            LineProgress(fraction = fraction)
             Row(
-                modifier = Modifier
-                    .background(NeonAmber.copy(alpha = 0.15f), RoundedCornerShape(50))
-                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Icon(
-                    Icons.Filled.LocalFireDepartment,
-                    contentDescription = null,
-                    tint = NeonAmber,
-                    modifier = Modifier.size(16.dp),
-                )
-                Spacer(Modifier.size(4.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Filled.Star,
+                        contentDescription = null,
+                        tint = NeonGreen,
+                        modifier = Modifier.size(16.dp),
+                    )
+                    Spacer(Modifier.size(6.dp))
+                    Text(
+                        "${state.goalPercent}% OF GOAL",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
                 Text(
-                    "연속 ${streak}일",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = NeonAmber,
+                    "%,d".format(state.goal),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+            }
+        }
+    }
+}
+
+/** YOUR ROUTE — 발광 루트가 그려진 장식용 지도 카드 */
+@Composable
+private fun RouteCard() {
+    StrideCard {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("YOUR ROUTE", style = MaterialTheme.typography.titleMedium, letterSpacing = 1.sp)
+                Icon(Icons.Filled.Navigation, contentDescription = null, tint = NeonGreen, modifier = Modifier.size(18.dp))
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color(0xFF0A0C0A)),
+            ) {
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    val w = size.width
+                    val h = size.height
+                    // 격자
+                    val gridColor = Color.White.copy(alpha = 0.04f)
+                    val cols = 6
+                    val rows = 4
+                    for (c in 1 until cols) {
+                        val x = w * c / cols
+                        drawLine(gridColor, Offset(x, 0f), Offset(x, h), strokeWidth = 1f)
+                    }
+                    for (r in 1 until rows) {
+                        val y = h * r / rows
+                        drawLine(gridColor, Offset(0f, y), Offset(w, y), strokeWidth = 1f)
+                    }
+                    // 루트 경로
+                    val pts = listOf(
+                        0.08f to 0.72f, 0.22f to 0.56f, 0.34f to 0.64f, 0.48f to 0.40f,
+                        0.62f to 0.52f, 0.78f to 0.34f, 0.92f to 0.26f,
+                    ).map { Offset(w * it.first, h * it.second) }
+                    val path = Path().apply {
+                        moveTo(pts.first().x, pts.first().y)
+                        for (i in 1 until pts.size) lineTo(pts[i].x, pts[i].y)
+                    }
+                    drawPath(path, NeonGreen.copy(alpha = 0.20f), style = Stroke(width = 12f, cap = StrokeCap.Round))
+                    drawPath(path, NeonGreen, style = Stroke(width = 4f, cap = StrokeCap.Round))
+                    // 시작/끝 마커
+                    drawCircle(NeonGreen.copy(alpha = 0.3f), radius = 12f, center = pts.first())
+                    drawCircle(Color.White, radius = 5f, center = pts.first())
+                    drawCircle(NeonGreen.copy(alpha = 0.3f), radius = 14f, center = pts.last())
+                    drawCircle(NeonGreenSoft, radius = 6f, center = pts.last())
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun EnergyTokenRow(state: HomeViewModel.UiState) {
+    StrideCard {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 18.dp, horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                ProgressRing(
+                    progress = state.energyPercent / 100f,
+                    modifier = Modifier.size(52.dp),
+                    ringWidth = 6.dp,
+                ) {
+                    Icon(Icons.Filled.Bolt, contentDescription = null, tint = NeonGreen, modifier = Modifier.size(20.dp))
+                }
+                Column {
+                    Text(
+                        "ENERGY",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        "${state.energyPercent}%",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .size(width = 1.dp, height = 44.dp)
+                    .background(MaterialTheme.colorScheme.outline),
+            )
+            Row(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                TokenBadge(size = 44.dp)
+                Column {
+                    Text(
+                        "SUP",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        "%,.0f".format(state.balance),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
             }
         }
     }
@@ -323,9 +391,15 @@ private fun WeeklyChart(week: List<DailyStepsEntity>, goal: Int) {
                         modifier = Modifier
                             .fillMaxWidth(0.55f)
                             .fillMaxHeight(fraction)
+                            .clip(RoundedCornerShape(6.dp))
                             .background(
-                                if (day == today) NeonGreen else NeonGreen.copy(alpha = 0.35f),
-                                RoundedCornerShape(6.dp),
+                                if (day == today) {
+                                    Brush.verticalGradient(listOf(NeonGreenSoft, NeonGreen))
+                                } else {
+                                    Brush.verticalGradient(
+                                        listOf(NeonGreen.copy(alpha = 0.35f), NeonGreen.copy(alpha = 0.25f))
+                                    )
+                                }
                             )
                     )
                 }

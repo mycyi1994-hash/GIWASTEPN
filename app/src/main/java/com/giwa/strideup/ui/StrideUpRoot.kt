@@ -98,7 +98,19 @@ fun StrideUpRoot() {
             startDestination = Screen.Home.route,
             modifier = Modifier.padding(innerPadding),
         ) {
-            composable(Screen.Home.route) { HomeScreen() }
+            composable(Screen.Home.route) {
+                HomeScreen(
+                    onStartWalk = {
+                        navController.navigate(Screen.Walk.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                )
+            }
             composable(Screen.Walk.route) { WalkScreen() }
             composable(Screen.Rewards.route) { RewardsScreen() }
             composable(Screen.Profile.route) { ProfileScreen() }

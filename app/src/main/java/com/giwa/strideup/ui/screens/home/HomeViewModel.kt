@@ -27,9 +27,15 @@ class HomeViewModel(
         val maxEnergy: Double = RewardEconomy.BASE_MAX_ENERGY,
         val balance: Double = 0.0,
         val streak: Int = 0,
+        val sneakerLevel: Int = 1,
         val week: List<DailyStepsEntity> = emptyList(),
         val sensorAvailable: Boolean = true,
-    )
+    ) {
+        val energyPercent: Int
+            get() = if (maxEnergy > 0) ((energy / maxEnergy) * 100).toInt().coerceIn(0, 100) else 0
+        val goalPercent: Int
+            get() = if (goal > 0) (todaySteps * 100 / goal) else 0
+    }
 
     val uiState: StateFlow<UiState> = combine(
         combine(
@@ -51,6 +57,7 @@ class HomeViewModel(
             maxEnergy = RewardEconomy.maxEnergy(level),
             balance = balance,
             streak = streak,
+            sneakerLevel = level,
             week = week,
             sensorAvailable = stepRepository.stepSensorAvailable,
         )
