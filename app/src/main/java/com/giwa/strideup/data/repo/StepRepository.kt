@@ -62,6 +62,10 @@ class StepRepository(
 
     private suspend fun onSteps(steps: Int) {
         val today = LocalDate.now().toEpochDay()
+        // 프로세스 재시작 직후 StateFlow 초기값(0)이 이미 저장된 오늘 기록을
+        // 덮어쓰지 않도록, 저장값보다 작은 값은 무시한다.
+        val stored = stepDao.byDay(today)?.steps ?: 0
+        if (steps < stored) return
         val goal = prefs.dailyGoal.first()
         stepDao.upsert(DailyStepsEntity(today, steps, goal, System.currentTimeMillis()))
 

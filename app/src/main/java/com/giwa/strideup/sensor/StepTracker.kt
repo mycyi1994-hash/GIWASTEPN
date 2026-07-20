@@ -26,6 +26,8 @@ import kotlinx.coroutines.launch
 class StepTracker(
     context: Context,
     private val prefs: UserPrefs,
+    /** 오늘 이미 저장된 걸음 수 조회 (재부팅 시 오프셋 보존용) */
+    private val todayPersistedSteps: suspend (Long) -> Int = { 0 },
 ) : SensorEventListener {
 
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -41,6 +43,16 @@ class StepTracker(
     private var simulatedSteps = 0
 
     val isAvailable: Boolean get() = stepSensor != null
+
+    /**
+     * [todaySteps]가 실제 측정값을 반영하는지 여부.
+     * StateFlow 초기값 0은 센서 이벤트가 처리되기 전까지는 신뢰할 수 없으므로,
+     * 세션 걸음 집계는 이 플래그가 true가 된 뒤의 방출부터 사용해야 한다.
+     * (센서가 없는 기기는 시뮬레이션 값만 반영되므로 처음부터 신뢰 가능)
+     */
+    @Volatile
+    var hasReading: Boolean = stepSensor == null
+        private set
 
     private var started = false
 
@@ -68,6 +80,7 @@ class StepTracker(
 
     /** 에뮬레이터/센서 미지원 기기에서 데모용으로 걸음을 더한다. */
     fun simulateSteps(count: Int) {
+        hasReading = true
         simulatedSteps += count.coerceAtLeast(0)
         _todaySteps.value = _todaySteps.value + count.coerceAtLeast(0)
     }
@@ -89,13 +102,17 @@ class StepTracker(
                 cumulative
             }
             cumulative < savedBaseline -> {
-                // 재부팅으로 센서 누적값이 초기화된 경우
-                prefs.setBaseline(today, 0L)
-                0L
+                // 재부팅으로 센서 누적값이 초기화된 경우:
+                // 오늘 이미 기록된 걸음 수를 오프셋으로 보존해 이어서 센다.
+                val preBoot = todayPersistedSteps(today).coerceAtLeast(0)
+                val newBaseline = cumulative - preBoot
+                prefs.setBaseline(today, newBaseline)
+                newBaseline
             }
             else -> savedBaseline
         }
         val sensorSteps = (cumulative - baseline).toInt().coerceAtLeast(0)
         _todaySteps.value = sensorSteps + simulatedSteps
+        hasReading = true
     }
 }

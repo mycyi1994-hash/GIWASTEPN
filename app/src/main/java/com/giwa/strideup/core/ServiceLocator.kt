@@ -27,7 +27,9 @@ object ServiceLocator {
         val app = context.applicationContext
         database = Room.databaseBuilder(app, AppDatabase::class.java, "strideup.db").build()
         userPrefs = UserPrefs(app)
-        stepTracker = StepTracker(app, userPrefs)
+        stepTracker = StepTracker(app, userPrefs) { day ->
+            database.stepDao().byDay(day)?.steps ?: 0
+        }
         rewardRepository = RewardRepository(database.rewardDao(), userPrefs)
         stepRepository = StepRepository(
             stepDao = database.stepDao(),

@@ -50,7 +50,9 @@ class WalkSessionService : Service() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private var stepJob: Job? = null
     private var timerJob: Job? = null
-    private var lastTodaySteps = 0
+
+    /** 세션 걸음 집계 기준점. 첫 실측값 방출로 초기화된다(null = 아직 미정). */
+    private var lastTodaySteps: Int? = null
     private var settling = false
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -76,14 +78,21 @@ class WalkSessionService : Service() {
         )
         _state.value = WalkSessionState(isActive = true, startedAt = System.currentTimeMillis())
 
+        // 일별 기록/목표 보너스 수집기까지 함께 보장한다 (중복 호출에 안전).
+        ServiceLocator.stepRepository.startTracking()
         val tracker = ServiceLocator.stepTracker
-        tracker.start()
-        lastTodaySteps = tracker.todaySteps.value
+        lastTodaySteps = null
 
         stepJob = scope.launch {
             tracker.todaySteps.collect { today ->
-                val delta = (today - lastTodaySteps).coerceAtLeast(0)
+                // StateFlow 초기값(0)은 실측이 아니므로, 첫 실측값을 기준점으로만 쓰고
+                // 그 이후 증가분만 세션 걸음으로 인정한다. 세션 전에 걸은 오늘 걸음이
+                // 세션 적립으로 흘러들어오는 것을 막는다.
+                if (!tracker.hasReading) return@collect
+                val last = lastTodaySteps
                 lastTodaySteps = today
+                if (last == null) return@collect
+                val delta = (today - last).coerceAtLeast(0)
                 val current = _state.value
                 if (current.isActive && !current.isPaused && delta > 0) {
                     val updated = current.copy(steps = current.steps + delta)
@@ -159,10 +168,13 @@ class WalkSessionService : Service() {
     }
 
     private fun buildNotification(steps: Int): android.app.Notification {
+        val launchIntent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
         val contentIntent = PendingIntent.getActivity(
             this,
             0,
-            Intent(this, MainActivity::class.java),
+            launchIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
         return NotificationCompat.Builder(this, CHANNEL_ID)

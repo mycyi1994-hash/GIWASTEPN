@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.giwa.strideup.data.local.DailyStepsEntity
@@ -67,6 +68,17 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel(factory = HomeViewModel.Fact
     ) {
         hasPermission = StepPermissions.hasActivityRecognition(context)
         if (hasPermission) viewModel.onPermissionGranted()
+    }
+
+    // 루트(StrideUpRoot)의 최초 권한 요청이나 시스템 설정에서 권한이 허용된 경우에도
+    // 카드가 남지 않도록, 화면이 재개될 때마다 권한 상태를 다시 확인한다.
+    LifecycleResumeEffect(Unit) {
+        val granted = StepPermissions.hasActivityRecognition(context)
+        if (granted != hasPermission) {
+            hasPermission = granted
+            if (granted) viewModel.onPermissionGranted()
+        }
+        onPauseOrDispose { }
     }
 
     LazyColumn(
