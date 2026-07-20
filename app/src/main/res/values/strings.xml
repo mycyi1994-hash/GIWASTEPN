@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">StrideUp</string>
+    <string name="notification_channel_walk">워킹 세션</string>
+    <string name="notification_walk_title">워킹 세션 진행 중</string>
+</resources>

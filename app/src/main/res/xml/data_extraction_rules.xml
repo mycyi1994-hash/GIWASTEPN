@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- 기본 백업 사용: 별도 제외 규칙 없음 -->
+    </cloud-backup>
+</data-extraction-rules>
