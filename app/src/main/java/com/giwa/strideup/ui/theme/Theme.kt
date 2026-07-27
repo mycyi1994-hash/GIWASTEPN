@@ -5,32 +5,39 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 
 private val StrideUpDarkColors = darkColorScheme(
-    primary = NeonGreen,
-    onPrimary = Night,
-    secondary = NeonCyan,
-    onSecondary = Night,
-    tertiary = NeonPurple,
-    onTertiary = Night,
-    background = Night,
-    onBackground = TextPrimary,
-    surface = Surface1,
-    onSurface = TextPrimary,
-    surfaceVariant = Surface2,
-    onSurfaceVariant = TextSecondary,
-    surfaceContainer = Surface1,
-    surfaceContainerHigh = Surface2,
-    error = NeonRed,
-    onError = Night,
-    outline = Stroke,
-    outlineVariant = Stroke,
+    primary = Champagne,
+    onPrimary = ObsidianDeep,
+    primaryContainer = CharcoalHigh,
+    onPrimaryContainer = ChampagneLight,
+    secondary = Platinum,
+    onSecondary = ObsidianDeep,
+    secondaryContainer = CharcoalHigh,
+    onSecondaryContainer = Platinum,
+    tertiary = Jade,
+    onTertiary = ObsidianDeep,
+    background = Obsidian,
+    onBackground = Ivory,
+    surface = Charcoal,
+    onSurface = Ivory,
+    surfaceVariant = CharcoalHigh,
+    onSurfaceVariant = Ash,
+    surfaceContainer = Charcoal,
+    surfaceContainerHigh = CharcoalHigh,
+    surfaceContainerHighest = CharcoalHigh,
+    error = Crimson,
+    onError = Ivory,
+    outline = Hairline,
+    outlineVariant = Hairline,
+    scrim = ObsidianDeep,
 )
 
-/** StrideUp은 M2E 컨셉에 맞춰 항상 다크 테마를 사용한다. */
+/** StrideUp은 금속 광택이 살아나는 다크 테마만 사용한다. */
 @Composable
 fun StrideUpTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = StrideUpDarkColors,
         typography = StrideUpTypography,
+        shapes = StrideUpShapes,
         content = content,
     )
 }

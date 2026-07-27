@@ -2,25 +2,33 @@ package com.giwa.strideup.ui.screens.walk
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
-import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Stop
-import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,6 +40,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -42,17 +53,25 @@ import com.giwa.strideup.BuildConfig
 import com.giwa.strideup.domain.RewardEconomy
 import com.giwa.strideup.service.WalkSessionService
 import com.giwa.strideup.ui.StepPermissions
-import com.giwa.strideup.ui.components.EnergyBar
-import com.giwa.strideup.ui.components.GlowCircleButton
-import com.giwa.strideup.ui.components.ProgressRing
-import com.giwa.strideup.ui.components.StartWalkButton
-import com.giwa.strideup.ui.components.StrideCard
-import com.giwa.strideup.ui.components.StrideUpWordmark
-import com.giwa.strideup.ui.theme.NeonGreen
-import com.giwa.strideup.ui.theme.NeonRed
-import com.giwa.strideup.ui.theme.Night
-import com.giwa.strideup.ui.theme.Surface2
-import com.giwa.strideup.ui.theme.TextSecondary
+import com.giwa.strideup.ui.components.CircleControl
+import com.giwa.strideup.ui.components.EnergyMeter
+import com.giwa.strideup.ui.components.Eyebrow
+import com.giwa.strideup.ui.components.GhostButton
+import com.giwa.strideup.ui.components.GoldButton
+import com.giwa.strideup.ui.components.HairlineDivider
+import com.giwa.strideup.ui.components.LuxeCard
+import com.giwa.strideup.ui.components.MetalRing
+import com.giwa.strideup.ui.components.MetalText
+import com.giwa.strideup.ui.components.Wordmark
+import com.giwa.strideup.ui.components.breathing
+import com.giwa.strideup.ui.theme.Ash
+import com.giwa.strideup.ui.theme.AshDim
+import com.giwa.strideup.ui.theme.Champagne
+import com.giwa.strideup.ui.theme.Copper
+import com.giwa.strideup.ui.theme.Crimson
+import com.giwa.strideup.ui.theme.Ivory
+import com.giwa.strideup.ui.theme.ObsidianDeep
+import com.giwa.strideup.ui.theme.Platinum
 
 @Composable
 fun WalkScreen(viewModel: WalkViewModel = viewModel(factory = WalkViewModel.Factory)) {
@@ -76,50 +95,49 @@ fun WalkScreen(viewModel: WalkViewModel = viewModel(factory = WalkViewModel.Fact
     val earnableSteps = (energy * RewardEconomy.STEPS_PER_ENERGY).toInt()
     val distanceKm = RewardEconomy.distanceMeters(session.steps) / 1000
     val calories = RewardEconomy.calories(session.steps)
+    val running = session.isActive && !session.isPaused
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(18.dp),
+        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 28.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         item {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 6.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                StrideUpWordmark(fontSize = 24.sp)
-                Text(
-                    when {
-                        !session.isActive -> "READY"
-                        session.isPaused -> "PAUSED"
-                        else -> "ACTIVE"
-                    },
-                    style = MaterialTheme.typography.labelLarge,
-                    color = if (session.isActive && !session.isPaused) NeonGreen else TextSecondary,
-                    letterSpacing = 2.sp,
-                )
+                Wordmark(fontSize = 19.sp)
+                StatusChip(isActive = session.isActive, isPaused = session.isPaused)
             }
         }
 
         item {
-            ProgressRing(
+            MetalRing(
                 progress = if (earnableSteps > 0) session.steps.toFloat() / earnableSteps else 0f,
-                modifier = Modifier.size(260.dp),
-                ringWidth = 18.dp,
+                modifier = Modifier.size(256.dp),
+                ringWidth = 12.dp,
+                glowAlpha = if (running) 0.16f else 0.08f,
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
                     Text(
-                        "%.2f".format(distanceKm),
+                        text = "%.2f".format(distanceKm),
                         fontSize = 64.sp,
-                        fontWeight = FontWeight.Black,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Light,
+                        letterSpacing = (-3).sp,
+                        color = Ivory,
                     )
-                    Text(
-                        "KM",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = NeonGreen,
+                    MetalText(
+                        text = "KILOMETERS",
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Medium,
                         letterSpacing = 4.sp,
                     )
                 }
@@ -127,90 +145,80 @@ fun WalkScreen(viewModel: WalkViewModel = viewModel(factory = WalkViewModel.Fact
         }
 
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
-            ) {
-                MetricTile(
-                    modifier = Modifier.weight(1f),
-                    icon = { Icon(Icons.AutoMirrored.Filled.DirectionsWalk, null, tint = NeonGreen, modifier = Modifier.size(22.dp)) },
-                    value = "%,d".format(session.steps),
-                    label = "STEPS",
-                )
-                MetricTile(
-                    modifier = Modifier.weight(1f),
-                    icon = { Icon(Icons.Filled.LocalFireDepartment, null, tint = NeonGreen, modifier = Modifier.size(22.dp)) },
-                    value = "%.0f".format(calories),
-                    label = "KCAL",
-                )
-            }
-        }
-
-        item {
-            StrideCard {
-                Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Filled.Bolt, null, tint = NeonGreen, modifier = Modifier.size(18.dp))
-                            Spacer(Modifier.size(6.dp))
-                            Text("에너지", style = MaterialTheme.typography.titleSmall)
-                        }
-                        Text(
-                            "예상 +%.2f SUP".format(estimate.points),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = NeonGreen,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
-                    EnergyBar(current = energy, max = RewardEconomy.maxEnergy(sneakerLevel))
-                    Text(
-                        "적립 가능 %,d보 · 걸을수록 SUP가 쌓여요".format(earnableSteps),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+            LuxeCard(contentPadding = PaddingValues(vertical = 20.dp, horizontal = 8.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Metric(
+                        icon = Icons.AutoMirrored.Filled.DirectionsWalk,
+                        tint = Champagne,
+                        value = "%,d".format(session.steps),
+                        label = "걸음",
+                    )
+                    Metric(
+                        icon = Icons.Filled.Schedule,
+                        tint = Platinum,
+                        value = formatDuration(session.elapsedSec),
+                        label = "시간",
+                    )
+                    Metric(
+                        icon = Icons.Filled.LocalFireDepartment,
+                        tint = Copper,
+                        value = "%,.0f".format(calories),
+                        label = "칼로리",
                     )
                 }
             }
         }
 
+        item {
+            LuxeCard(spacing = 13.dp) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Filled.Bolt,
+                            contentDescription = null,
+                            tint = Champagne,
+                            modifier = Modifier.size(15.dp),
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Eyebrow("Energy")
+                    }
+                    MetalText(
+                        text = "+%.2f SUP".format(estimate.points),
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
+                EnergyMeter(current = energy, max = RewardEconomy.maxEnergy(sneakerLevel))
+                Text(
+                    text = "적립 가능 %,d보 · 걸을수록 SUP가 쌓입니다".format(earnableSteps),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = AshDim,
+                )
+            }
+        }
+
         session.lastRewardPoints?.let { points ->
             item {
-                StrideCard {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        Text("세션 완료! 🎉", style = MaterialTheme.typography.titleMedium)
-                        Text(
-                            "+%.2f SUP".format(points),
-                            fontSize = 32.sp,
-                            fontWeight = FontWeight.Black,
-                            color = NeonGreen,
-                        )
-                        Text(
-                            "총 %,d보 중 %,d보 적립 인정".format(
-                                session.lastSessionSteps,
-                                session.lastRewardedSteps,
-                            ),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        TextButton(onClick = { viewModel.clearReward() }) { Text("확인") }
-                    }
-                }
+                SettlementCard(
+                    points = points,
+                    sessionSteps = session.lastSessionSteps,
+                    rewardedSteps = session.lastRewardedSteps,
+                    onConfirm = viewModel::clearReward,
+                )
             }
         }
 
         item {
             if (!session.isActive) {
-                StartWalkButton(
-                    text = "START WALK",
+                GoldButton(
+                    text = "Start Walk",
                     onClick = {
                         val missing = StepPermissions.missing(context)
                         if (missing.isEmpty()) {
@@ -226,45 +234,48 @@ fun WalkScreen(viewModel: WalkViewModel = viewModel(factory = WalkViewModel.Fact
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    // 잠금 토글
-                    GlowCircleButton(
+                    CircleControl(
                         onClick = { locked = !locked },
-                        size = 56.dp,
-                        containerColor = if (locked) NeonGreen else Surface2,
-                        glow = locked,
+                        size = 52.dp,
+                        filled = false,
+                        accent = if (locked) Champagne else Ash,
                     ) {
                         Icon(
-                            if (locked) Icons.Filled.Lock else Icons.Filled.LockOpen,
+                            imageVector = if (locked) Icons.Filled.Lock else Icons.Filled.LockOpen,
                             contentDescription = "화면 잠금",
-                            tint = if (locked) Night else TextSecondary,
+                            tint = if (locked) Champagne else Ash,
+                            modifier = Modifier.size(20.dp),
                         )
                     }
-                    // 일시정지 / 재개 (메인)
-                    GlowCircleButton(
+                    CircleControl(
                         onClick = {
                             if (session.isPaused) WalkSessionService.resume(context)
                             else WalkSessionService.pause(context)
                         },
-                        size = 84.dp,
-                        containerColor = NeonGreen,
+                        size = 82.dp,
+                        halo = running,
                         enabled = !locked,
                     ) {
                         Icon(
-                            if (session.isPaused) Icons.Filled.PlayArrow else Icons.Filled.Pause,
+                            imageVector = if (session.isPaused) Icons.Filled.PlayArrow else Icons.Filled.Pause,
                             contentDescription = if (session.isPaused) "재개" else "일시정지",
-                            tint = Night,
-                            modifier = Modifier.size(36.dp),
+                            tint = ObsidianDeep,
+                            modifier = Modifier.size(32.dp),
                         )
                     }
-                    // 종료
-                    GlowCircleButton(
+                    CircleControl(
                         onClick = { WalkSessionService.stop(context) },
-                        size = 56.dp,
-                        containerColor = NeonRed,
-                        glow = false,
+                        size = 52.dp,
+                        filled = false,
+                        accent = Crimson,
                         enabled = !locked,
                     ) {
-                        Icon(Icons.Filled.Stop, contentDescription = "종료", tint = MaterialTheme.colorScheme.onError)
+                        Icon(
+                            Icons.Filled.Stop,
+                            contentDescription = "종료",
+                            tint = Crimson,
+                            modifier = Modifier.size(20.dp),
+                        )
                     }
                 }
             }
@@ -273,9 +284,9 @@ fun WalkScreen(viewModel: WalkViewModel = viewModel(factory = WalkViewModel.Fact
         if (session.isActive && locked) {
             item {
                 Text(
-                    "🔒 화면이 잠겼어요 · 자물쇠를 눌러 해제",
+                    text = "화면이 잠겼습니다 · 자물쇠를 눌러 해제",
                     style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondary,
+                    color = AshDim,
                 )
             }
         }
@@ -284,8 +295,9 @@ fun WalkScreen(viewModel: WalkViewModel = viewModel(factory = WalkViewModel.Fact
             item {
                 TextButton(onClick = { viewModel.simulateSteps(100) }) {
                     Text(
-                        "+100 걸음 시뮬레이션 (디버그)",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        text = "+100 걸음 시뮬레이션 (디버그)",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = AshDim,
                     )
                 }
             }
@@ -293,34 +305,113 @@ fun WalkScreen(viewModel: WalkViewModel = viewModel(factory = WalkViewModel.Fact
     }
 }
 
+/** READY / ACTIVE / PAUSED — 활성 시 금빛 점이 천천히 호흡한다. */
 @Composable
-private fun MetricTile(
-    modifier: Modifier = Modifier,
-    icon: @Composable () -> Unit,
+private fun StatusChip(isActive: Boolean, isPaused: Boolean) {
+    val running = isActive && !isPaused
+    val pulse = breathing()
+    val label = when {
+        !isActive -> "READY"
+        isPaused -> "PAUSED"
+        else -> "ACTIVE"
+    }
+    val accent = if (running) Champagne else AshDim
+    Row(
+        modifier = Modifier
+            .background(accent.copy(alpha = 0.07f), RoundedCornerShape(50))
+            .border(1.dp, accent.copy(alpha = 0.26f), RoundedCornerShape(50))
+            .padding(horizontal = 12.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(5.dp)
+                .alpha(if (running) 0.45f + pulse * 0.55f else 0.6f)
+                .background(accent, CircleShape),
+        )
+        Spacer(Modifier.width(7.dp))
+        Text(
+            text = label,
+            color = accent,
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = 2.sp,
+        )
+    }
+}
+
+@Composable
+private fun RowScope.Metric(
+    icon: ImageVector,
+    tint: Color,
     value: String,
     label: String,
 ) {
-    StrideCard(modifier = modifier) {
+    Column(
+        modifier = Modifier.weight(1f),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(18.dp))
+        Text(
+            text = value,
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Light,
+            letterSpacing = (-0.5).sp,
+            color = Ivory,
+        )
+        Eyebrow(label, color = AshDim)
+    }
+}
+
+/** 세션 정산 — 금장 인증서처럼 마감한다. */
+@Composable
+private fun SettlementCard(
+    points: Double,
+    sessionSteps: Int,
+    rewardedSteps: Int,
+    onConfirm: () -> Unit,
+) {
+    LuxeCard(accent = true, contentPadding = PaddingValues(24.dp), spacing = 12.dp) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 18.dp),
+            modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            icon()
+            Eyebrow("Session complete", color = Champagne)
+            Row(verticalAlignment = Alignment.Bottom) {
+                MetalText(
+                    text = "+%.2f".format(points),
+                    fontSize = 42.sp,
+                    fontWeight = FontWeight.Light,
+                    letterSpacing = (-1.5).sp,
+                )
+                Spacer(Modifier.width(7.dp))
+                Text(
+                    text = "SUP",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Champagne.copy(alpha = 0.8f),
+                    modifier = Modifier.padding(bottom = 8.dp),
+                )
+            }
+            HairlineDivider()
             Text(
-                value,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Black,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            Text(
-                label,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                letterSpacing = 2.sp,
+                text = "총 %,d보 중 %,d보 적립 인정".format(sessionSteps, rewardedSteps),
+                style = MaterialTheme.typography.bodySmall,
+                color = Ash,
             )
         }
+        GhostButton(text = "확인", onClick = onConfirm)
+    }
+}
+
+private fun formatDuration(totalSec: Long): String {
+    val hours = totalSec / 3600
+    val minutes = (totalSec % 3600) / 60
+    val seconds = totalSec % 60
+    return if (hours > 0) {
+        "%d:%02d:%02d".format(hours, minutes, seconds)
+    } else {
+        "%02d:%02d".format(minutes, seconds)
     }
 }

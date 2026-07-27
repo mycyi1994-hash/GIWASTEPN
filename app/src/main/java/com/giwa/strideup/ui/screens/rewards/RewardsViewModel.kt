@@ -19,6 +19,10 @@ class RewardsViewModel(rewardRepository: RewardRepository) : ViewModel() {
     val ledger: StateFlow<List<RewardEntity>> = rewardRepository.ledger()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    /** 멤버십 카드의 등급 표기에 사용한다. */
+    val sneakerLevel: StateFlow<Int> = rewardRepository.sneakerLevel
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 1)
+
     companion object {
         val Factory = viewModelFactory {
             initializer {
