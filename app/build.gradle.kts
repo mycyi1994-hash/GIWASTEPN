@@ -13,11 +13,31 @@ android {
         applicationId = "com.giwa.strideup"
         minSdk = 26
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.2.0"
+        versionCode = 4
+        versionName = "1.2.1"
+    }
+
+    signingConfigs {
+        // CI 러너는 매번 새로 생성되므로 AGP가 자동 생성하는 debug 키스토어는
+        // 빌드마다 서명이 달라진다. 그러면 이전에 설치한 앱 위에 덮어쓸 때
+        // INSTALL_FAILED_UPDATE_INCOMPATIBLE로 설치가 거부된다.
+        // 저장소에 고정 키스토어를 두어 모든 빌드가 같은 서명을 갖게 한다.
+        // (표준 Android debug 키와 동일한 성격의 공개 키 — 배포용 서명이 아니다.)
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+            // 사이드로딩 호환성을 위해 v1(JAR) 서명도 함께 넣는다.
+            enableV1Signing = true
+            enableV2Signing = true
+        }
     }
 
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(

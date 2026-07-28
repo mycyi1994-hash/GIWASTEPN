@@ -84,6 +84,20 @@ app/src/main/java/com/giwa/strideup/
 - **Actions 아티팩트**: 워크플로 실행 페이지의 `StrideUp-debug-apk`
 - **`apk-dist` 브랜치**: 최신 `StrideUp-debug.apk` 파일이 커밋됨
 
+### 고정 debug 키스토어 (`app/debug.keystore`)
+
+CI 러너는 실행마다 새로 생성되므로, AGP가 자동 생성하는 debug 키스토어에
+맡기면 **빌드마다 APK 서명이 달라집니다.** 그러면 기기에 이미 설치된 앱 위에
+새 APK를 덮어쓸 때 `INSTALL_FAILED_UPDATE_INCOMPATIBLE`이 발생해
+"앱이 설치되지 않았습니다"로 실패합니다.
+
+이를 막기 위해 고정 키스토어를 저장소에 포함하고 `signingConfigs.debug`에
+연결했습니다. 표준 Android debug 키와 동일한 성격의 공개 키이며
+(비밀번호 `android`), **배포용 서명 키가 아닙니다.** Play 스토어 출시에는
+별도의 release 키스토어를 CI 시크릿으로 주입해야 합니다.
+
+CI는 매 빌드마다 APK 서명 지문이 이 키스토어와 일치하는지 검증합니다.
+
 ### 에뮬레이터에서 체험하기
 
 에뮬레이터에는 걸음 센서가 없는 경우가 많습니다. 디버그 빌드의 **러닝 화면 →

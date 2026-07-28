@@ -34,6 +34,23 @@ jobs:
       - name: Build debug APK
         run: ./gradlew :app:assembleDebug --stacktrace
 
+      # 고정 키스토어로 서명됐는지 확인한다. 지문이 빌드마다 달라지면
+      # 기기에 이미 설치된 앱을 덮어쓸 수 없다(INSTALL_FAILED_UPDATE_INCOMPATIBLE).
+      - name: Verify APK signature is stable
+        run: |
+          set -euo pipefail
+          EXPECTED=$(keytool -list -v -keystore app/debug.keystore -storepass android \
+            | grep 'SHA256:' | head -1 | tr -d ' ')
+          ACTUAL=$(keytool -printcert -jarfile app/build/outputs/apk/debug/app-debug.apk \
+            | grep 'SHA256:' | head -1 | tr -d ' ')
+          echo "keystore : $EXPECTED"
+          echo "apk      : $ACTUAL"
+          if [ "$EXPECTED" != "$ACTUAL" ]; then
+            echo "::error::APK가 고정 debug 키스토어로 서명되지 않았습니다."
+            exit 1
+          fi
+          echo "✓ 서명 일치 — 이전 빌드 위에 업데이트 설치 가능"
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
