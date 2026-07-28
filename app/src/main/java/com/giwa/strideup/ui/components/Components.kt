@@ -443,8 +443,10 @@ fun BarMeter(
     fraction: Float,
     modifier: Modifier = Modifier,
     height: Dp = 8.dp,
+    color: Color? = null,
 ) {
     val filled = animatedFloat(fraction.coerceIn(0f, 1f))
+    val fill = color?.let { Brush.horizontalGradient(listOf(it.copy(alpha = 0.65f), it)) } ?: VoltPlate
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -458,7 +460,7 @@ fun BarMeter(
                     .fillMaxWidth(filled)
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(50))
-                    .background(VoltPlate),
+                    .background(fill),
             )
         }
     }

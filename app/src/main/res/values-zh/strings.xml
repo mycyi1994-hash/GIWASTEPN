@@ -151,9 +151,8 @@
     <string name="sneaker_energy_saving">能量节省</string>
     <string name="sneaker_durability">耐久度</string>
     <string name="sneaker_about">关于这枚 NFT</string>
-    <string name="sneaker_about_body">每一双球鞋在铸造时都会随机生成型号、配色和属性。稀有度决定属性上限——传说级能开出最强的数值，也能升到最高等级。</string>
+    <string name="sneaker_about_body" formatted="false">每双鞋都属于四大属性之一，并有对应稀有度。增幅刻意做得很小 —— 每档约 +1% —— 收集的乐趣在于外观和图鉴，而不是数值。</string>
     <string name="rarity_common">普通</string>
-    <string name="rarity_uncommon">精良</string>
     <string name="rarity_rare">稀有</string>
     <string name="rarity_epic">史诗</string>
     <string name="rarity_legendary">传说</string>
@@ -356,4 +355,115 @@
     <string name="cd_notifications">通知</string>
     <string name="cd_wallet">钱包</string>
     <string name="cd_back">返回</string>
+
+    <!-- Sneaker factions -->
+    <string name="faction_fire">火</string>
+    <string name="faction_water">水</string>
+    <string name="faction_lightning">雷</string>
+    <string name="faction_wind">风</string>
+    <string name="stat_boost">增幅</string>
+
+    <!-- Community segments -->
+    <string name="community_seg_board">论坛</string>
+    <string name="community_seg_crew">跑团</string>
+    <string name="community_flash_nearby">附近的闪电跑</string>
+    <string name="community_board_empty">还没有帖子，来发第一条吧。</string>
+    <string name="community_my_crews">我的跑团</string>
+    <string name="community_no_crew_yet">你还没有加入跑团。在下面加入一个，或者自己创建。</string>
+    <string name="community_ranking">排行榜</string>
+
+    <!-- Post categories -->
+    <string name="post_cat_all">全部</string>
+    <string name="post_cat_flash">闪电跑</string>
+    <string name="post_cat_free">自由讨论</string>
+    <string name="post_cat_tip">干货</string>
+
+    <!-- Post card -->
+    <string name="post_km_away">%1$s km</string>
+    <string name="post_place_tbd">地点待定</string>
+    <string name="post_slots">%1$d / %2$d 人</string>
+    <string name="post_join">参加</string>
+    <string name="post_joined">已参加</string>
+    <string name="post_closed">已截止</string>
+    <string name="post_started">已开始</string>
+    <string name="post_starts_in_hours">%1$d小时%2$d分后</string>
+    <string name="post_starts_in_minutes">%1$d分钟后</string>
+    <string name="post_delete">删除</string>
+
+    <!-- Compose -->
+    <string name="post_write">发帖</string>
+    <string name="post_submit">发布</string>
+    <string name="post_field_title">标题</string>
+    <string name="post_field_title_hint">想聊点什么？</string>
+    <string name="post_field_body">正文</string>
+    <string name="post_field_body_hint">补充一些细节…</string>
+    <string name="post_flash_details">集合信息</string>
+    <string name="post_field_place">集合地点</string>
+    <string name="post_field_place_hint">Riverside Park Gate 3</string>
+    <string name="post_field_distance">距离 (km)</string>
+    <string name="post_field_starts_in">多久后出发 (分)</string>
+    <string name="post_field_capacity">名额</string>
+    <string name="post_flash_hint">闪电跑按距离排序，越近排得越靠前。</string>
+
+
+    <!-- Crew creation -->
+    <string name="crew_create_title">创建跑团</string>
+    <string name="crew_create_sub">把附近的跑者聚起来一起跑</string>
+    <string name="crew_create_submit">创建</string>
+    <string name="crew_create_preview_name">跑团名称</string>
+    <string name="crew_create_preview_tag">一句话介绍你的跑团</string>
+    <string name="crew_create_preview_hint">创建后你就是团长。成员可以立刻发帖并参加组队跑。</string>
+    <string name="crew_field_name">跑团名称</string>
+    <string name="crew_field_name_hint">Sunrise Striders</string>
+    <string name="crew_field_tagline">简介</string>
+    <string name="crew_field_tagline_hint">每天早上轻松 5 公里</string>
+    <string name="crew_field_area">活动区域</string>
+    <string name="crew_field_area_hint">Riverside</string>
+    <string name="crew_owner_badge">团长</string>
+    <string name="crew_area_here">附近</string>
+    <string name="crew_board">论坛</string>
+    <string name="crew_board_empty">跑团里还没有帖子，来聊两句吧。</string>
+
+    <!-- Ranking -->
+    <string name="rank_me">我</string>
+    <string name="rank_board_steps">本周步数</string>
+    <string name="rank_board_sup">SUP 余额</string>
+    <string name="rank_my_position">我的排名</string>
+    <string name="rank_total_runners">本周共 %1$d 位跑者</string>
+    <string name="rank_steps_value">%1$s 步</string>
+    <string name="ranking_teaser">本周第 %1$d 名 · %2$s 步</string>
+
+    <!-- Seed crews -->
+    <string name="seed_crew_trailblazer_tagline">每个周末的越野路线</string>
+    <string name="seed_crew_night_tagline">夜幕后的城市环线</string>
+    <string name="seed_crew_summit_tagline">爬坡、间歇，没有借口</string>
+    <string name="seed_crew_striders_tagline">新手友好，走走也没关系</string>
+
+    <!-- Seed posts -->
+    <string name="seed_flash1_title">夜跑滨江 5 公里，有人来吗？</string>
+    <string name="seed_flash1_body">轻松配速 6 分钟，第一次来的也欢迎。</string>
+    <string name="seed_flash2_title">上班前的晨跑</string>
+    <string name="seed_flash2_body">6:30 出发，正好跑 40 分钟就散。</string>
+    <string name="seed_flash3_title">找个间歇跑搭子</string>
+    <string name="seed_flash3_body">400 米 × 8 组。能陪我保持配速就更好了。</string>
+    <string name="seed_flash4_title">周末长距离 20 公里</string>
+    <string name="seed_flash4_body">慢慢跑，中途会停两次补给。</string>
+    <string name="seed_free1_title">终于跑完半马了</string>
+    <string name="seed_free1_body">半年前跑 3 公里都费劲，今天 1 小时 58 分完赛。坚持真的有用。</string>
+    <string name="seed_free2_title">下雨天大家都怎么跑？</string>
+    <string name="seed_free2_body">跑步机太无聊了，有没有能坚持下来的室内练法？</string>
+    <string name="seed_free3_title">刚刚突破 1000 SUP</string>
+    <string name="seed_free3_body">只是走路通勤而已，攒得比想象中快。</string>
+    <string name="seed_tip1_title">能量小技巧 —— 别在早上一次用光</string>
+    <string name="seed_tip1_body">能量在午夜刷新，所以晚上有跑步计划的日子，早上只用一半，总收益更高。</string>
+    <string name="seed_tip2_title">铸造前换上幸运值最高的鞋</string>
+    <string name="seed_tip2_body">装备中球鞋的幸运值会直接影响高稀有度的概率。铸造前换一双就行。</string>
+    <string name="seed_tip3_title">组队跑四个人起才划算</string>
+    <string name="seed_tip3_body">增幅按人数叠加，比一个人跑明显划算。要所有人在大厅点准备才会开始。</string>
+    <string name="seed_crew1_title">定一下本周的跑团目标</string>
+    <string name="seed_crew1_body">上周平均 32 公里，这周冲 35 怎么样？</string>
+    <string name="seed_crew2_title">更新了我们的路线图</string>
+    <string name="seed_crew2_body">因为桥梁施工，第 3 段加了绕行路线。下次聚跑前看一下。</string>
+    <string name="seed_crew3_title">今晚跑团例跑</string>
+    <string name="seed_crew3_body">8 点整出发，迟到很难追上！</string>
 </resources>

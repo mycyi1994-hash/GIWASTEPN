@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.giwa.strideup.R
+import com.giwa.strideup.domain.Faction
 import com.giwa.strideup.domain.Rarity
 import com.giwa.strideup.domain.Sneaker
 import com.giwa.strideup.ui.theme.CarbonHigh
@@ -36,10 +37,9 @@ import com.giwa.strideup.ui.theme.Slate
 import com.giwa.strideup.ui.theme.Snow
 import com.giwa.strideup.ui.theme.Volt
 
-/** 희귀도 표시 색 — 컬러웨이와 무관하게 등급을 한눈에 읽히게 한다. */
+/** 희귀도 표시 색 — 속성색과 무관하게 등급을 한눈에 읽히게 한다. */
 fun Rarity.tint(): Color = when (this) {
     Rarity.COMMON -> Color(0xFF9CA3AB)
-    Rarity.UNCOMMON -> Color(0xFF6FD08C)
     Rarity.RARE -> Color(0xFF4FB3FF)
     Rarity.EPIC -> Color(0xFFB47BFF)
     Rarity.LEGENDARY -> Color(0xFFFFC24F)
@@ -49,12 +49,45 @@ fun Rarity.tint(): Color = when (this) {
 fun Rarity.label(): String = stringResource(
     when (this) {
         Rarity.COMMON -> R.string.rarity_common
-        Rarity.UNCOMMON -> R.string.rarity_uncommon
         Rarity.RARE -> R.string.rarity_rare
         Rarity.EPIC -> R.string.rarity_epic
         Rarity.LEGENDARY -> R.string.rarity_legendary
     }
 )
+
+/** 속성 표시색 — 도메인이 들고 있는 네온색을 그대로 쓴다. */
+fun Faction.tint(): Color = Color(accent)
+
+@Composable
+fun Faction.label(): String = stringResource(
+    when (this) {
+        Faction.FIRE -> R.string.faction_fire
+        Faction.WATER -> R.string.faction_water
+        Faction.LIGHTNING -> R.string.faction_lightning
+        Faction.WIND -> R.string.faction_wind
+    }
+)
+
+/** 속성 pill 배지 */
+@Composable
+fun FactionChip(faction: Faction, modifier: Modifier = Modifier, small: Boolean = false) {
+    val c = faction.tint()
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(50))
+            .background(c.copy(alpha = 0.14f))
+            .border(1.dp, c.copy(alpha = 0.5f), RoundedCornerShape(50))
+            .padding(horizontal = if (small) 7.dp else 10.dp, vertical = if (small) 2.dp else 4.dp),
+    ) {
+        Text(
+            text = faction.label(),
+            color = c,
+            fontSize = if (small) 8.5.sp else 10.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 1.sp,
+        )
+    }
+}
 
 /** 희귀도 pill 배지 */
 @Composable
@@ -134,16 +167,27 @@ fun SneakerCollectionCard(
         )
 
         Text(
-            text = sneaker.model.displayName,
+            text = sneaker.variantName,
             style = MaterialTheme.typography.titleSmall,
             color = Snow,
             fontSize = 13.sp,
         )
-        Text(
-            text = sneaker.colorway.displayName,
-            fontSize = 11.sp,
-            color = Silver,
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = sneaker.faction.label(),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                color = sneaker.faction.tint(),
+            )
+            Text(
+                text = "+%.1f%%".format(sneaker.boostPercent),
+                fontSize = 11.sp,
+                color = Silver,
+            )
+        }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -251,17 +295,13 @@ fun EquippedSneakerCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
                 Text(
-                    text = sneaker.model.displayName,
+                    text = "${sneaker.faction.label()} ${sneaker.variantName}",
                     style = MaterialTheme.typography.titleMedium,
                     color = Snow,
                 )
-                Text(
-                    text = sneaker.colorway.displayName,
-                    fontSize = 12.sp,
-                    color = Silver,
-                )
+                FactionChip(sneaker.faction, small = true)
             }
             Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 RarityChip(sneaker.rarity)
@@ -285,8 +325,8 @@ fun EquippedSneakerCard(
             horizontalArrangement = Arrangement.spacedBy(9.dp),
         ) {
             SneakerMiniStat(
-                label = stringResource(R.string.stat_efficiency),
-                value = "×%.2f".format(sneaker.earningMultiplier),
+                label = stringResource(R.string.stat_boost),
+                value = "+%.1f%%".format(sneaker.boostPercent),
                 modifier = Modifier.weight(1f),
             )
             SneakerMiniStat(

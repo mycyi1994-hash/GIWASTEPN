@@ -10,35 +10,28 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bolt
-import androidx.compose.material.icons.filled.ChatBubbleOutline
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.NightsStay
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -55,57 +48,56 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.giwa.strideup.R
 import com.giwa.strideup.data.repo.Crew
-import com.giwa.strideup.domain.RewardEconomy
+import com.giwa.strideup.domain.Leaderboard
+import com.giwa.strideup.domain.Post
+import com.giwa.strideup.domain.PostCategory
+import com.giwa.strideup.domain.RankBoard
 import com.giwa.strideup.ui.components.AvatarStack
 import com.giwa.strideup.ui.components.DarkIconButton
 import com.giwa.strideup.ui.components.GhostButton
 import com.giwa.strideup.ui.components.GlowCard
 import com.giwa.strideup.ui.components.HexBadge
 import com.giwa.strideup.ui.components.PillChip
-import com.giwa.strideup.ui.components.RouteMap
 import com.giwa.strideup.ui.components.SectionHeader
 import com.giwa.strideup.ui.components.VoltButton
 import com.giwa.strideup.ui.components.quietClickable
-import com.giwa.strideup.ui.theme.Alert
 import com.giwa.strideup.ui.theme.CarbonHigh
 import com.giwa.strideup.ui.theme.Edge
+import com.giwa.strideup.ui.theme.Night
 import com.giwa.strideup.ui.theme.Silver
 import com.giwa.strideup.ui.theme.Slate
 import com.giwa.strideup.ui.theme.Snow
 import com.giwa.strideup.ui.theme.Volt
 
+/**
+ * 커뮤니티 — 두 개의 세그먼트로 나뉜다.
+ *
+ * **게시판**: 앱 사용자 전체가 쓰는 열린 공간. 번개러닝(가까운 순) · 자유 · 꿀팁.
+ * **크루**: 내가 속한 소규모 커뮤니티. 모임 만들기와 크루 전용 게시판.
+ */
 @Composable
 fun CommunityScreen(
     onOpenLobby: (String) -> Unit = {},
     onOpenNotifications: () -> Unit = {},
+    onOpenRanking: () -> Unit = {},
+    onOpenCrew: (String) -> Unit = {},
+    onCreateCrew: () -> Unit = {},
+    onWritePost: (String) -> Unit = {},
     viewModel: CommunityViewModel = viewModel(factory = CommunityViewModel.Factory),
 ) {
-    val joined by viewModel.joinedCrewIds.collectAsStateWithLifecycle()
-    var query by rememberSaveable { mutableStateOf("") }
-    var selectedChip by rememberSaveable { mutableIntStateOf(0) }
-
-    val chipLabels = listOf(
-        stringResource(R.string.chip_discover),
-        stringResource(R.string.chip_crews),
-        stringResource(R.string.chip_following),
+    val tab by viewModel.tab.collectAsStateWithLifecycle()
+    val segments = listOf(
+        stringResource(R.string.community_seg_board),
+        stringResource(R.string.community_seg_crew),
     )
 
-    val filtered = viewModel.crews.filter { it.name.contains(query, ignoreCase = true) }
-    val visibleCrews = when (selectedChip) {
-        2 -> filtered.filter { joined.contains(it.id) }
-        else -> filtered
-    }
-
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 10.dp, bottom = 22.dp),
-        verticalArrangement = Arrangement.spacedBy(15.dp),
-    ) {
-        item {
+    Column(Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier.padding(start = 18.dp, end = 18.dp, top = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(13.dp),
+        ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -119,7 +111,7 @@ fun CommunityScreen(
                         color = Snow,
                     )
                     Text(
-                        text = " / PARTY",
+                        text = " / GIWA",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Black,
                         fontStyle = FontStyle.Italic,
@@ -134,46 +126,312 @@ fun CommunityScreen(
                     badge = true,
                 )
             }
+
+            SegmentedTabs(
+                labels = segments,
+                selected = if (tab == CommunityTab.BOARD) 0 else 1,
+                onSelect = {
+                    viewModel.selectTab(if (it == 0) CommunityTab.BOARD else CommunityTab.CREW)
+                },
+            )
         }
 
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                SearchField(query, { query = it }, Modifier.weight(1f))
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(CarbonHigh)
-                        .border(1.dp, Edge, RoundedCornerShape(16.dp))
-                        .quietClickable { query = "" }
-                        .padding(13.dp),
-                ) {
-                    Icon(Icons.Filled.Tune, contentDescription = null, tint = Snow, modifier = Modifier.size(17.dp))
+        when (tab) {
+            CommunityTab.BOARD -> BoardTab(
+                viewModel = viewModel,
+                onOpenRanking = onOpenRanking,
+                onWritePost = { onWritePost("") },
+            )
+
+            CommunityTab.CREW -> CrewTab(
+                viewModel = viewModel,
+                onOpenLobby = onOpenLobby,
+                onOpenCrew = onOpenCrew,
+                onCreateCrew = onCreateCrew,
+            )
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// 게시판 탭
+// ─────────────────────────────────────────────────────────────
+
+@Composable
+private fun BoardTab(
+    viewModel: CommunityViewModel,
+    onOpenRanking: () -> Unit,
+    onWritePost: () -> Unit,
+) {
+    val posts by viewModel.boardPosts.collectAsStateWithLifecycle()
+    val filter by viewModel.categoryFilter.collectAsStateWithLifecycle()
+    val weeklySteps by viewModel.weeklySteps.collectAsStateWithLifecycle()
+    val balance by viewModel.balance.collectAsStateWithLifecycle()
+    var query by rememberSaveable { mutableStateOf("") }
+
+    val meLabel = stringResource(R.string.rank_me)
+    val myRank = remember(weeklySteps, balance, meLabel) {
+        Leaderboard.build(RankBoard.WEEKLY_STEPS, meLabel, weeklySteps, balance)
+            .first { it.isMe }
+            .rank
+    }
+
+    val visible = remember(posts, filter, query) { filterPosts(posts, filter, query) }
+
+    Box(Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 92.dp),
+            verticalArrangement = Arrangement.spacedBy(13.dp),
+        ) {
+            item {
+                RankingTeaser(
+                    rank = myRank,
+                    weeklySteps = weeklySteps,
+                    onClick = onOpenRanking,
+                )
+            }
+
+            item {
+                SearchField(query, { query = it })
+            }
+
+            item {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    item {
+                        PillChip(
+                            text = stringResource(R.string.post_cat_all),
+                            selected = filter == null,
+                            onClick = { viewModel.selectCategory(null) },
+                        )
+                    }
+                    items(PostCategory.entries.size) { index ->
+                        val category = PostCategory.entries[index]
+                        PillChip(
+                            text = category.label(),
+                            selected = filter == category,
+                            onClick = { viewModel.selectCategory(category) },
+                        )
+                    }
                 }
             }
-        }
 
-        item {
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(chipLabels.size) { index ->
-                    PillChip(
-                        text = chipLabels[index],
-                        selected = selectedChip == index,
-                        onClick = { selectedChip = index },
-                        badge = if (index == 2) joined.size else 0,
+            if (filter == null || filter == PostCategory.FLASH) {
+                item {
+                    SectionHeader(title = stringResource(R.string.community_flash_nearby))
+                }
+            }
+
+            if (visible.isEmpty()) {
+                item {
+                    GlowCard(contentPadding = PaddingValues(26.dp)) {
+                        Text(
+                            text = if (query.isBlank()) {
+                                stringResource(R.string.community_board_empty)
+                            } else {
+                                stringResource(R.string.community_no_results, query)
+                            },
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Silver,
+                        )
+                    }
+                }
+            }
+
+            items(visible, key = { it.id }) { post ->
+                if (post.isFlash) {
+                    FlashRunCard(
+                        post = post,
+                        onJoin = { viewModel.toggleJoinFlash(post.id) },
+                        onLike = { viewModel.toggleLike(post.id) },
+                        onDelete = { viewModel.deletePost(post.id) },
+                    )
+                } else {
+                    TextPostCard(
+                        post = post,
+                        onLike = { viewModel.toggleLike(post.id) },
+                        onDelete = { viewModel.deletePost(post.id) },
                     )
                 }
             }
         }
 
+        WriteFab(
+            onClick = onWritePost,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = 18.dp, bottom = 20.dp),
+        )
+    }
+}
+
+/**
+ * 번개러닝은 가까운 순, 나머지는 최신 순.
+ * 필터가 없으면 번개러닝을 위로 올려 "지금 뛸 사람"이 먼저 보이게 한다.
+ */
+private fun filterPosts(
+    posts: List<Post>,
+    filter: PostCategory?,
+    query: String,
+): List<Post> {
+    val matched = posts.filter { post ->
+        (filter == null || post.category == filter) &&
+            (
+                query.isBlank() ||
+                    post.title.contains(query, ignoreCase = true) ||
+                    post.body.contains(query, ignoreCase = true) ||
+                    post.author.contains(query, ignoreCase = true)
+                )
+    }
+    val (flash, rest) = matched.partition { it.isFlash }
+    val sortedFlash = flash.sortedWith(compareBy({ it.isClosed }, { it.distanceKm }))
+    val sortedRest = rest.sortedByDescending { it.createdAt }
+    return when (filter) {
+        PostCategory.FLASH -> sortedFlash
+        null -> sortedFlash + sortedRest
+        else -> sortedRest
+    }
+}
+
+@Composable
+private fun RankingTeaser(rank: Int, weeklySteps: Long, onClick: () -> Unit) {
+    GlowCard(
+        modifier = Modifier.quietClickable(onClick),
+        accent = true,
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
+        spacing = 0.dp,
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(13.dp),
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(42.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(Volt.copy(alpha = 0.13f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    Icons.Filled.EmojiEvents,
+                    contentDescription = null,
+                    tint = Volt,
+                    modifier = Modifier.size(21.dp),
+                )
+            }
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                Text(
+                    text = stringResource(R.string.community_ranking),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = Snow,
+                )
+                Text(
+                    text = stringResource(
+                        R.string.ranking_teaser,
+                        rank,
+                        "%,d".format(weeklySteps),
+                    ),
+                    fontSize = 11.sp,
+                    color = Silver,
+                )
+            }
+            Icon(
+                Icons.Filled.ChevronRight,
+                contentDescription = null,
+                tint = Slate,
+                modifier = Modifier.size(18.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun WriteFab(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(50))
+            .background(Volt)
+            .quietClickable(onClick)
+            .padding(horizontal = 18.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Icon(
+            Icons.Filled.Add,
+            contentDescription = null,
+            tint = Night,
+            modifier = Modifier.size(17.dp),
+        )
+        Text(
+            text = stringResource(R.string.post_write),
+            color = Night,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Black,
+        )
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// 크루 탭
+// ─────────────────────────────────────────────────────────────
+
+@Composable
+private fun CrewTab(
+    viewModel: CommunityViewModel,
+    onOpenLobby: (String) -> Unit,
+    onOpenCrew: (String) -> Unit,
+    onCreateCrew: () -> Unit,
+) {
+    val crews by viewModel.crews.collectAsStateWithLifecycle()
+    val joined by viewModel.joinedCrewIds.collectAsStateWithLifecycle()
+    var query by rememberSaveable { mutableStateOf("") }
+
+    val filtered = crews.filter { it.name.contains(query, ignoreCase = true) }
+    val myCrews = filtered.filter { joined.contains(it.id) }
+    val others = filtered.filterNot { joined.contains(it.id) }.sortedBy { it.kmAway }
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(13.dp),
+    ) {
+        item { CreateCrewCard(onClick = onCreateCrew) }
+
+        item { SearchField(query, { query = it }) }
+
         item {
-            SectionHeader(title = stringResource(R.string.community_nearby))
+            SectionHeader(
+                title = stringResource(R.string.community_my_crews),
+                actionText = "${myCrews.size}",
+            )
         }
 
-        if (visibleCrews.isEmpty()) {
+        if (myCrews.isEmpty()) {
+            item {
+                GlowCard(contentPadding = PaddingValues(24.dp)) {
+                    Text(
+                        text = stringResource(R.string.community_no_crew_yet),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Silver,
+                    )
+                }
+            }
+        }
+
+        items(myCrews, key = { "my_${it.id}" }) { crew ->
+            CrewCard(
+                crew = crew,
+                joined = true,
+                onToggleJoin = { viewModel.toggleJoin(crew.id) },
+                onOpenLobby = { onOpenLobby(crew.id) },
+                onOpenBoard = { onOpenCrew(crew.id) },
+            )
+        }
+
+        item { SectionHeader(title = stringResource(R.string.community_nearby)) }
+
+        if (others.isEmpty()) {
             item {
                 GlowCard(contentPadding = PaddingValues(24.dp)) {
                     Text(
@@ -187,52 +445,64 @@ fun CommunityScreen(
                     )
                 }
             }
-        } else {
-            items(visibleCrews, key = { it.id }) { crew ->
-                CrewCard(
-                    crew = crew,
-                    joined = joined.contains(crew.id),
-                    onToggleJoin = { viewModel.toggleJoin(crew.id) },
-                    onOpenLobby = { onOpenLobby(crew.id) },
-                )
-            }
         }
 
-        item { PartyRunCard(joined = joined.isNotEmpty(), onOpenLobby = onOpenLobby) }
-
-        item { PopularPostCard() }
-
-        item { ActivityFeed() }
+        items(others, key = { "near_${it.id}" }) { crew ->
+            CrewCard(
+                crew = crew,
+                joined = false,
+                onToggleJoin = { viewModel.toggleJoin(crew.id) },
+                onOpenLobby = { onOpenLobby(crew.id) },
+                onOpenBoard = { onOpenCrew(crew.id) },
+            )
+        }
     }
 }
 
+/** 당근 그룹처럼 "모임 만들기"를 크루 탭 맨 위에 둔다. */
 @Composable
-private fun SearchField(query: String, onQueryChange: (String) -> Unit, modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(CarbonHigh)
-            .border(1.dp, Edge, RoundedCornerShape(16.dp))
-            .padding(horizontal = 13.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+private fun CreateCrewCard(onClick: () -> Unit) {
+    GlowCard(
+        modifier = Modifier.quietClickable(onClick),
+        contentPadding = PaddingValues(16.dp),
+        spacing = 0.dp,
     ) {
-        Icon(Icons.Filled.Search, contentDescription = null, tint = Slate, modifier = Modifier.size(17.dp))
-        Box(Modifier.weight(1f)) {
-            if (query.isEmpty()) {
-                Text(
-                    text = stringResource(R.string.community_search_hint),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Slate,
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(13.dp),
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(42.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(Volt.copy(alpha = 0.13f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    Icons.Filled.Groups,
+                    contentDescription = null,
+                    tint = Volt,
+                    modifier = Modifier.size(21.dp),
                 )
             }
-            BasicTextField(
-                value = query,
-                onValueChange = onQueryChange,
-                singleLine = true,
-                textStyle = TextStyle(color = Snow, fontSize = 13.sp),
-                cursorBrush = SolidColor(Volt),
-                modifier = Modifier.fillMaxWidth(),
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                Text(
+                    text = stringResource(R.string.crew_create_title),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = Snow,
+                )
+                Text(
+                    text = stringResource(R.string.crew_create_sub),
+                    fontSize = 11.sp,
+                    color = Silver,
+                )
+            }
+            Icon(
+                Icons.Filled.ChevronRight,
+                contentDescription = null,
+                tint = Slate,
+                modifier = Modifier.size(18.dp),
             )
         }
     }
@@ -244,16 +514,42 @@ private fun CrewCard(
     joined: Boolean,
     onToggleJoin: () -> Unit,
     onOpenLobby: () -> Unit,
+    onOpenBoard: () -> Unit,
 ) {
     GlowCard(contentPadding = PaddingValues(16.dp), spacing = 12.dp, accent = joined) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .quietClickable(onOpenBoard),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(13.dp),
         ) {
             HexBadge(text = crew.monogram, size = 46.dp)
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                Text(crew.name, style = MaterialTheme.typography.titleSmall, color = Snow)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    Text(crew.name, style = MaterialTheme.typography.titleSmall, color = Snow)
+                    if (crew.owned) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(50))
+                                .background(Volt.copy(alpha = 0.16f))
+                                .padding(horizontal = 6.dp, vertical = 2.dp),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.crew_owner_badge),
+                                color = Volt,
+                                fontSize = 8.5.sp,
+                                fontWeight = FontWeight.Black,
+                            )
+                        }
+                    }
+                }
+                if (crew.tagline.isNotBlank()) {
+                    Text(crew.tagline, fontSize = 11.sp, color = Silver, maxLines = 1)
+                }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -265,7 +561,11 @@ private fun CrewCard(
                         modifier = Modifier.size(11.dp),
                     )
                     Text(
-                        text = stringResource(R.string.community_km_away, crew.kmAway),
+                        text = if (crew.kmAway > 0) {
+                            stringResource(R.string.community_km_away, "%.1f".format(crew.kmAway))
+                        } else {
+                            crew.area.ifBlank { stringResource(R.string.crew_area_here) }
+                        },
                         fontSize = 11.sp,
                         color = Slate,
                     )
@@ -290,6 +590,10 @@ private fun CrewCard(
                     modifier = Modifier.weight(1f),
                 )
                 GhostButton(
+                    text = stringResource(R.string.crew_board),
+                    onClick = onOpenBoard,
+                )
+                GhostButton(
                     text = stringResource(R.string.community_leave_crew),
                     onClick = onToggleJoin,
                     accent = Silver,
@@ -305,177 +609,46 @@ private fun CrewCard(
     }
 }
 
+// ─────────────────────────────────────────────────────────────
+
 @Composable
-private fun PartyRunCard(joined: Boolean, onOpenLobby: (String) -> Unit) {
-    GlowCard(accent = true, contentPadding = PaddingValues(18.dp), spacing = 12.dp) {
-        Text(
-            text = stringResource(R.string.community_tonight),
-            style = MaterialTheme.typography.labelSmall,
-            color = Volt,
+private fun SearchField(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(CarbonHigh)
+            .border(1.dp, Edge, RoundedCornerShape(16.dp))
+            .padding(horizontal = 13.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Icon(
+            Icons.Filled.Search,
+            contentDescription = null,
+            tint = Slate,
+            modifier = Modifier.size(17.dp),
         )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(9.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Neon Night Run", style = MaterialTheme.typography.titleLarge, color = Snow)
-                    Spacer(Modifier.width(6.dp))
-                    Icon(
-                        Icons.Filled.NightsStay,
-                        contentDescription = null,
-                        tint = Volt,
-                        modifier = Modifier.size(15.dp),
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    Icon(Icons.Filled.Schedule, contentDescription = null, tint = Silver, modifier = Modifier.size(12.dp))
-                    Text("8:00 PM", fontSize = 12.sp, color = Silver)
-                    Text("·", fontSize = 12.sp, color = Slate)
-                    Text("Riverside Park", fontSize = 12.sp, color = Silver)
-                    Text("·", fontSize = 12.sp, color = Slate)
-                    Text("6.2 km", fontSize = 12.sp, color = Silver)
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    Icon(Icons.Filled.Bolt, contentDescription = null, tint = Volt, modifier = Modifier.size(13.dp))
-                    Text(
-                        text = stringResource(
-                            R.string.crew_boost,
-                            RewardEconomy.partyBonusPercent(4),
-                        ),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Volt,
-                    )
-                }
+        Box(Modifier.weight(1f)) {
+            if (query.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.community_search_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Slate,
+                )
             }
-            RouteMap(
-                modifier = Modifier
-                    .width(112.dp)
-                    .height(94.dp),
-            )
-        }
-        if (joined) {
-            VoltButton(
-                text = stringResource(R.string.community_im_in),
-                onClick = { onOpenLobby("night_runners") },
+            BasicTextField(
+                value = query,
+                onValueChange = onQueryChange,
+                singleLine = true,
+                textStyle = TextStyle(color = Snow, fontSize = 13.sp),
+                cursorBrush = SolidColor(Volt),
                 modifier = Modifier.fillMaxWidth(),
             )
-        } else {
-            Text(
-                text = stringResource(R.string.crew_join_first),
-                style = MaterialTheme.typography.bodySmall,
-                color = Slate,
-            )
-        }
-    }
-}
-
-@Composable
-private fun PopularPostCard() {
-    var liked by rememberSaveable { mutableStateOf(false) }
-    GlowCard(contentPadding = PaddingValues(18.dp), spacing = 12.dp) {
-        SectionHeader(title = stringResource(R.string.community_popular))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .border(1.5.dp, Volt, CircleShape)
-                    .padding(3.dp)
-                    .background(CarbonHigh, CircleShape),
-            )
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(1.dp)) {
-                Text("Alex R.", style = MaterialTheme.typography.titleSmall, color = Snow)
-                Text(
-                    text = stringResource(R.string.time_hours_ago, 2),
-                    fontSize = 11.sp,
-                    color = Slate,
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .border(1.dp, Volt.copy(alpha = 0.4f), RoundedCornerShape(50))
-                    .padding(horizontal = 9.dp, vertical = 4.dp),
-            ) {
-                Text("Trailblazer Crew", fontSize = 10.sp, color = Volt, fontWeight = FontWeight.SemiBold)
-            }
-        }
-        Text(
-            text = stringResource(R.string.community_post_body),
-            style = MaterialTheme.typography.bodyMedium,
-            color = Snow,
-        )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(18.dp),
-        ) {
-            Row(
-                modifier = Modifier.quietClickable { liked = !liked },
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(5.dp),
-            ) {
-                Icon(
-                    imageVector = if (liked) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                    contentDescription = null,
-                    tint = if (liked) Alert else Silver,
-                    modifier = Modifier.size(17.dp),
-                )
-                Text("${if (liked) 46 else 45}", fontSize = 12.sp, color = Silver)
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(5.dp),
-            ) {
-                Icon(
-                    Icons.Filled.ChatBubbleOutline,
-                    contentDescription = null,
-                    tint = Silver,
-                    modifier = Modifier.size(16.dp),
-                )
-                Text("12", fontSize = 12.sp, color = Silver)
-            }
-            Spacer(Modifier.weight(1f))
-            Icon(Icons.Filled.Share, contentDescription = null, tint = Silver, modifier = Modifier.size(16.dp))
-        }
-    }
-}
-
-@Composable
-private fun ActivityFeed() {
-    GlowCard(contentPadding = PaddingValues(18.dp), spacing = 12.dp) {
-        SectionHeader(title = stringResource(R.string.community_activity))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(34.dp)
-                    .background(CarbonHigh, CircleShape),
-            )
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(1.dp)) {
-                Text(
-                    text = stringResource(R.string.community_feed_joined, "Maya C.", "Night Runners"),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Snow,
-                )
-                Text(
-                    text = stringResource(R.string.time_hours_ago, 1),
-                    fontSize = 11.sp,
-                    color = Slate,
-                )
-            }
-            HexBadge(text = "NR", size = 30.dp)
         }
     }
 }

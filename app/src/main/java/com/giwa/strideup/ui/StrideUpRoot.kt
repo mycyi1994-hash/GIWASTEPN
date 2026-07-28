@@ -62,7 +62,11 @@ import com.giwa.strideup.ui.components.HairlineDivider
 import com.giwa.strideup.ui.components.NightCanvas
 import com.giwa.strideup.ui.components.quietClickable
 import com.giwa.strideup.ui.screens.community.CommunityScreen
+import com.giwa.strideup.ui.screens.community.CrewBoardScreen
+import com.giwa.strideup.ui.screens.community.CrewCreateScreen
 import com.giwa.strideup.ui.screens.community.PartyLobbyScreen
+import com.giwa.strideup.ui.screens.community.PostComposeScreen
+import com.giwa.strideup.ui.screens.community.RankingScreen
 import com.giwa.strideup.ui.screens.events.EventsScreen
 import com.giwa.strideup.ui.screens.home.HomeScreen
 import com.giwa.strideup.ui.screens.items.ItemsScreen
@@ -106,9 +110,19 @@ object Routes {
     const val SETTINGS_CONNECTED = "settings/connected"
     const val SNEAKER = "sneaker/{id}"
     const val LOBBY = "lobby/{crewId}"
+    const val RANKING = "ranking"
+    const val CREW_CREATE = "crew/create"
+    const val CREW_BOARD = "crew/board/{crewId}"
+    const val POST_COMPOSE = "post/compose/{crewId}"
 
     fun sneaker(id: Long) = "sneaker/$id"
     fun lobby(crewId: String) = "lobby/$crewId"
+    fun crewBoard(crewId: String) = "crew/board/$crewId"
+
+    /** crewId가 비어 있으면 전체 게시판에 쓰는 글 */
+    fun postCompose(crewId: String) = "post/compose/${crewId.ifBlank { NO_CREW }}"
+
+    const val NO_CREW = "_"
 }
 
 @Composable
@@ -177,6 +191,10 @@ private fun MainScaffold() {
                 CommunityScreen(
                     onOpenLobby = { crewId -> navController.navigate(Routes.lobby(crewId)) },
                     onOpenNotifications = { navController.navigate(Routes.NOTIFICATIONS) },
+                    onOpenRanking = { navController.navigate(Routes.RANKING) },
+                    onOpenCrew = { crewId -> navController.navigate(Routes.crewBoard(crewId)) },
+                    onCreateCrew = { navController.navigate(Routes.CREW_CREATE) },
+                    onWritePost = { crewId -> navController.navigate(Routes.postCompose(crewId)) },
                 )
             }
             composable(Screen.Items.route) {
@@ -238,6 +256,41 @@ private fun MainScaffold() {
                     crewId = entry.arguments?.getString("crewId").orEmpty(),
                     onBack = { navController.popBackStack() },
                     onRunStarted = { navController.navigate(Routes.RUN) },
+                )
+            }
+            composable(Routes.RANKING) {
+                RankingScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Routes.CREW_CREATE) {
+                CrewCreateScreen(
+                    onBack = { navController.popBackStack() },
+                    onCreated = { crewId ->
+                        navController.popBackStack()
+                        navController.navigate(Routes.crewBoard(crewId))
+                    },
+                )
+            }
+            composable(
+                route = Routes.CREW_BOARD,
+                arguments = listOf(navArgument("crewId") { type = NavType.StringType }),
+            ) { entry ->
+                CrewBoardScreen(
+                    crewId = entry.arguments?.getString("crewId").orEmpty(),
+                    onBack = { navController.popBackStack() },
+                    onOpenLobby = { crewId -> navController.navigate(Routes.lobby(crewId)) },
+                    onWritePost = { crewId -> navController.navigate(Routes.postCompose(crewId)) },
+                )
+            }
+            composable(
+                route = Routes.POST_COMPOSE,
+                arguments = listOf(navArgument("crewId") { type = NavType.StringType }),
+            ) { entry ->
+                val raw = entry.arguments?.getString("crewId").orEmpty()
+                val crewId = if (raw == Routes.NO_CREW) "" else raw
+                PostComposeScreen(
+                    crewId = crewId,
+                    crewName = ServiceLocator.crewRepository.crewOf(crewId)?.name.orEmpty(),
+                    onBack = { navController.popBackStack() },
                 )
             }
         }

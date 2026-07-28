@@ -139,6 +139,50 @@ interface CrewDao {
 }
 
 @Dao
+interface CrewInfoDao {
+
+    @Upsert
+    suspend fun upsert(entity: CrewEntity)
+
+    @Upsert
+    suspend fun upsertAll(entities: List<CrewEntity>)
+
+    @Query("SELECT * FROM crews ORDER BY kmAway ASC")
+    fun observeAll(): Flow<List<CrewEntity>>
+
+    @Query("SELECT * FROM crews WHERE id = :id")
+    suspend fun byId(id: String): CrewEntity?
+
+    @Query("SELECT COUNT(*) FROM crews")
+    suspend fun count(): Int
+}
+
+@Dao
+interface PostDao {
+
+    @Insert
+    suspend fun insert(entity: PostEntity): Long
+
+    @Insert
+    suspend fun insertAll(entities: List<PostEntity>)
+
+    @Update
+    suspend fun update(entity: PostEntity)
+
+    @Query("DELETE FROM posts WHERE id = :id")
+    suspend fun delete(id: Long)
+
+    @Query("SELECT * FROM posts ORDER BY createdAt DESC")
+    fun observeAll(): Flow<List<PostEntity>>
+
+    @Query("SELECT * FROM posts WHERE id = :id")
+    suspend fun byId(id: Long): PostEntity?
+
+    @Query("SELECT COUNT(*) FROM posts")
+    suspend fun count(): Int
+}
+
+@Dao
 interface NotificationDao {
 
     @Insert

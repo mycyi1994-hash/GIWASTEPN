@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
@@ -23,9 +24,10 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
+import com.giwa.strideup.domain.Faction
 import com.giwa.strideup.domain.Rarity
+import com.giwa.strideup.domain.Silhouette
 import com.giwa.strideup.domain.Sneaker
-import com.giwa.strideup.domain.SneakerModel
 import com.giwa.strideup.domain.StripeStyle
 import kotlin.math.PI
 import kotlin.math.cos
@@ -35,14 +37,12 @@ import kotlin.math.sin
 /**
  * 스니커즈 측면 실루엣.
  *
- * 디자인 박스는 1.0 × 0.62 (가로:세로)로 고정하고 캔버스에 맞춰 균등 스케일한다.
- * 모델 파라미터(밑창 두께 · 토 들림 · 칼라 높이 · 스트라이프)가 실루엣을 바꾸고,
- * 컬러웨이가 색을, 희귀도가 발광 강도를 정한다.
+ * 디자인 박스 1.0 × 0.62를 캔버스에 균등 스케일한다.
+ * 속성이 색과 배경 이펙트를, 등급·변형이 실루엣과 오너먼트를 정한다.
  */
 private const val BOX_W = 1.0f
 private const val BOX_H = 0.62f
 
-/** 캔버스 좌표 변환기 */
 private class Frame(scope: DrawScope) {
     val scale = min(scope.size.width / BOX_W, scope.size.height / BOX_H)
     val ox = (scope.size.width - BOX_W * scale) / 2f
@@ -60,46 +60,58 @@ private fun Path.cubicTo(
     x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float,
 ) = cubicTo(f.x(x1), f.y(y1), f.x(x2), f.y(y2), f.x(x3), f.y(y3))
 
-/** 희귀도별 외곽 아우라 강도 */
 private fun Rarity.auraAlpha(): Float = when (this) {
-    Rarity.COMMON -> 0.16f
-    Rarity.UNCOMMON -> 0.22f
-    Rarity.RARE -> 0.30f
+    Rarity.COMMON -> 0.18f
+    Rarity.RARE -> 0.28f
     Rarity.EPIC -> 0.40f
-    Rarity.LEGENDARY -> 0.52f
+    Rarity.LEGENDARY -> 0.55f
 }
 
-/**
- * 스니커즈를 그린다.
- *
- * @param shimmer 0f~1f, 표면을 훑는 광택 위치. 0이면 광택 없음.
- */
 @Composable
 fun SneakerArt(
     sneaker: Sneaker,
     modifier: Modifier = Modifier,
     showGlow: Boolean = true,
     shimmer: Float = 0f,
+    /** 0f~1f 반복 위상 — 속성 이펙트 애니메이션용 */
+    phase: Float = 0f,
 ) {
-    val cw = sneaker.colorway
-    val model = sneaker.model
-    val upper = Color(cw.upper)
-    val upperShade = Color(cw.upperShade)
-    val accent = Color(cw.accent)
-    val accentSoft = Color(cw.accentSoft)
-    val sole = Color(cw.sole)
+    val fa = sneaker.faction
+    val accent = Color(fa.accent)
+    val accentSoft = Color(fa.accentSoft)
+    val accentDeep = Color(fa.accentDeep)
+    // 상위 등급의 물 속성은 어퍼가 밝은 실버로 바뀐다 (목업 반영)
+    val lighten = sneaker.faction == Faction.WATER && sneaker.rarity.ordinal >= Rarity.EPIC.ordinal
+    val upper = if (lighten) Color(0xFFDDE5EC) else Color(fa.upper)
+    val upperShade = if (lighten) Color(0xFF9AA8B4) else Color(fa.upperShade)
+    val sole = Color(fa.sole)
+    val sil = sneaker.silhouette
 
     Canvas(modifier) {
         val f = Frame(this)
-        val mt = 0.545f - model.soleThickness      // 미드솔 상단 = 어퍼 하단
-        val ct = model.collarTop                    // 발목 칼라 상단
-        val rise = model.toeRise
+        val mt = 0.545f - sil.soleThickness
+        val ct = sil.collarTop
+        val rise = sil.toeRise
 
-        // ── 0. 바닥 발광 ─────────────────────────────────────
+        // ── 배경: 속성 이펙트 ───────────────────────────────
+        if (showGlow) {
+            drawFactionEffect(f, fa, sneaker.rarity, accent, accentSoft, phase)
+        }
+
+        // ── 전설 오너먼트 (신발 뒤) ─────────────────────────
+        if (sneaker.rarity == Rarity.LEGENDARY) {
+            if (sneaker.variant == 0) {
+                drawLegendaryWings(f, accent, accentSoft, phase)
+            } else {
+                drawLegendaryCreature(f, fa, accent, accentSoft, phase)
+            }
+        }
+
+        // ── 바닥 발광 ──────────────────────────────────────
         if (showGlow) {
             val glowY = f.y(0.605f)
-            val glowW = f.u(0.98f)
-            val glowH = f.u(0.10f)
+            val glowW = f.u(1.00f)
+            val glowH = f.u(0.11f)
             drawOval(
                 brush = Brush.radialGradient(
                     colors = listOf(accent.copy(alpha = sneaker.rarity.auraAlpha()), Color.Transparent),
@@ -109,22 +121,16 @@ fun SneakerArt(
                 topLeft = Offset(f.x(0.5f) - glowW / 2f, glowY - glowH / 2f),
                 size = Size(glowW, glowH),
             )
-            // 상위 등급은 신발 뒤로 아우라가 한 겹 더 퍼진다
-            if (sneaker.rarity.ordinal >= Rarity.EPIC.ordinal) {
-                val r = f.u(0.52f)
-                drawCircle(
-                    brush = Brush.radialGradient(
-                        colors = listOf(accent.copy(alpha = 0.14f), Color.Transparent),
-                        center = Offset(f.x(0.5f), f.y(0.36f)),
-                        radius = r,
-                    ),
-                    radius = r,
-                    center = Offset(f.x(0.5f), f.y(0.36f)),
-                )
-            }
+            // 궤도 링 — 목업의 바닥 원형 광선
+            drawOval(
+                color = accent.copy(alpha = 0.45f),
+                topLeft = Offset(f.x(0.5f) - f.u(0.50f), f.y(0.585f)),
+                size = Size(f.u(1.00f), f.u(0.075f)),
+                style = Stroke(width = f.u(0.007f)),
+            )
         }
 
-        // ── 1. 아웃솔 (바닥 트레드) ──────────────────────────
+        // ── 아웃솔 ─────────────────────────────────────────
         val outsole = Path().apply {
             moveTo(f, 0.100f, 0.545f)
             lineTo(f, 0.950f, 0.535f - rise)
@@ -133,9 +139,7 @@ fun SneakerArt(
             cubicTo(f, 0.080f, 0.598f, 0.060f, 0.565f, 0.100f, 0.545f)
             close()
         }
-        drawPath(outsole, color = Color(0xFF0A0C0D))
-
-        // 트레드 홈
+        drawPath(outsole, color = Color(0xFF07080A))
         for (i in 0 until 9) {
             val t = i / 8f
             val gx = 0.16f + t * 0.75f
@@ -149,7 +153,7 @@ fun SneakerArt(
             )
         }
 
-        // ── 2. 미드솔 ────────────────────────────────────────
+        // ── 미드솔 ─────────────────────────────────────────
         val midsole = Path().apply {
             moveTo(f, 0.048f, mt)
             lineTo(f, 0.950f, mt)
@@ -161,43 +165,48 @@ fun SneakerArt(
         drawPath(
             midsole,
             brush = Brush.verticalGradient(
-                colors = listOf(sole, Color(0xFF0E1011)),
+                colors = listOf(sole, Color(0xFF0B0D0F)),
                 startY = f.y(mt),
                 endY = f.y(0.556f),
             ),
         )
 
-        // ── 3. 미드솔 발광 윈도우 (목업의 LED) ────────────────
-        val winTop = mt + 0.022f
-        val winBottom = 0.520f
-        listOf(0.150f to 0.262f, 0.300f to 0.392f).forEach { (x0, x1) ->
-            val w = f.u(x1 - x0)
+        // ── 발광 포드 (등급이 높을수록 많다) ─────────────────
+        val winTop = mt + 0.020f
+        val winBottom = 0.521f
+        val podStart = 0.135f
+        val podEnd = 0.62f
+        val podW = (podEnd - podStart) / sil.pods * 0.68f
+        for (i in 0 until sil.pods) {
+            val x0 = podStart + (podEnd - podStart) * i / sil.pods
+            val w = f.u(podW)
             val h = f.u(winBottom - winTop)
             val tl = Offset(f.x(x0), f.y(winTop))
             if (showGlow) {
                 drawOval(
                     brush = Brush.radialGradient(
-                        colors = listOf(accent.copy(alpha = 0.55f), Color.Transparent),
+                        colors = listOf(accent.copy(alpha = 0.62f), Color.Transparent),
                         center = Offset(tl.x + w / 2f, tl.y + h / 2f),
-                        radius = w * 1.1f,
+                        radius = w * 1.25f,
                     ),
-                    topLeft = Offset(tl.x - w * 0.55f, tl.y - h * 1.1f),
-                    size = Size(w * 2.1f, h * 3.2f),
+                    topLeft = Offset(tl.x - w * 0.62f, tl.y - h * 1.2f),
+                    size = Size(w * 2.24f, h * 3.4f),
                 )
             }
             drawRoundRect(
                 brush = Brush.verticalGradient(listOf(accentSoft, accent)),
                 topLeft = tl,
                 size = Size(w, h),
-                cornerRadius = androidx.compose.ui.geometry.CornerRadius(f.u(0.020f)),
+                cornerRadius = CornerRadius(f.u(0.018f)),
             )
         }
 
-        // ── 4. 어퍼 (본체) ───────────────────────────────────
+        // ── 어퍼 ───────────────────────────────────────────
+        val collarLift = if (sil.highTop) 0.055f else 0f
         val upperPath = Path().apply {
             moveTo(f, 0.055f, mt)
-            cubicTo(f, 0.030f, mt - 0.12f, 0.045f, ct + 0.055f, 0.100f, ct + 0.012f)
-            cubicTo(f, 0.150f, ct - 0.020f, 0.220f, ct - 0.018f, 0.262f, ct + 0.038f)
+            cubicTo(f, 0.030f, mt - 0.12f, 0.045f, ct + 0.055f - collarLift, 0.100f, ct + 0.012f - collarLift)
+            cubicTo(f, 0.150f, ct - 0.020f - collarLift, 0.220f, ct - 0.018f - collarLift, 0.262f, ct + 0.038f - collarLift)
             cubicTo(f, 0.305f, ct + 0.092f, 0.350f, ct + 0.128f, 0.420f, ct + 0.148f)
             lineTo(f, 0.530f, ct + 0.160f)
             cubicTo(f, 0.680f, ct + 0.185f, 0.800f, mt - 0.070f, 0.890f, mt - 0.030f)
@@ -213,8 +222,6 @@ fun SneakerArt(
                 end = f.p(0.9f, mt),
             ),
         )
-
-        // 어퍼 상단 하이라이트 (빛 받는 면)
         drawPath(
             upperPath,
             brush = Brush.verticalGradient(
@@ -224,7 +231,19 @@ fun SneakerArt(
             ),
         )
 
-        // ── 5. 토캡 ──────────────────────────────────────────
+        // 상위 등급 어퍼 텍스처 — 육각 메쉬
+        if (sneaker.rarity.ordinal >= Rarity.RARE.ordinal) {
+            for (row in 0 until 3) {
+                for (col in 0 until 7) {
+                    val hx = 0.30f + col * 0.075f + (row % 2) * 0.037f
+                    val hy = ct + 0.185f + row * 0.048f
+                    if (hy > mt - 0.02f) continue
+                    drawHex(f, hx, hy, 0.020f, accent.copy(alpha = 0.16f), 0.0035f)
+                }
+            }
+        }
+
+        // ── 토캡 ───────────────────────────────────────────
         val toeCap = Path().apply {
             moveTo(f, 0.782f, mt)
             cubicTo(f, 0.792f, mt - 0.058f, 0.845f, mt - 0.044f, 0.890f, mt - 0.030f)
@@ -233,60 +252,58 @@ fun SneakerArt(
         }
         drawPath(toeCap, color = Color.White.copy(alpha = 0.06f))
 
-        // ── 6. 힐 카운터 (뒤꿈치 보강재) ──────────────────────
+        // ── 힐 카운터 ──────────────────────────────────────
         val heel = Path().apply {
             moveTo(f, 0.052f, mt)
-            cubicTo(f, 0.030f, mt - 0.11f, 0.046f, ct + 0.055f, 0.100f, ct + 0.014f)
-            lineTo(f, 0.158f, ct + 0.050f)
+            cubicTo(f, 0.030f, mt - 0.11f, 0.046f, ct + 0.055f - collarLift, 0.100f, ct + 0.014f - collarLift)
+            lineTo(f, 0.158f, ct + 0.050f - collarLift)
             cubicTo(f, 0.112f, ct + 0.090f, 0.100f, mt - 0.060f, 0.112f, mt)
             close()
         }
-        drawPath(heel, color = accent.copy(alpha = 0.20f))
-        drawPath(heel, color = accent.copy(alpha = 0.55f), style = Stroke(width = f.u(0.006f)))
+        drawPath(heel, color = accent.copy(alpha = 0.22f))
+        drawPath(heel, color = accent.copy(alpha = 0.60f), style = Stroke(width = f.u(0.006f)))
 
-        // ── 7. 발목 칼라 개구부 ──────────────────────────────
-        rotate(degrees = -16f, pivot = f.p(0.300f, ct + 0.078f)) {
+        // ── 칼라 개구부 ────────────────────────────────────
+        rotate(degrees = -16f, pivot = f.p(0.300f, ct + 0.078f - collarLift)) {
             drawOval(
-                color = Color(0xFF07090A),
-                topLeft = Offset(f.x(0.300f) - f.u(0.108f), f.y(ct + 0.078f) - f.u(0.046f)),
+                color = Color(0xFF06070A),
+                topLeft = Offset(
+                    f.x(0.300f) - f.u(0.108f),
+                    f.y(ct + 0.078f - collarLift) - f.u(0.046f),
+                ),
                 size = Size(f.u(0.216f), f.u(0.092f)),
             )
             drawOval(
-                color = accent.copy(alpha = 0.30f),
-                topLeft = Offset(f.x(0.300f) - f.u(0.108f), f.y(ct + 0.078f) - f.u(0.046f)),
+                color = accent.copy(alpha = 0.35f),
+                topLeft = Offset(
+                    f.x(0.300f) - f.u(0.108f),
+                    f.y(ct + 0.078f - collarLift) - f.u(0.046f),
+                ),
                 size = Size(f.u(0.216f), f.u(0.092f)),
                 style = Stroke(width = f.u(0.007f)),
             )
         }
 
-        // ── 8. 레이스 (끈) ───────────────────────────────────
+        // ── 레이스 ─────────────────────────────────────────
         for (i in 0 until 4) {
             val t = i / 3f
             val lx = 0.452f + t * 0.176f
             val ly = ct + 0.150f + t * 0.030f
             drawLine(
-                color = accentSoft.copy(alpha = 0.85f),
+                color = accentSoft.copy(alpha = 0.9f),
                 start = f.p(lx - 0.024f, ly),
                 end = f.p(lx + 0.026f, ly + 0.052f),
                 strokeWidth = f.u(0.013f),
                 cap = StrokeCap.Round,
             )
         }
-        // 레이스 패널 라인
-        drawLine(
-            color = Color.White.copy(alpha = 0.10f),
-            start = f.p(0.430f, ct + 0.160f),
-            end = f.p(0.690f, ct + 0.212f),
-            strokeWidth = f.u(0.008f),
-            cap = StrokeCap.Round,
-        )
 
-        // ── 9. 사이드 스트라이프 (모델별) ─────────────────────
-        drawStripe(f, model, accent, accentSoft, mt, ct)
+        // ── 사이드 스트라이프 ───────────────────────────────
+        drawStripe(f, sil, accent, accentSoft, accentDeep, mt, ct)
 
-        // ── 10. 헥사곤 로고 배지 ─────────────────────────────
+        // ── 헥사곤 로고 배지 ────────────────────────────────
         val badgeC = f.p(0.430f, (ct + 0.160f + mt) / 2f + 0.030f)
-        val badgeR = f.u(0.052f)
+        val badgeR = f.u(0.054f)
         val hex = Path().apply {
             for (i in 0 until 6) {
                 val a = (-90f + i * 60f) * (PI / 180.0)
@@ -296,14 +313,14 @@ fun SneakerArt(
             }
             close()
         }
-        drawPath(hex, color = accent.copy(alpha = 0.16f))
+        drawPath(hex, color = accent.copy(alpha = 0.20f))
         drawPath(hex, color = accent, style = Stroke(width = f.u(0.009f)))
-        drawCircle(accent, radius = badgeR * 0.26f, center = badgeC)
+        drawFactionGlyph(f, fa, badgeC, badgeR * 0.55f, accentSoft)
 
-        // ── 11. 어퍼 외곽선 ──────────────────────────────────
+        // ── 외곽선 ─────────────────────────────────────────
         drawPath(upperPath, color = Color.Black.copy(alpha = 0.45f), style = Stroke(width = f.u(0.007f)))
 
-        // ── 12. 광택 스윕 ────────────────────────────────────
+        // ── 광택 스윕 ──────────────────────────────────────
         if (shimmer > 0f) {
             val band = f.u(0.30f)
             val cx = f.x(-0.2f) + (f.x(1.2f) - f.x(-0.2f)) * shimmer
@@ -319,17 +336,268 @@ fun SneakerArt(
     }
 }
 
-/** 모델별 사이드 스트라이프 */
-private fun DrawScope.drawStripe(
+/** 작은 육각형 스트로크 */
+private fun DrawScope.drawHex(f: Frame, cx: Float, cy: Float, r: Float, color: Color, width: Float) {
+    val p = Path()
+    for (i in 0 until 6) {
+        val a = (-90f + i * 60f) * (PI / 180.0)
+        val x = f.x(cx + r * cos(a).toFloat())
+        val y = f.y(cy + r * sin(a).toFloat())
+        if (i == 0) p.moveTo(x, y) else p.lineTo(x, y)
+    }
+    p.close()
+    drawPath(p, color = color, style = Stroke(width = f.u(width)))
+}
+
+/** 배지 안 속성 문양 */
+private fun DrawScope.drawFactionGlyph(f: Frame, fa: Faction, c: Offset, r: Float, color: Color) {
+    when (fa) {
+        Faction.FIRE -> {
+            val p = Path().apply {
+                moveTo(c.x, c.y - r * 1.2f)
+                cubicTo(c.x + r, c.y - r * 0.2f, c.x + r * 0.7f, c.y + r, c.x, c.y + r)
+                cubicTo(c.x - r * 0.7f, c.y + r, c.x - r, c.y - r * 0.2f, c.x, c.y - r * 1.2f)
+                close()
+            }
+            drawPath(p, color = color)
+        }
+        Faction.WATER -> {
+            val p = Path().apply {
+                moveTo(c.x, c.y - r * 1.25f)
+                cubicTo(c.x + r * 1.05f, c.y + r * 0.1f, c.x + r * 0.6f, c.y + r, c.x, c.y + r)
+                cubicTo(c.x - r * 0.6f, c.y + r, c.x - r * 1.05f, c.y + r * 0.1f, c.x, c.y - r * 1.25f)
+                close()
+            }
+            drawPath(p, color = color)
+        }
+        Faction.LIGHTNING -> {
+            val p = Path().apply {
+                moveTo(c.x + r * 0.35f, c.y - r * 1.2f)
+                lineTo(c.x - r * 0.55f, c.y + r * 0.15f)
+                lineTo(c.x + r * 0.05f, c.y + r * 0.15f)
+                lineTo(c.x - r * 0.30f, c.y + r * 1.2f)
+                lineTo(c.x + r * 0.60f, c.y - r * 0.25f)
+                lineTo(c.x + r * 0.00f, c.y - r * 0.25f)
+                close()
+            }
+            drawPath(p, color = color)
+        }
+        Faction.WIND -> {
+            for (i in 0 until 3) {
+                val yy = c.y - r * 0.5f + i * r * 0.5f
+                val len = r * (1.1f - i * 0.2f)
+                drawArc(
+                    color = color,
+                    startAngle = 160f,
+                    sweepAngle = 200f,
+                    useCenter = false,
+                    topLeft = Offset(c.x - len, yy - r * 0.32f),
+                    size = Size(len * 1.6f, r * 0.64f),
+                    style = Stroke(width = f.u(0.006f), cap = StrokeCap.Round),
+                )
+            }
+        }
+    }
+}
+
+/** 속성별 배경 이펙트 */
+private fun DrawScope.drawFactionEffect(
     f: Frame,
-    model: SneakerModel,
+    fa: Faction,
+    rarity: Rarity,
     accent: Color,
     accentSoft: Color,
+    phase: Float,
+) {
+    val density = when (rarity) {
+        Rarity.COMMON -> 6
+        Rarity.RARE -> 9
+        Rarity.EPIC -> 13
+        Rarity.LEGENDARY -> 18
+    }
+    when (fa) {
+        Faction.FIRE -> {
+            // 위로 흩날리는 불티
+            for (i in 0 until density) {
+                val seed = (i * 53 % 100) / 100f
+                val t = ((seed + phase) % 1f)
+                val ex = 0.10f + seed * 0.82f
+                val ey = 0.56f - t * 0.48f
+                val a = (1f - t) * 0.55f
+                drawCircle(
+                    color = if (i % 3 == 0) accentSoft.copy(alpha = a) else accent.copy(alpha = a),
+                    radius = f.u(0.006f + (1f - t) * 0.008f),
+                    center = f.p(ex + sin(t * 6.0).toFloat() * 0.02f, ey),
+                )
+            }
+        }
+        Faction.WATER -> {
+            // 튀어오르는 물방울
+            for (i in 0 until density) {
+                val seed = (i * 41 % 100) / 100f
+                val t = ((seed + phase) % 1f)
+                val ex = 0.08f + seed * 0.86f
+                val arc = 4f * t * (1f - t) // 포물선
+                val ey = 0.57f - arc * 0.34f
+                val a = (1f - t * 0.7f) * 0.55f
+                drawCircle(
+                    color = accentSoft.copy(alpha = a),
+                    radius = f.u(0.005f + arc * 0.008f),
+                    center = f.p(ex, ey),
+                )
+            }
+        }
+        Faction.LIGHTNING -> {
+            // 지그재그 전격
+            for (i in 0 until density / 3) {
+                val seed = (i * 67 % 100) / 100f
+                val on = ((seed + phase * 2f) % 1f) < 0.35f
+                if (!on) continue
+                val sx = 0.12f + seed * 0.74f
+                val p = Path()
+                var yy = 0.06f
+                var xx = sx
+                p.moveTo(f, xx, yy)
+                repeat(4) { k ->
+                    xx += if (k % 2 == 0) 0.045f else -0.035f
+                    yy += 0.085f
+                    p.lineTo(f, xx, yy)
+                }
+                drawPath(p, color = accent.copy(alpha = 0.55f), style = Stroke(width = f.u(0.008f), cap = StrokeCap.Round))
+                drawPath(p, color = accentSoft.copy(alpha = 0.85f), style = Stroke(width = f.u(0.003f), cap = StrokeCap.Round))
+            }
+        }
+        Faction.WIND -> {
+            // 감아 도는 바람 궤적
+            for (i in 0 until density / 2) {
+                val seed = (i * 71 % 100) / 100f
+                val t = ((seed + phase) % 1f)
+                val cy = 0.20f + seed * 0.34f
+                val w = 0.22f + t * 0.55f
+                val a = (1f - t) * 0.42f
+                drawArc(
+                    color = accent.copy(alpha = a),
+                    startAngle = 150f + t * 60f,
+                    sweepAngle = 150f,
+                    useCenter = false,
+                    topLeft = f.p(0.5f - w / 2f, cy - 0.05f),
+                    size = Size(f.u(w), f.u(0.10f)),
+                    style = Stroke(width = f.u(0.006f), cap = StrokeCap.Round),
+                )
+            }
+        }
+    }
+}
+
+/** 전설 1 — 에너지 날개 */
+private fun DrawScope.drawLegendaryWings(f: Frame, accent: Color, accentSoft: Color, phase: Float) {
+    val flap = sin(phase * 2 * PI).toFloat() * 0.02f
+    listOf(-1f, 1f).forEach { dir ->
+        for (i in 0 until 5) {
+            val t = i / 4f
+            val baseX = 0.30f
+            val baseY = 0.33f
+            val len = 0.30f + t * 0.16f
+            val spread = (0.10f + t * 0.26f + flap) * -1f
+            val p = Path().apply {
+                moveTo(f, baseX, baseY)
+                cubicTo(
+                    f,
+                    baseX - len * 0.45f, baseY + spread * 0.6f,
+                    baseX - len * 0.85f, baseY + spread * 1.1f,
+                    baseX - len, baseY + spread * 1.5f * dir.coerceAtLeast(0.4f),
+                )
+            }
+            val a = 0.55f - t * 0.28f
+            drawPath(
+                p,
+                color = if (i % 2 == 0) accentSoft.copy(alpha = a) else accent.copy(alpha = a),
+                style = Stroke(width = f.u(0.020f - t * 0.008f), cap = StrokeCap.Round),
+            )
+        }
+    }
+}
+
+/** 전설 2 — 신발을 감싸는 드래곤 실루엣 */
+private fun DrawScope.drawLegendaryCreature(
+    f: Frame,
+    fa: Faction,
+    accent: Color,
+    accentSoft: Color,
+    phase: Float,
+) {
+    val wave = sin(phase * 2 * PI).toFloat()
+
+    // 몸통 — 신발을 휘감는 S자 곡선
+    val body = Path().apply {
+        moveTo(f, 0.04f, 0.30f)
+        cubicTo(f, 0.22f, 0.10f + wave * 0.015f, 0.46f, 0.10f, 0.62f, 0.20f)
+        cubicTo(f, 0.78f, 0.30f, 0.86f, 0.44f, 0.98f, 0.40f)
+    }
+    drawPath(body, color = accent.copy(alpha = 0.30f), style = Stroke(width = f.u(0.055f), cap = StrokeCap.Round))
+    drawPath(body, color = accent.copy(alpha = 0.70f), style = Stroke(width = f.u(0.026f), cap = StrokeCap.Round))
+    drawPath(body, color = accentSoft.copy(alpha = 0.85f), style = Stroke(width = f.u(0.008f), cap = StrokeCap.Round))
+
+    // 등지느러미
+    for (i in 0 until 7) {
+        val t = i / 6f
+        val bx = 0.10f + t * 0.52f
+        val by = 0.20f - sin(t * PI).toFloat() * 0.10f + wave * 0.012f
+        val p = Path().apply {
+            moveTo(f, bx, by)
+            lineTo(f, bx + 0.020f, by - 0.055f - t * 0.02f)
+            lineTo(f, bx + 0.042f, by)
+            close()
+        }
+        drawPath(p, color = accentSoft.copy(alpha = 0.60f))
+    }
+
+    // 머리
+    val headC = f.p(0.055f, 0.30f)
+    val hr = f.u(0.055f)
+    drawCircle(accent.copy(alpha = 0.35f), radius = hr * 1.5f, center = headC)
+    val head = Path().apply {
+        moveTo(headC.x - hr * 1.6f, headC.y)
+        cubicTo(
+            headC.x - hr * 0.6f, headC.y - hr * 1.1f,
+            headC.x + hr * 0.8f, headC.y - hr * 0.9f,
+            headC.x + hr * 1.1f, headC.y,
+        )
+        cubicTo(
+            headC.x + hr * 0.8f, headC.y + hr * 0.9f,
+            headC.x - hr * 0.6f, headC.y + hr * 1.0f,
+            headC.x - hr * 1.6f, headC.y,
+        )
+        close()
+    }
+    drawPath(head, color = accent.copy(alpha = 0.85f))
+    drawPath(head, color = accentSoft, style = Stroke(width = f.u(0.006f)))
+    // 눈
+    drawCircle(Color.White, radius = hr * 0.20f, center = Offset(headC.x - hr * 0.2f, headC.y - hr * 0.18f))
+    // 뿔
+    listOf(-0.55f, -0.15f).forEach { dy ->
+        drawLine(
+            color = accentSoft,
+            start = Offset(headC.x + hr * 0.2f, headC.y + hr * dy),
+            end = Offset(headC.x + hr * 1.5f, headC.y + hr * (dy - 0.9f)),
+            strokeWidth = f.u(0.010f),
+            cap = StrokeCap.Round,
+        )
+    }
+}
+
+/** 사이드 스트라이프 */
+private fun DrawScope.drawStripe(
+    f: Frame,
+    sil: Silhouette,
+    accent: Color,
+    accentSoft: Color,
+    accentDeep: Color,
     mt: Float,
     ct: Float,
 ) {
     val mid = (ct + 0.170f + mt) / 2f
-    when (model.stripe) {
+    when (sil.stripe) {
         StripeStyle.SWOOSH -> {
             val p = Path().apply {
                 moveTo(f, 0.170f, mt - 0.020f)
@@ -389,13 +657,29 @@ private fun DrawScope.drawStripe(
                 style = Stroke(width = f.u(0.022f), cap = StrokeCap.Round),
             )
         }
+        StripeStyle.SPLIT -> {
+            // 갈라지는 두 갈래 — 상위 등급용
+            val a = Path().apply {
+                moveTo(f, 0.190f, mt - 0.005f)
+                cubicTo(f, 0.360f, mid + 0.030f, 0.540f, mid - 0.020f, 0.780f, mid - 0.085f)
+                lineTo(f, 0.792f, mid - 0.048f)
+                cubicTo(f, 0.550f, mid + 0.014f, 0.370f, mid + 0.066f, 0.200f, mt + 0.022f)
+                close()
+            }
+            drawPath(a, brush = Brush.horizontalGradient(listOf(accentDeep, accent)))
+            val b = Path().apply {
+                moveTo(f, 0.230f, mt + 0.010f)
+                cubicTo(f, 0.400f, mid + 0.086f, 0.560f, mid + 0.040f, 0.720f, mid - 0.010f)
+                lineTo(f, 0.730f, mid + 0.024f)
+                cubicTo(f, 0.570f, mid + 0.074f, 0.410f, mid + 0.120f, 0.240f, mt + 0.042f)
+                close()
+            }
+            drawPath(b, brush = Brush.horizontalGradient(listOf(accent, accentSoft)))
+        }
     }
 }
 
-/**
- * 히어로 연출 — 공중에 뜬 스니커즈 + 궤도 링 + 흐르는 광택.
- * 스플래시와 상세 화면에서 쓴다.
- */
+/** 히어로 연출 — 부유 + 광택 + 속성 이펙트 애니메이션 */
 @Composable
 fun SneakerHero(
     sneaker: Sneaker,
@@ -421,22 +705,30 @@ fun SneakerHero(
         ),
         label = "heroFloat",
     )
-    val accent = Color(sneaker.colorway.accent)
+    val phase by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2400, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart,
+        ),
+        label = "heroPhase",
+    )
+    val accent = Color(sneaker.faction.accent)
 
     Box(modifier, contentAlignment = Alignment.Center) {
         if (orbit) {
             Canvas(Modifier.fillMaxSize()) {
                 val cx = size.width / 2f
-                val cy = size.height * 0.60f
+                val cy = size.height * 0.62f
                 val rx = size.width * 0.46f
-                val ry = size.height * 0.17f
-                // 궤도 링 두 겹
-                listOf(1.0f to 0.55f, 0.78f to 0.30f).forEach { (s, a) ->
+                val ry = size.height * 0.15f
+                listOf(1.0f to 0.50f, 0.76f to 0.26f).forEach { (s, a) ->
                     drawOval(
                         color = accent.copy(alpha = a),
                         topLeft = Offset(cx - rx * s, cy - ry * s),
                         size = Size(rx * 2 * s, ry * 2 * s),
-                        style = Stroke(width = size.minDimension * 0.008f),
+                        style = Stroke(width = size.minDimension * 0.007f),
                     )
                 }
             }
@@ -448,6 +740,7 @@ fun SneakerHero(
                 .graphicsLayer { translationY = float * 7f },
             showGlow = true,
             shimmer = shimmer.coerceIn(0f, 1f),
+            phase = phase,
         )
     }
 }

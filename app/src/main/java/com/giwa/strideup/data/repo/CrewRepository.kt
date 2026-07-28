@@ -1,6 +1,10 @@
 package com.giwa.strideup.data.repo
 
+import android.content.Context
+import com.giwa.strideup.R
 import com.giwa.strideup.data.local.CrewDao
+import com.giwa.strideup.data.local.CrewEntity
+import com.giwa.strideup.data.local.CrewInfoDao
 import com.giwa.strideup.data.local.CrewMembershipEntity
 import com.giwa.strideup.data.local.NotificationType
 import kotlin.random.Random
@@ -11,18 +15,24 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-/** 러닝 크루 (데모 데이터) */
+/** 러닝 크루 */
 data class Crew(
     val id: String,
     val monogram: String,
     val name: String,
-    val kmAway: String,
+    val tagline: String,
+    val area: String,
+    val kmAway: Double,
     val memberCount: Int,
     val roster: List<String>,
+    /** 내가 만든 모임 */
+    val owned: Boolean,
 )
 
 data class PartyMember(
@@ -67,7 +77,10 @@ data class PartyState(
 }
 
 /**
- * 크루 가입 상태와 파티런 로비를 관리한다.
+ * 크루 목록·가입 상태와 파티런 로비를 관리한다.
+ *
+ * 크루는 Room에 저장되며 기본 4개는 첫 실행 시 시드된다. 사용자가 만든 모임도
+ * 같은 표에 들어가 목록·게시판·파티런을 그대로 쓴다.
  *
  * 백엔드가 없으므로 크루원은 시뮬레이션한다. 내가 준비를 누르면 남은 크루원들이
  * 차례로 준비를 마치고, 전원 준비되면 카운트다운 후 다 같이 측정이 시작된다.
@@ -75,23 +88,80 @@ data class PartyState(
  */
 class CrewRepository(
     private val crewDao: CrewDao,
+    private val crewInfoDao: CrewInfoDao,
     private val rewardRepository: RewardRepository,
+    private val appContext: Context,
 ) {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private var simulationJob: Job? = null
 
-    val crews: List<Crew> = listOf(
-        Crew("trailblazer", "TB", "Trailblazer Crew", "0.8", 128, listOf("Maya C.", "Jun H.", "Elena R.", "Marco P.")),
-        Crew("night_runners", "NR", "Night Runners", "1.3", 86, listOf("Sora K.", "Diego M.", "Lena B.")),
-        Crew("summit", "SS", "Summit Seekers", "2.1", 142, listOf("Aiko T.", "Tomas L.", "Priya N.", "Owen D.", "Zara F.")),
-        Crew("new_striders", "NS", "New Striders", "0.5", 42, listOf("Kai W.", "Nora S.")),
-    )
-
-    fun crewOf(id: String): Crew? = crews.firstOrNull { it.id == id }
+    val crews: StateFlow<List<Crew>> = crewInfoDao.observeAll()
+        .map { list -> list.map { it.toDomain() } }
+        .stateIn(scope, SharingStarted.Eagerly, emptyList())
 
     val joinedCrewIds: Flow<Set<String>> =
         crewDao.observeAll().map { list -> list.map { it.crewId }.toSet() }
+
+    fun crewOf(id: String): Crew? = crews.value.firstOrNull { it.id == id }
+
+    /** 기본 크루 시드. 이미 있으면 아무것도 하지 않는다. */
+    suspend fun ensureSeeded() {
+        if (crewInfoDao.count() > 0) return
+        val now = System.currentTimeMillis()
+        crewInfoDao.upsertAll(
+            listOf(
+                CrewEntity(
+                    id = "trailblazer",
+                    name = "Trailblazer Crew",
+                    monogram = "TB",
+                    tagline = appContext.getString(R.string.seed_crew_trailblazer_tagline),
+                    area = "Riverside",
+                    kmAway = 0.8,
+                    memberCount = 128,
+                    roster = "Maya C.|Jun H.|Elena R.|Marco P.",
+                    createdAt = now,
+                    owned = false,
+                ),
+                CrewEntity(
+                    id = "night_runners",
+                    name = "Night Runners",
+                    monogram = "NR",
+                    tagline = appContext.getString(R.string.seed_crew_night_tagline),
+                    area = "Downtown",
+                    kmAway = 1.3,
+                    memberCount = 86,
+                    roster = "Sora K.|Diego M.|Lena B.",
+                    createdAt = now,
+                    owned = false,
+                ),
+                CrewEntity(
+                    id = "summit",
+                    name = "Summit Seekers",
+                    monogram = "SS",
+                    tagline = appContext.getString(R.string.seed_crew_summit_tagline),
+                    area = "Highland",
+                    kmAway = 2.1,
+                    memberCount = 142,
+                    roster = "Aiko T.|Tomas L.|Priya N.|Owen D.|Zara F.",
+                    createdAt = now,
+                    owned = false,
+                ),
+                CrewEntity(
+                    id = "new_striders",
+                    name = "New Striders",
+                    monogram = "NS",
+                    tagline = appContext.getString(R.string.seed_crew_striders_tagline),
+                    area = "Cedar Park",
+                    kmAway = 0.5,
+                    memberCount = 42,
+                    roster = "Kai W.|Nora S.",
+                    createdAt = now,
+                    owned = false,
+                ),
+            )
+        )
+    }
 
     suspend fun join(crewId: String) {
         crewDao.insert(CrewMembershipEntity(crewId, System.currentTimeMillis()))
@@ -100,6 +170,38 @@ class CrewRepository(
 
     suspend fun leave(crewId: String) {
         crewDao.leave(crewId)
+    }
+
+    /**
+     * 모임 만들기. 만든 사람은 곧바로 가입 상태가 된다.
+     *
+     * 새 모임에는 파티런을 바로 체험할 수 있도록 초대 멤버 몇 명을 넣어 둔다.
+     */
+    suspend fun create(name: String, tagline: String, area: String): String {
+        val trimmed = name.trim().ifBlank { return "" }
+        val id = "crew_${System.currentTimeMillis()}"
+        val monogram = trimmed.split(" ", "-", "_")
+            .filter { it.isNotBlank() }
+            .take(2)
+            .map { it.first().uppercaseChar() }
+            .joinToString("")
+            .ifBlank { trimmed.take(2).uppercase() }
+        crewInfoDao.upsert(
+            CrewEntity(
+                id = id,
+                name = trimmed,
+                monogram = monogram,
+                tagline = tagline.trim(),
+                area = area.trim(),
+                kmAway = 0.0,
+                memberCount = 4,
+                roster = "Riley P.|Sena K.|Théo M.",
+                createdAt = System.currentTimeMillis(),
+                owned = true,
+            )
+        )
+        join(id)
+        return id
     }
 
     // ── 파티런 로비 ──────────────────────────────────────────
@@ -217,3 +319,16 @@ class CrewRepository(
     fun currentPartySize(): Int =
         if (_party.value.isActive) _party.value.partySize.coerceAtLeast(1) else 1
 }
+
+/** Room 엔티티 → 도메인 모델 */
+fun CrewEntity.toDomain(): Crew = Crew(
+    id = id,
+    monogram = monogram,
+    name = name,
+    tagline = tagline,
+    area = area,
+    kmAway = kmAway,
+    memberCount = memberCount,
+    roster = roster.split("|").filter { it.isNotBlank() },
+    owned = owned,
+)

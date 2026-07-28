@@ -153,9 +153,8 @@
     <string name="sneaker_energy_saving">Energy saving</string>
     <string name="sneaker_durability">Durability</string>
     <string name="sneaker_about">About this NFT</string>
-    <string name="sneaker_about_body">Every pair is minted with its own model, colorway and rolled stats. Rarity sets the ceiling — Legendary pairs roll the strongest numbers and reach the highest level.</string>
+    <string name="sneaker_about_body" formatted="false">Every pair belongs to one of four factions and a rarity tier. Boosts stay deliberately small — about +1% per tier — so collecting is about the look and the album, not raw power.</string>
     <string name="rarity_common">COMMON</string>
-    <string name="rarity_uncommon">UNCOMMON</string>
     <string name="rarity_rare">RARE</string>
     <string name="rarity_epic">EPIC</string>
     <string name="rarity_legendary">LEGENDARY</string>
@@ -358,4 +357,115 @@
     <string name="cd_notifications">Notifications</string>
     <string name="cd_wallet">Wallet</string>
     <string name="cd_back">Back</string>
+
+    <!-- Sneaker factions -->
+    <string name="faction_fire">Fire</string>
+    <string name="faction_water">Water</string>
+    <string name="faction_lightning">Lightning</string>
+    <string name="faction_wind">Wind</string>
+    <string name="stat_boost">Boost</string>
+
+    <!-- Community segments -->
+    <string name="community_seg_board">Board</string>
+    <string name="community_seg_crew">Crews</string>
+    <string name="community_flash_nearby">Flash runs near you</string>
+    <string name="community_board_empty">No posts yet. Be the first to write one.</string>
+    <string name="community_my_crews">My crews</string>
+    <string name="community_no_crew_yet">You haven\'t joined a crew yet. Join one below or start your own.</string>
+    <string name="community_ranking">Ranking</string>
+
+    <!-- Post categories -->
+    <string name="post_cat_all">All</string>
+    <string name="post_cat_flash">Flash run</string>
+    <string name="post_cat_free">Open board</string>
+    <string name="post_cat_tip">Tips</string>
+
+    <!-- Post card -->
+    <string name="post_km_away">%1$s km</string>
+    <string name="post_place_tbd">Place TBD</string>
+    <string name="post_slots">%1$d / %2$d joined</string>
+    <string name="post_join">Join</string>
+    <string name="post_joined">Joined</string>
+    <string name="post_closed">Closed</string>
+    <string name="post_started">Started</string>
+    <string name="post_starts_in_hours">in %1$dh %2$dm</string>
+    <string name="post_starts_in_minutes">in %1$dm</string>
+    <string name="post_delete">Delete</string>
+
+    <!-- Compose -->
+    <string name="post_write">Write</string>
+    <string name="post_submit">Post it</string>
+    <string name="post_field_title">TITLE</string>
+    <string name="post_field_title_hint">What\'s this about?</string>
+    <string name="post_field_body">BODY</string>
+    <string name="post_field_body_hint">Add the details…</string>
+    <string name="post_flash_details">Meetup details</string>
+    <string name="post_field_place">MEETING POINT</string>
+    <string name="post_field_place_hint">Riverside Park Gate 3</string>
+    <string name="post_field_distance">KM AWAY</string>
+    <string name="post_field_starts_in">STARTS IN (MIN)</string>
+    <string name="post_field_capacity">SLOTS</string>
+    <string name="post_flash_hint">Runners nearby see your flash run first — the closer it is, the higher it shows.</string>
+
+
+    <!-- Crew creation -->
+    <string name="crew_create_title">Start a crew</string>
+    <string name="crew_create_sub">Gather runners near you and run together</string>
+    <string name="crew_create_submit">Create crew</string>
+    <string name="crew_create_preview_name">Crew name</string>
+    <string name="crew_create_preview_tag">One line about your crew</string>
+    <string name="crew_create_preview_hint">You\'ll be the host. Members can post and join party runs right away.</string>
+    <string name="crew_field_name">CREW NAME</string>
+    <string name="crew_field_name_hint">Sunrise Striders</string>
+    <string name="crew_field_tagline">TAGLINE</string>
+    <string name="crew_field_tagline_hint">Easy 5K every morning</string>
+    <string name="crew_field_area">AREA</string>
+    <string name="crew_field_area_hint">Riverside</string>
+    <string name="crew_owner_badge">HOST</string>
+    <string name="crew_area_here">Nearby</string>
+    <string name="crew_board">Board</string>
+    <string name="crew_board_empty">No crew posts yet. Start the conversation.</string>
+
+    <!-- Ranking -->
+    <string name="rank_me">You</string>
+    <string name="rank_board_steps">Weekly steps</string>
+    <string name="rank_board_sup">SUP balance</string>
+    <string name="rank_my_position">MY POSITION</string>
+    <string name="rank_total_runners">out of %1$d runners this week</string>
+    <string name="rank_steps_value">%1$s steps</string>
+    <string name="ranking_teaser">You\'re #%1$d this week · %2$s steps</string>
+
+    <!-- Seed crews -->
+    <string name="seed_crew_trailblazer_tagline">Trail routes every weekend</string>
+    <string name="seed_crew_night_tagline">City loops after dark</string>
+    <string name="seed_crew_summit_tagline">Hills, intervals, no excuses</string>
+    <string name="seed_crew_striders_tagline">Beginner friendly, walk breaks welcome</string>
+
+    <!-- Seed posts -->
+    <string name="seed_flash1_title">Night 5K by the river, anyone?</string>
+    <string name="seed_flash1_body">Easy 6:00/km pace. First-timers very welcome.</string>
+    <string name="seed_flash2_title">Morning run before work</string>
+    <string name="seed_flash2_body">We start at 6:30 and wrap up in exactly 40 minutes.</string>
+    <string name="seed_flash3_title">Looking for an interval partner</string>
+    <string name="seed_flash3_body">400m × 8. Bonus points if you can hold the pace with me.</string>
+    <string name="seed_flash4_title">Weekend long run, 20K</string>
+    <string name="seed_flash4_body">Slow and steady. We stop twice for snacks.</string>
+    <string name="seed_free1_title">Finally ran a half marathon</string>
+    <string name="seed_free1_body">Six months ago 3K wrecked me. Today I finished in 1:58. Consistency really is the whole trick.</string>
+    <string name="seed_free2_title">What do you all do on rainy days?</string>
+    <string name="seed_free2_body">The treadmill bores me to death. Anyone got an indoor routine that actually sticks?</string>
+    <string name="seed_free3_title">Just crossed 1,000 SUP</string>
+    <string name="seed_free3_body">All from commuting on foot. It adds up faster than I expected.</string>
+    <string name="seed_tip1_title">Energy tip — don\'t burn it all in the morning</string>
+    <string name="seed_tip1_body">Energy refills at midnight, so on evening-run days spend only half of it early. Your total earnings come out higher.</string>
+    <string name="seed_tip2_title">Mint while wearing your highest-luck pair</string>
+    <string name="seed_tip2_body">The luck stat on your equipped sneaker feeds straight into the odds for higher rarities. Swap right before you mint.</string>
+    <string name="seed_tip3_title">Party runs pay off from four people up</string>
+    <string name="seed_tip3_body">The boost scales with headcount, so it clearly beats running alone. Everyone has to hit ready in the lobby before it starts.</string>
+    <string name="seed_crew1_title">Let\'s set this week\'s crew goal</string>
+    <string name="seed_crew1_body">We averaged 32 km last week — how about 35 this time?</string>
+    <string name="seed_crew2_title">Updated our route map</string>
+    <string name="seed_crew2_body">Added a detour around section 3 because of the bridge works. Check it before the next meetup.</string>
+    <string name="seed_crew3_title">Crew run tonight</string>
+    <string name="seed_crew3_body">We leave at 8:00 sharp — catching up later is rough!</string>
 </resources>

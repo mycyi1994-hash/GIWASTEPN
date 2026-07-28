@@ -30,12 +30,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.giwa.strideup.R
 import com.giwa.strideup.ui.components.BarMeter
 import com.giwa.strideup.ui.components.DarkIconButton
+import com.giwa.strideup.ui.components.FactionChip
 import com.giwa.strideup.ui.components.GhostButton
 import com.giwa.strideup.ui.components.GlowCard
 import com.giwa.strideup.ui.components.RarityChip
 import com.giwa.strideup.ui.components.SneakerHero
 import com.giwa.strideup.ui.components.StatBar
 import com.giwa.strideup.ui.components.VoltButton
+import com.giwa.strideup.ui.components.label
 import com.giwa.strideup.ui.components.tint
 import com.giwa.strideup.ui.theme.Silver
 import com.giwa.strideup.ui.theme.Slate
@@ -91,7 +93,7 @@ fun SneakerDetailScreen(
                     onClick = onBack,
                 )
                 Text(
-                    text = sneaker?.model?.displayName.orEmpty(),
+                    text = sneaker?.let { "${it.faction.label()} ${it.variantName}" }.orEmpty(),
                     modifier = Modifier.weight(1f),
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Black,
@@ -122,7 +124,10 @@ fun SneakerDetailScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    RarityChip(sneaker.rarity)
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        FactionChip(sneaker.faction)
+                        RarityChip(sneaker.rarity)
+                    }
                     Text(
                         text = stringResource(R.string.sneaker_mint_no, sneaker.mintNumber),
                         fontSize = 11.sp,
@@ -141,7 +146,7 @@ fun SneakerDetailScreen(
                     verticalArrangement = Arrangement.spacedBy(3.dp),
                 ) {
                     Text(
-                        text = sneaker.colorway.displayName,
+                        text = sneaker.variantName,
                         style = MaterialTheme.typography.titleMedium,
                         color = Snow,
                     )
@@ -165,10 +170,10 @@ fun SneakerDetailScreen(
                 )
                 StatBar(
                     label = stringResource(R.string.sneaker_earning),
-                    value = sneaker.earningMultiplier,
-                    max = 4.0,
-                    accent = sneaker.rarity.tint(),
-                    display = "×%.2f".format(sneaker.earningMultiplier),
+                    value = sneaker.boostPercent,
+                    max = 20.0,
+                    accent = sneaker.faction.tint(),
+                    display = "+%.1f%%".format(sneaker.boostPercent),
                 )
                 StatBar(
                     label = stringResource(R.string.stat_luck),
@@ -185,7 +190,7 @@ fun SneakerDetailScreen(
                 StatBar(
                     label = stringResource(R.string.sneaker_energy_saving),
                     value = (1.0 - sneaker.energyEfficiency) * 100,
-                    max = 25.0,
+                    max = 15.0,
                     accent = Volt,
                     display = "%.0f%%".format((1.0 - sneaker.energyEfficiency) * 100),
                 )

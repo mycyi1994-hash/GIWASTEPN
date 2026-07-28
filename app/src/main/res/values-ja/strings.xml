@@ -152,9 +152,8 @@
     <string name="sneaker_energy_saving">エナジー節約</string>
     <string name="sneaker_durability">耐久度</string>
     <string name="sneaker_about">このNFTについて</string>
-    <string name="sneaker_about_body">スニーカーはモデル・カラーウェイ・ステータスがそれぞれ違う状態でミントされます。レアリティが上限を決めていて、レジェンダリーほど強い数値が出て、レベルも高くまで上げられます。</string>
+    <string name="sneaker_about_body" formatted="false">すべてのスニーカーは4つの属性と等級を持ちます。ブーストは等級ごとに約+1%と控えめ。集める楽しさは性能ではなく、見た目と図鑑の完成にあります。</string>
     <string name="rarity_common">コモン</string>
-    <string name="rarity_uncommon">アンコモン</string>
     <string name="rarity_rare">レア</string>
     <string name="rarity_epic">エピック</string>
     <string name="rarity_legendary">レジェンダリー</string>
@@ -357,4 +356,115 @@
     <string name="cd_notifications">通知</string>
     <string name="cd_wallet">ウォレット</string>
     <string name="cd_back">戻る</string>
+
+    <!-- Sneaker factions -->
+    <string name="faction_fire">炎</string>
+    <string name="faction_water">水</string>
+    <string name="faction_lightning">雷</string>
+    <string name="faction_wind">風</string>
+    <string name="stat_boost">ブースト</string>
+
+    <!-- Community segments -->
+    <string name="community_seg_board">掲示板</string>
+    <string name="community_seg_crew">クルー</string>
+    <string name="community_flash_nearby">近くのフラッシュラン</string>
+    <string name="community_board_empty">まだ投稿がありません。最初の一件を書いてみましょう。</string>
+    <string name="community_my_crews">マイクルー</string>
+    <string name="community_no_crew_yet">まだクルーに参加していません。下から参加するか、自分でつくってみましょう。</string>
+    <string name="community_ranking">ランキング</string>
+
+    <!-- Post categories -->
+    <string name="post_cat_all">すべて</string>
+    <string name="post_cat_flash">フラッシュラン</string>
+    <string name="post_cat_free">自由</string>
+    <string name="post_cat_tip">お役立ち</string>
+
+    <!-- Post card -->
+    <string name="post_km_away">%1$s km</string>
+    <string name="post_place_tbd">場所未定</string>
+    <string name="post_slots">%1$d / %2$d 人</string>
+    <string name="post_join">参加</string>
+    <string name="post_joined">参加中</string>
+    <string name="post_closed">締切</string>
+    <string name="post_started">開始済み</string>
+    <string name="post_starts_in_hours">%1$d時間%2$d分後</string>
+    <string name="post_starts_in_minutes">%1$d分後</string>
+    <string name="post_delete">削除</string>
+
+    <!-- Compose -->
+    <string name="post_write">投稿</string>
+    <string name="post_submit">投稿する</string>
+    <string name="post_field_title">タイトル</string>
+    <string name="post_field_title_hint">どんな話題ですか？</string>
+    <string name="post_field_body">本文</string>
+    <string name="post_field_body_hint">詳しく書いてみましょう…</string>
+    <string name="post_flash_details">集合の詳細</string>
+    <string name="post_field_place">集合場所</string>
+    <string name="post_field_place_hint">Riverside Park Gate 3</string>
+    <string name="post_field_distance">距離 (km)</string>
+    <string name="post_field_starts_in">出発まで (分)</string>
+    <string name="post_field_capacity">定員</string>
+    <string name="post_flash_hint">フラッシュランは近い順に並びます。近いほど上に表示されます。</string>
+
+
+    <!-- Crew creation -->
+    <string name="crew_create_title">クルーをつくる</string>
+    <string name="crew_create_sub">近くのランナーを集めて一緒に走ろう</string>
+    <string name="crew_create_submit">作成する</string>
+    <string name="crew_create_preview_name">クルー名</string>
+    <string name="crew_create_preview_tag">クルーをひと言で紹介</string>
+    <string name="crew_create_preview_hint">作成するとあなたが主催者になります。メンバーはすぐに投稿やパーティランに参加できます。</string>
+    <string name="crew_field_name">クルー名</string>
+    <string name="crew_field_name_hint">Sunrise Striders</string>
+    <string name="crew_field_tagline">紹介</string>
+    <string name="crew_field_tagline_hint">毎朝ゆるっと 5K</string>
+    <string name="crew_field_area">活動エリア</string>
+    <string name="crew_field_area_hint">Riverside</string>
+    <string name="crew_owner_badge">主催</string>
+    <string name="crew_area_here">近く</string>
+    <string name="crew_board">掲示板</string>
+    <string name="crew_board_empty">クルーの投稿はまだありません。話しかけてみましょう。</string>
+
+    <!-- Ranking -->
+    <string name="rank_me">あなた</string>
+    <string name="rank_board_steps">週間歩数</string>
+    <string name="rank_board_sup">SUP 残高</string>
+    <string name="rank_my_position">自分の順位</string>
+    <string name="rank_total_runners">今週のランナー %1$d 人中</string>
+    <string name="rank_steps_value">%1$s 歩</string>
+    <string name="ranking_teaser">今週 %1$d 位 · %2$s 歩</string>
+
+    <!-- Seed crews -->
+    <string name="seed_crew_trailblazer_tagline">週末はトレイルコース</string>
+    <string name="seed_crew_night_tagline">日が暮れてから街を一周</string>
+    <string name="seed_crew_summit_tagline">坂とインターバル、言い訳なし</string>
+    <string name="seed_crew_striders_tagline">初心者歓迎、歩いてもOK</string>
+
+    <!-- Seed posts -->
+    <string name="seed_flash1_title">河沿いのナイト 5K、一緒にどうですか</string>
+    <string name="seed_flash1_body">キロ6分のゆるいペースです。はじめての方も歓迎。</string>
+    <string name="seed_flash2_title">出勤前のモーニングラン</string>
+    <string name="seed_flash2_body">6:30 スタート、きっちり40分で解散します。</string>
+    <string name="seed_flash3_title">インターバルの相棒募集</string>
+    <string name="seed_flash3_body">400m × 8本。ペースを合わせてくれる方だと助かります。</string>
+    <string name="seed_flash4_title">週末ロング 20K</string>
+    <string name="seed_flash4_body">ゆっくり長く。途中でコンビニに2回寄ります。</string>
+    <string name="seed_free1_title">ついにハーフを完走しました</string>
+    <string name="seed_free1_body">半年前は3kmでバテていたのに、今日は1時間58分でゴール。続けることが全てですね。</string>
+    <string name="seed_free2_title">雨の日はみなさんどうしていますか？</string>
+    <string name="seed_free2_body">トレッドミルは退屈で続かなくて。室内で続けられるメニューありますか？</string>
+    <string name="seed_free3_title">SUP がはじめて1000を超えました</string>
+    <string name="seed_free3_body">通勤で歩いただけなのに、思ったより早く貯まりました。</string>
+    <string name="seed_tip1_title">エナジーのコツ — 朝に使い切らないこと</string>
+    <string name="seed_tip1_body">エナジーは深夜0時に回復するので、夜に走る日は朝に半分だけ使うと合計獲得量が増えます。</string>
+    <string name="seed_tip2_title">ミントは運の高いスニーカーを履いて</string>
+    <string name="seed_tip2_body">装備中のスニーカーの運が、上位レアリティの確率にそのまま効きます。ミント直前に履き替えを。</string>
+    <string name="seed_tip3_title">パーティランは4人からがお得</string>
+    <string name="seed_tip3_body">人数に応じてブーストが乗るので、ひとりで走るより明らかに多く貯まります。ロビーで全員が準備完了を押すと始まります。</string>
+    <string name="seed_crew1_title">今週のクルー目標を決めましょう</string>
+    <string name="seed_crew1_body">先週は平均32kmだったので、今週は35kmを目指しませんか？</string>
+    <string name="seed_crew2_title">コースマップを更新しました</string>
+    <string name="seed_crew2_body">橋の工事のため3区間に迂回路を追加しました。次の定例前に確認してください。</string>
+    <string name="seed_crew3_title">今夜のクルー定例ラン</string>
+    <string name="seed_crew3_body">8時ちょうどに出発。遅れると追いつくのが大変です！</string>
 </resources>

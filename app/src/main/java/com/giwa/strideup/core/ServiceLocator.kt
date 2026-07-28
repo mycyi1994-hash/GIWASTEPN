@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.giwa.strideup.data.local.AppDatabase
 import com.giwa.strideup.data.prefs.UserPrefs
 import com.giwa.strideup.data.repo.BoostRepository
+import com.giwa.strideup.data.repo.CommunityRepository
 import com.giwa.strideup.data.repo.CrewRepository
 import com.giwa.strideup.data.repo.EventRepository
 import com.giwa.strideup.data.repo.NotificationRepository
@@ -31,6 +32,8 @@ object ServiceLocator {
     lateinit var boostRepository: BoostRepository
         private set
     lateinit var crewRepository: CrewRepository
+        private set
+    lateinit var communityRepository: CommunityRepository
         private set
     lateinit var eventRepository: EventRepository
         private set
@@ -65,7 +68,13 @@ object ServiceLocator {
         )
         sneakerRepository = SneakerRepository(database.sneakerDao(), rewardRepository)
         boostRepository = BoostRepository(database.boostDao(), rewardRepository, userPrefs)
-        crewRepository = CrewRepository(database.crewDao(), rewardRepository)
+        crewRepository = CrewRepository(
+            crewDao = database.crewDao(),
+            crewInfoDao = database.crewInfoDao(),
+            rewardRepository = rewardRepository,
+            appContext = app,
+        )
+        communityRepository = CommunityRepository(database.postDao(), app)
         eventRepository = EventRepository(database.claimedEventDao(), rewardRepository)
         notificationRepository = NotificationRepository(database.notificationDao())
     }

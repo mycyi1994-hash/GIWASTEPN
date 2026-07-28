@@ -11,6 +11,7 @@ import com.giwa.strideup.data.repo.PurchaseError
 import com.giwa.strideup.data.repo.RewardRepository
 import com.giwa.strideup.data.repo.SneakerRepository
 import com.giwa.strideup.domain.BoostType
+import com.giwa.strideup.domain.Faction
 import com.giwa.strideup.domain.Sneaker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -48,6 +49,9 @@ class ItemsViewModel(
 
     val collectionProgress: StateFlow<Pair<Int, Int>> = sneakerRepository.collectionProgress
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0 to 0)
+
+    val factionProgress: StateFlow<Map<Faction, Int>> = sneakerRepository.factionProgress
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyMap())
 
     /** 민팅 성공 시 결과 다이얼로그용 */
     val mintResult = MutableStateFlow<Sneaker?>(null)

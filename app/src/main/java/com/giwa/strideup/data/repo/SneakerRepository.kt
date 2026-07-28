@@ -3,10 +3,11 @@ package com.giwa.strideup.data.repo
 import com.giwa.strideup.data.local.NotificationType
 import com.giwa.strideup.data.local.RewardType
 import com.giwa.strideup.data.local.SneakerDao
-import com.giwa.strideup.domain.Rarity
+import com.giwa.strideup.domain.Faction
 import com.giwa.strideup.domain.RewardEconomy
 import com.giwa.strideup.domain.Sneaker
 import com.giwa.strideup.domain.SneakerMint
+import com.giwa.strideup.domain.TOTAL_COLLECTION
 import kotlin.random.Random
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -52,7 +53,6 @@ class SneakerRepository(
         val upgraded = entity.copy(
             level = entity.level + 1,
             // 강화하면 스탯도 소폭 상승한다
-            efficiency = entity.efficiency + 0.03,
             comfort = entity.comfort + 0.02,
             luck = entity.luck + 0.02,
         )
@@ -89,10 +89,15 @@ class SneakerRepository(
         return minted.copy(id = newId)
     }
 
-    /** 도감 진행도 — 보유한 (모델 × 희귀도) 조합 수 */
+    /** 도감 진행도 — 보유한 (속성 × 등급 × 변형) 조합 수 */
     val collectionProgress: Flow<Pair<Int, Int>> = inventory.map { list ->
-        val owned = list.map { it.model.id to it.rarity.id }.toSet().size
-        val total = com.giwa.strideup.domain.SneakerModel.entries.size * Rarity.entries.size
-        owned to total
+        list.map { it.slotKey }.toSet().size to TOTAL_COLLECTION
+    }
+
+    /** 속성별 수집 현황 — 도감 탭에서 "불 3/11" 처럼 쓴다 */
+    val factionProgress: Flow<Map<Faction, Int>> = inventory.map { list ->
+        Faction.entries.associateWith { f ->
+            list.filter { it.faction == f }.map { it.slotKey }.toSet().size
+        }
     }
 }

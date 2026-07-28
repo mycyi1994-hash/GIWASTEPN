@@ -45,16 +45,15 @@ object RewardType {
     const val EARN_PARTY = "EARN_PARTY"
 }
 
-/** 보유 스니커즈 NFT */
+/** 보유 스니커즈 NFT — 속성(Faction) × 등급(Rarity) × 변형(variant) */
 @Entity(tableName = "sneakers")
 data class SneakerEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val modelId: String,
-    val colorwayId: String,
+    val factionId: String,
     val rarity: String,
+    val variant: Int,
     val level: Int,
     val mintNumber: Int,
-    val efficiency: Double,
     val luck: Double,
     val comfort: Double,
     val durability: Int,
@@ -84,6 +83,51 @@ data class ClaimedEventEntity(
 data class CrewMembershipEntity(
     @PrimaryKey val crewId: String,
     val joinedAt: Long,
+)
+
+/**
+ * 크루 정보. 기본 제공 크루는 첫 실행 시 시드되고, 사용자가 만든 모임도 같은 표에 들어간다.
+ * roster는 "이름|이름|이름" 형태로 직렬화한다.
+ */
+@Entity(tableName = "crews")
+data class CrewEntity(
+    @PrimaryKey val id: String,
+    val name: String,
+    val monogram: String,
+    val tagline: String,
+    val area: String,
+    val kmAway: Double,
+    val memberCount: Int,
+    val roster: String,
+    val createdAt: Long,
+    /** 내가 만든 모임 */
+    val owned: Boolean,
+)
+
+/**
+ * 커뮤니티 게시글.
+ * crewId가 비어 있으면 전체 게시판, 값이 있으면 해당 크루 전용 게시판이다.
+ * 번개러닝(FLASH) 글만 place/meetAt/capacity를 쓴다.
+ */
+@Entity(tableName = "posts")
+data class PostEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val category: String,
+    val crewId: String,
+    val author: String,
+    val title: String,
+    val body: String,
+    val createdAt: Long,
+    val likes: Int,
+    val liked: Boolean,
+    val commentCount: Int,
+    val mine: Boolean,
+    val place: String,
+    val distanceKm: Double,
+    val meetAt: Long,
+    val capacity: Int,
+    val joinedCount: Int,
+    val joined: Boolean,
 )
 
 /** 앱 내 알림. 본문은 type + 인자로 표시 시점에 현지화한다. */

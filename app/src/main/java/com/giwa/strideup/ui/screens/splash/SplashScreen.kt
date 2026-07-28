@@ -85,12 +85,18 @@ fun SplashScreen(onReady: () -> Unit) {
             ServiceLocator.sneakerRepository.ensureStarter()
         }
 
-        progress = 0.42f
+        progress = 0.34f
         withTimeoutOrNull(2_000) {
             ServiceLocator.boostRepository.purgeExpired()
         }
 
-        progress = 0.63f
+        progress = 0.50f
+        withTimeoutOrNull(3_000) {
+            ServiceLocator.crewRepository.ensureSeeded()
+            ServiceLocator.communityRepository.ensureSeeded()
+        }
+
+        progress = 0.68f
         // 첫 방출을 기다려 홈이 0으로 깜빡이지 않게 한다.
         withTimeoutOrNull(3_000) {
             ServiceLocator.rewardRepository.balance.first()

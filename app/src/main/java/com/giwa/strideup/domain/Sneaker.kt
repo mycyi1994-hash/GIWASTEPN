@@ -1,45 +1,105 @@
 package com.giwa.strideup.domain
 
-import kotlin.math.pow
 import kotlin.random.Random
 
 /**
- * StrideUp 스니커즈 NFT.
+ * StrideUp 스니커즈 NFT — **속성(Faction) × 등급(Rarity) × 변형(Variant)** 체계.
  *
- * 수집욕은 세 축의 곱에서 나온다: **모델(실루엣) × 컬러웨이 × 희귀도**.
- * 같은 모델이라도 컬러웨이가 다르고, 같은 컬러웨이라도 희귀도에 따라
- * 스탯 범위와 발광 강도가 다르다. 여기에 민팅 번호(#0001)가 붙어
- * "내 것"이라는 감각을 만든다.
+ * 속성 4개(불·물·번개·바람) × 등급별 변형 11종 = 총 44종.
+ * 속성이 색과 이펙트를, 등급이 실루엣 정교함·오너먼트·부스트를 정한다.
+ *
+ * 부스트는 의도적으로 작게 잡았다 — 등급이 한 단계 오를 때마다 +1%.
+ * 수집의 재미는 성능 격차가 아니라 외형과 도감 완성에서 나온다.
  */
 
 // ─────────────────────────────────────────────────────────────
-// 희귀도
+// 속성
+// ─────────────────────────────────────────────────────────────
+
+enum class Faction(
+    val id: String,
+    val displayName: String,
+    /** 주 네온색 */
+    val accent: Int,
+    /** 밝은 하이라이트 */
+    val accentSoft: Int,
+    /** 음영 */
+    val accentDeep: Int,
+    /** 어퍼 기본색 */
+    val upper: Int,
+    /** 어퍼 음영 */
+    val upperShade: Int,
+    /** 밑창색 */
+    val sole: Int,
+) {
+    FIRE(
+        "FIRE", "Fire",
+        accent = 0xFFFF2E2E.toInt(),
+        accentSoft = 0xFFFF9166.toInt(),
+        accentDeep = 0xFF9E1010.toInt(),
+        upper = 0xFF17100F.toInt(),
+        upperShade = 0xFF0D0808.toInt(),
+        sole = 0xFF241416.toInt(),
+    ),
+    WATER(
+        "WATER", "Water",
+        accent = 0xFF2E9BFF.toInt(),
+        accentSoft = 0xFFA6E4FF.toInt(),
+        accentDeep = 0xFF0F4FA8.toInt(),
+        upper = 0xFF0F151E.toInt(),
+        upperShade = 0xFF080C12.toInt(),
+        sole = 0xFF15202E.toInt(),
+    ),
+    LIGHTNING(
+        "LIGHTNING", "Lightning",
+        accent = 0xFFF5E800.toInt(),
+        accentSoft = 0xFFFFFA9E.toInt(),
+        accentDeep = 0xFFA89C00.toInt(),
+        upper = 0xFF15140D.toInt(),
+        upperShade = 0xFF0B0A06.toInt(),
+        sole = 0xFF201E12.toInt(),
+    ),
+    WIND(
+        "WIND", "Wind",
+        accent = 0xFFA4F515.toInt(),
+        accentSoft = 0xFFDCFF8F.toInt(),
+        accentDeep = 0xFF5F9400.toInt(),
+        upper = 0xFF10150C.toInt(),
+        upperShade = 0xFF080B06.toInt(),
+        sole = 0xFF182014.toInt(),
+    );
+
+    companion object {
+        fun of(id: String): Faction = entries.firstOrNull { it.id == id } ?: FIRE
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// 등급
 // ─────────────────────────────────────────────────────────────
 
 enum class Rarity(
     val id: String,
-    /** 스탯 상한 배수 — 높을수록 좋은 스탯이 나온다 */
-    val statScale: Double,
-    /** 민팅 확률 가중치 */
-    val weight: Int,
-    /** 최대 강화 레벨 */
+    /** 이 등급에 속한 변형 개수 */
+    val variantCount: Int,
+    /** 적립 부스트 (%) — 등급 한 단계당 +1% */
+    val boostPercent: Double,
     val maxLevel: Int,
+    /** 민팅 가중치 */
+    val weight: Int,
 ) {
-    COMMON("COMMON", 1.00, 50, 10),
-    UNCOMMON("UNCOMMON", 1.18, 27, 15),
-    RARE("RARE", 1.40, 15, 20),
-    EPIC("EPIC", 1.70, 6, 25),
-    LEGENDARY("LEGENDARY", 2.10, 2, 30);
+    COMMON("COMMON", variantCount = 3, boostPercent = 0.0, maxLevel = 10, weight = 55),
+    RARE("RARE", variantCount = 3, boostPercent = 1.0, maxLevel = 15, weight = 28),
+    EPIC("EPIC", variantCount = 3, boostPercent = 2.0, maxLevel = 20, weight = 13),
+    LEGENDARY("LEGENDARY", variantCount = 2, boostPercent = 3.0, maxLevel = 30, weight = 4);
 
     companion object {
         fun of(id: String): Rarity = entries.firstOrNull { it.id == id } ?: COMMON
 
-        /** 가중 추첨. luck(0.0~) 이 높을수록 상위 희귀도 가중치가 커진다. */
+        /** 가중 추첨. luck이 높을수록 상위 등급 가중치가 커진다. */
         fun roll(random: Random, luck: Double = 0.0): Rarity {
             val weights = entries.map { r ->
-                // luck은 상위 등급일수록 크게 작용한다
-                val boost = 1.0 + luck * 0.12 * r.ordinal
-                r to (r.weight * boost)
+                r to r.weight * (1.0 + luck * 0.15 * r.ordinal)
             }
             val total = weights.sumOf { it.second }
             var pick = random.nextDouble() * total
@@ -52,102 +112,83 @@ enum class Rarity(
     }
 }
 
+/** 속성 하나가 가진 변형 개수 (3+3+3+2 = 11) */
+val VARIANTS_PER_FACTION: Int = Rarity.entries.sumOf { it.variantCount }
+
+/** 전체 도감 크기 = 속성 4 × 변형 11 */
+val TOTAL_COLLECTION: Int = Faction.entries.size * VARIANTS_PER_FACTION
+
 // ─────────────────────────────────────────────────────────────
-// 모델 (실루엣)
+// 실루엣
 // ─────────────────────────────────────────────────────────────
+
+enum class StripeStyle { SWOOSH, BLADE, CHEVRON, DUAL, WAVE, SPLIT }
 
 /**
- * 실루엣 파라미터. 그리기 함수가 이 값들로 형태를 바꾸므로
- * 모델마다 눈에 띄게 다른 신발이 나온다.
+ * 등급·변형마다 다른 신발 형태.
+ * 상위 등급일수록 밑창이 두껍고 발광 포드가 늘어나며 하이탑이 섞인다.
  */
-enum class SneakerModel(
-    val id: String,
-    val displayName: String,
-    /** 미드솔 두께 (0.06 ~ 0.16) */
+data class Silhouette(
     val soleThickness: Float,
-    /** 토박스 들림 (0.0 ~ 0.06) */
     val toeRise: Float,
-    /** 발목 칼라 높이 (0.16 낮음 ~ 0.10 높음) */
     val collarTop: Float,
-    /** 사이드 스트라이프 스타일 */
     val stripe: StripeStyle,
-    /** 기본 스탯 성향 (효율/행운/착화감 가중) */
-    val bias: Triple<Double, Double, Double>,
-) {
-    APEX_RUNNER(
-        "APEX_RUNNER", "Apex Runner",
-        soleThickness = 0.105f, toeRise = 0.030f, collarTop = 0.145f,
-        stripe = StripeStyle.SWOOSH, bias = Triple(1.15, 0.95, 0.95),
-    ),
-    VOLT_TRAINER(
-        "VOLT_TRAINER", "Volt Trainer",
-        soleThickness = 0.135f, toeRise = 0.018f, collarTop = 0.125f,
-        stripe = StripeStyle.BLADE, bias = Triple(0.95, 1.00, 1.20),
-    ),
-    TRAIL_BLAZER(
-        "TRAIL_BLAZER", "Trail Blazer",
-        soleThickness = 0.150f, toeRise = 0.048f, collarTop = 0.110f,
-        stripe = StripeStyle.CHEVRON, bias = Triple(1.05, 1.15, 0.90),
-    ),
-    SPRINT_X(
-        "SPRINT_X", "Sprint X",
-        soleThickness = 0.078f, toeRise = 0.040f, collarTop = 0.160f,
-        stripe = StripeStyle.DUAL, bias = Triple(1.25, 0.90, 0.90),
-    ),
-    FLOW_GLIDE(
-        "FLOW_GLIDE", "Flow Glide",
-        soleThickness = 0.120f, toeRise = 0.024f, collarTop = 0.135f,
-        stripe = StripeStyle.WAVE, bias = Triple(1.00, 1.20, 1.05),
-    );
+    /** 미드솔 발광 포드 개수 */
+    val pods: Int,
+    val highTop: Boolean,
+)
 
-    companion object {
-        fun of(id: String): SneakerModel = entries.firstOrNull { it.id == id } ?: APEX_RUNNER
+/**
+ * 등급·변형별 모델명. 속성명과 합쳐 "Fire Apex" 같은 이름이 된다.
+ * 브랜드명 성격이라 현지화하지 않는다.
+ */
+object VariantNames {
+    private val common = listOf("Runner", "Trainer", "Trail")
+    private val rare = listOf("Racer", "Glide", "Blade")
+    private val epic = listOf("Apex", "Phantom", "Titan")
+    private val legendary = listOf("Seraph", "Dragon")
+
+    fun of(rarity: Rarity, variant: Int): String {
+        val list = when (rarity) {
+            Rarity.COMMON -> common
+            Rarity.RARE -> rare
+            Rarity.EPIC -> epic
+            Rarity.LEGENDARY -> legendary
+        }
+        return list[variant.coerceIn(0, list.size - 1)]
     }
 }
 
-enum class StripeStyle { SWOOSH, BLADE, CHEVRON, DUAL, WAVE }
-
-// ─────────────────────────────────────────────────────────────
-// 컬러웨이
-// ─────────────────────────────────────────────────────────────
-
-/**
- * ARGB 정수로 보관한다(Compose Color 의존성 없이 도메인에 두기 위해).
- * 전부 다크 베이스 + 네온 액센트 — 앱의 Volt 무드를 유지하면서 색만 갈린다.
- */
-data class Colorway(
-    val id: String,
-    val displayName: String,
-    val upper: Int,
-    val upperShade: Int,
-    val accent: Int,
-    val accentSoft: Int,
-    val sole: Int,
-    /** 희귀도 하한 — 이 등급 이상에서만 등장한다 */
-    val minRarity: Rarity = Rarity.COMMON,
-)
-
-object Colorways {
-    val ALL = listOf(
-        Colorway("VOLT_BLACK", "Volt Black", 0xFF16191C.toInt(), 0xFF0D0F11.toInt(), 0xFFC3FF3E.toInt(), 0xFFE4FF9F.toInt(), 0xFF23272B.toInt()),
-        Colorway("CARBON", "Carbon Grey", 0xFF2A2E33.toInt(), 0xFF1B1F23.toInt(), 0xFFB6BDC4.toInt(), 0xFFE3E7EA.toInt(), 0xFF14171A.toInt()),
-        Colorway("EMBER", "Ember", 0xFF1A1416.toInt(), 0xFF120E10.toInt(), 0xFFFF6B3D.toInt(), 0xFFFFB08A.toInt(), 0xFF2A1F22.toInt()),
-        Colorway("ICE", "Ice Blue", 0xFF13191F.toInt(), 0xFF0C1116.toInt(), 0xFF4FD8FF.toInt(), 0xFFB4EEFF.toInt(), 0xFF1E262E.toInt()),
-        Colorway("VIOLET", "Violet Pulse", 0xFF171320.toInt(), 0xFF100D17.toInt(), 0xFFA97BFF.toInt(), 0xFFD8C2FF.toInt(), 0xFF221C2E.toInt(), Rarity.UNCOMMON),
-        Colorway("TOXIC", "Toxic Mint", 0xFF101A18.toInt(), 0xFF0A1211.toInt(), 0xFF3DFFB0.toInt(), 0xFFA8FFDD.toInt(), 0xFF1A2724.toInt(), Rarity.UNCOMMON),
-        Colorway("SOLAR", "Solar Flare", 0xFF1C1810.toInt(), 0xFF13100A.toInt(), 0xFFFFD23D.toInt(), 0xFFFFEBA3.toInt(), 0xFF2A2417.toInt(), Rarity.RARE),
-        Colorway("CRIMSON", "Crimson Edge", 0xFF1B1013.toInt(), 0xFF120A0D.toInt(), 0xFFFF3D6E.toInt(), 0xFFFF9FB8.toInt(), 0xFF2A181D.toInt(), Rarity.RARE),
-        Colorway("ABYSS", "Abyss Teal", 0xFF0C1A1C.toInt(), 0xFF071213.toInt(), 0xFF19E6D0.toInt(), 0xFF9CFFF5.toInt(), 0xFF12262A.toInt(), Rarity.EPIC),
-        Colorway("PLASMA", "Plasma", 0xFF1A1024.toInt(), 0xFF120A19.toInt(), 0xFFFF4FE0.toInt(), 0xFFFFB3F3.toInt(), 0xFF281838.toInt(), Rarity.EPIC),
-        Colorway("AURUM", "Aurum", 0xFF1A160D.toInt(), 0xFF110E07.toInt(), 0xFFE8C36A.toInt(), 0xFFFFF0C4.toInt(), 0xFF2B2413.toInt(), Rarity.LEGENDARY),
-        Colorway("PRISM", "Prism", 0xFF14161F.toInt(), 0xFF0D0E14.toInt(), 0xFF7CF5FF.toInt(), 0xFFFFC2F0.toInt(), 0xFF1E2130.toInt(), Rarity.LEGENDARY),
+object Silhouettes {
+    private val common = listOf(
+        Silhouette(0.098f, 0.026f, 0.150f, StripeStyle.SWOOSH, 2, false),
+        Silhouette(0.116f, 0.020f, 0.140f, StripeStyle.BLADE, 2, false),
+        Silhouette(0.132f, 0.034f, 0.132f, StripeStyle.CHEVRON, 3, false),
+    )
+    private val rare = listOf(
+        Silhouette(0.126f, 0.030f, 0.136f, StripeStyle.DUAL, 3, false),
+        Silhouette(0.142f, 0.024f, 0.126f, StripeStyle.WAVE, 3, false),
+        Silhouette(0.150f, 0.040f, 0.118f, StripeStyle.SPLIT, 4, false),
+    )
+    private val epic = listOf(
+        Silhouette(0.138f, 0.032f, 0.128f, StripeStyle.SWOOSH, 4, false),
+        Silhouette(0.156f, 0.026f, 0.108f, StripeStyle.SPLIT, 4, true),
+        Silhouette(0.168f, 0.044f, 0.100f, StripeStyle.CHEVRON, 5, true),
+    )
+    private val legendary = listOf(
+        Silhouette(0.160f, 0.038f, 0.112f, StripeStyle.WAVE, 5, false),
+        Silhouette(0.178f, 0.048f, 0.096f, StripeStyle.SPLIT, 6, true),
     )
 
-    fun of(id: String): Colorway = ALL.firstOrNull { it.id == id } ?: ALL.first()
-
-    /** 해당 희귀도에서 뽑을 수 있는 컬러웨이 */
-    fun available(rarity: Rarity): List<Colorway> =
-        ALL.filter { it.minRarity.ordinal <= rarity.ordinal }
+    fun of(rarity: Rarity, variant: Int): Silhouette {
+        val list = when (rarity) {
+            Rarity.COMMON -> common
+            Rarity.RARE -> rare
+            Rarity.EPIC -> epic
+            Rarity.LEGENDARY -> legendary
+        }
+        return list[variant.coerceIn(0, list.size - 1)]
+    }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -156,47 +197,57 @@ object Colorways {
 
 data class Sneaker(
     val id: Long,
-    val model: SneakerModel,
-    val colorway: Colorway,
+    val faction: Faction,
     val rarity: Rarity,
+    /** 등급 내 변형 인덱스 (0부터) */
+    val variant: Int,
     val level: Int,
     val mintNumber: Int,
-    /** 적립 효율 (1.0 ~ ) */
-    val efficiency: Double,
-    /** 행운 — 상위 희귀도 민팅 확률 */
+    /** 행운 — 민팅 시 상위 등급 확률 보정 (1.00 ~ 1.60) */
     val luck: Double,
-    /** 착화감 — 에너지 소모 절감 */
+    /** 착화감 — 에너지 소모 절감 (1.00 ~ 1.40) */
     val comfort: Double,
-    /** 내구도 0~100 */
     val durability: Int,
     val equipped: Boolean,
     val acquiredAt: Long,
 ) {
-    /** 이 스니커즈를 신었을 때의 SUP 적립 배율 */
-    val earningMultiplier: Double
-        get() = 1.0 + (efficiency - 1.0) + 0.15 * (level - 1).coerceAtLeast(0)
+    val silhouette: Silhouette get() = Silhouettes.of(rarity, variant)
 
-    /** 착화감이 높을수록 에너지를 덜 쓴다 (최대 25% 절감) */
+    /** 모델명 — "Apex", "Dragon" */
+    val variantName: String get() = VariantNames.of(rarity, variant)
+
+    /** 전체 이름 — "Fire Apex". 알림·토스트처럼 Composable 밖에서 쓴다. */
+    val displayName: String get() = "${faction.displayName} $variantName"
+
+    /**
+     * 적립 배율. 등급 +1%, 같은 등급 내 변형 +0.3%, 레벨 +0.5%.
+     * 최고 조합(전설2 Lv.30)이라도 약 +18% 수준으로 과하지 않다.
+     */
+    val boostPercent: Double
+        get() = rarity.boostPercent + variant * 0.3 + (level - 1).coerceAtLeast(0) * 0.5
+
+    val earningMultiplier: Double get() = 1.0 + boostPercent / 100.0
+
+    /** 착화감이 높을수록 에너지를 덜 쓴다 (최대 15% 절감) */
     val energyEfficiency: Double
-        get() = 1.0 - ((comfort - 1.0) * 0.20).coerceIn(0.0, 0.25)
+        get() = 1.0 - ((comfort - 1.0) * 0.375).coerceIn(0.0, 0.15)
 
-    /** 다음 레벨 강화 비용 */
-    val upgradeCost: Double
-        get() = RewardEconomy.sneakerUpgradeCost(level, rarity)
+    val upgradeCost: Double get() = RewardEconomy.sneakerUpgradeCost(level, rarity)
 
     val canUpgrade: Boolean get() = level < rarity.maxLevel
 
-    val displayName: String get() = "${colorway.displayName} ${model.displayName}"
+    /** 도감 슬롯 식별자 */
+    val slotKey: String get() = "${faction.id}:${rarity.id}:$variant"
 }
 
-/** 민팅기 — 새 스니커즈의 스탯을 뽑는다. */
+/** 민팅기 */
 object SneakerMint {
 
-    /** 스탯 1개를 희귀도·모델 성향에 맞춰 뽑는다 */
-    private fun rollStat(random: Random, rarity: Rarity, bias: Double): Double {
-        // 0.0~1.0 을 제곱해 낮은 값이 흔하게 나오도록(상위 롤이 귀하게)
-        val roll = random.nextDouble().pow(1.4)
-        return 1.0 + roll * 0.55 * rarity.statScale * bias
+    private fun rollStat(random: Random, rarity: Rarity, span: Double): Double {
+        // 상위 등급일수록 좋은 롤이 나오되, 차이는 완만하게
+        val base = random.nextDouble() * span
+        val bonus = rarity.ordinal * span * 0.12
+        return 1.0 + base + bonus
     }
 
     fun mint(
@@ -204,40 +255,36 @@ object SneakerMint {
         mintNumber: Int,
         luck: Double = 0.0,
         forcedRarity: Rarity? = null,
-        forcedModel: SneakerModel? = null,
+        forcedFaction: Faction? = null,
     ): Sneaker {
         val rarity = forcedRarity ?: Rarity.roll(random, luck)
-        val model = forcedModel ?: SneakerModel.entries[random.nextInt(SneakerModel.entries.size)]
-        val palette = Colorways.available(rarity)
-        val colorway = palette[random.nextInt(palette.size)]
-        val (be, bl, bc) = model.bias
+        val faction = forcedFaction ?: Faction.entries[random.nextInt(Faction.entries.size)]
+        val variant = random.nextInt(rarity.variantCount)
         return Sneaker(
             id = 0,
-            model = model,
-            colorway = colorway,
+            faction = faction,
             rarity = rarity,
+            variant = variant,
             level = 1,
             mintNumber = mintNumber,
-            efficiency = rollStat(random, rarity, be),
-            luck = rollStat(random, rarity, bl),
-            comfort = rollStat(random, rarity, bc),
+            luck = rollStat(random, rarity, 0.45),
+            comfort = rollStat(random, rarity, 0.30),
             durability = 100,
             equipped = false,
             acquiredAt = System.currentTimeMillis(),
         )
     }
 
-    /** 첫 실행 시 지급하는 스타터 — 항상 Volt Black Apex Runner (Common) */
+    /** 첫 실행 시 지급하는 스타터 — Wind 초급 */
     fun starter(): Sneaker = Sneaker(
         id = 0,
-        model = SneakerModel.APEX_RUNNER,
-        colorway = Colorways.of("VOLT_BLACK"),
+        faction = Faction.WIND,
         rarity = Rarity.COMMON,
+        variant = 0,
         level = 1,
         mintNumber = 1,
-        efficiency = 1.20,
-        luck = 1.10,
-        comfort = 1.15,
+        luck = 1.15,
+        comfort = 1.12,
         durability = 100,
         equipped = true,
         acquiredAt = System.currentTimeMillis(),

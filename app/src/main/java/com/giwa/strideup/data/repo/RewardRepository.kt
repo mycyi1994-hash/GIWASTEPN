@@ -10,12 +10,11 @@ import com.giwa.strideup.data.local.RewardType
 import com.giwa.strideup.data.local.SneakerDao
 import com.giwa.strideup.data.prefs.UserPrefs
 import com.giwa.strideup.domain.BoostType
-import com.giwa.strideup.domain.Colorways
+import com.giwa.strideup.domain.Faction
 import com.giwa.strideup.domain.Rarity
 import com.giwa.strideup.domain.RewardEconomy
 import com.giwa.strideup.domain.SessionReward
 import com.giwa.strideup.domain.Sneaker
-import com.giwa.strideup.domain.SneakerModel
 import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -141,31 +140,32 @@ class RewardRepository(
 }
 
 /** Room 엔티티 → 도메인 모델 */
-fun com.giwa.strideup.data.local.SneakerEntity.toDomain(): Sneaker = Sneaker(
-    id = id,
-    model = SneakerModel.of(modelId),
-    colorway = Colorways.of(colorwayId),
-    rarity = Rarity.of(rarity),
-    level = level,
-    mintNumber = mintNumber,
-    efficiency = efficiency,
-    luck = luck,
-    comfort = comfort,
-    durability = durability,
-    equipped = equipped,
-    acquiredAt = acquiredAt,
-)
+fun com.giwa.strideup.data.local.SneakerEntity.toDomain(): Sneaker {
+    val r = Rarity.of(rarity)
+    return Sneaker(
+        id = id,
+        faction = Faction.of(factionId),
+        rarity = r,
+        variant = variant.coerceIn(0, r.variantCount - 1),
+        level = level,
+        mintNumber = mintNumber,
+        luck = luck,
+        comfort = comfort,
+        durability = durability,
+        equipped = equipped,
+        acquiredAt = acquiredAt,
+    )
+}
 
 /** 도메인 모델 → Room 엔티티 */
 fun Sneaker.toEntity(): com.giwa.strideup.data.local.SneakerEntity =
     com.giwa.strideup.data.local.SneakerEntity(
         id = id,
-        modelId = model.id,
-        colorwayId = colorway.id,
+        factionId = faction.id,
         rarity = rarity.id,
+        variant = variant,
         level = level,
         mintNumber = mintNumber,
-        efficiency = efficiency,
         luck = luck,
         comfort = comfort,
         durability = durability,

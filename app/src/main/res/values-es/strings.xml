@@ -151,9 +151,8 @@
     <string name="sneaker_energy_saving">Ahorro de energía</string>
     <string name="sneaker_durability">Durabilidad</string>
     <string name="sneaker_about">Sobre este NFT</string>
-    <string name="sneaker_about_body">Cada par se mintea con su propio modelo, colorway y stats aleatorios. La rareza marca el techo: los pares Legendarios sacan los números más altos y llegan al nivel máximo.</string>
+    <string name="sneaker_about_body" formatted="false">Cada par pertenece a una de las cuatro facciones y a un nivel de rareza. Los impulsos son pequeños a propósito (+1% por nivel): coleccionar va del diseño y del álbum, no de la potencia.</string>
     <string name="rarity_common">COMÚN</string>
-    <string name="rarity_uncommon">POCO COMÚN</string>
     <string name="rarity_rare">RARO</string>
     <string name="rarity_epic">ÉPICO</string>
     <string name="rarity_legendary">LEGENDARIO</string>
@@ -356,4 +355,115 @@
     <string name="cd_notifications">Notificaciones</string>
     <string name="cd_wallet">Wallet</string>
     <string name="cd_back">Atrás</string>
+
+    <!-- Sneaker factions -->
+    <string name="faction_fire">Fuego</string>
+    <string name="faction_water">Agua</string>
+    <string name="faction_lightning">Rayo</string>
+    <string name="faction_wind">Viento</string>
+    <string name="stat_boost">Impulso</string>
+
+    <!-- Community segments -->
+    <string name="community_seg_board">Foro</string>
+    <string name="community_seg_crew">Crews</string>
+    <string name="community_flash_nearby">Quedadas cerca de ti</string>
+    <string name="community_board_empty">Aún no hay publicaciones. Escribe la primera.</string>
+    <string name="community_my_crews">Mis crews</string>
+    <string name="community_no_crew_yet">Todavía no estás en ningún crew. Únete a uno o crea el tuyo.</string>
+    <string name="community_ranking">Ranking</string>
+
+    <!-- Post categories -->
+    <string name="post_cat_all">Todo</string>
+    <string name="post_cat_flash">Quedada</string>
+    <string name="post_cat_free">General</string>
+    <string name="post_cat_tip">Consejos</string>
+
+    <!-- Post card -->
+    <string name="post_km_away">%1$s km</string>
+    <string name="post_place_tbd">Lugar por definir</string>
+    <string name="post_slots">%1$d / %2$d inscritos</string>
+    <string name="post_join">Unirme</string>
+    <string name="post_joined">Apuntado</string>
+    <string name="post_closed">Cerrado</string>
+    <string name="post_started">Empezó</string>
+    <string name="post_starts_in_hours">en %1$dh %2$dm</string>
+    <string name="post_starts_in_minutes">en %1$dm</string>
+    <string name="post_delete">Eliminar</string>
+
+    <!-- Compose -->
+    <string name="post_write">Publicar</string>
+    <string name="post_submit">Publicar</string>
+    <string name="post_field_title">TÍTULO</string>
+    <string name="post_field_title_hint">¿De qué se trata?</string>
+    <string name="post_field_body">CONTENIDO</string>
+    <string name="post_field_body_hint">Añade los detalles…</string>
+    <string name="post_flash_details">Detalles de la quedada</string>
+    <string name="post_field_place">PUNTO DE ENCUENTRO</string>
+    <string name="post_field_place_hint">Riverside Park Gate 3</string>
+    <string name="post_field_distance">DISTANCIA (KM)</string>
+    <string name="post_field_starts_in">SALE EN (MIN)</string>
+    <string name="post_field_capacity">PLAZAS</string>
+    <string name="post_flash_hint">Las quedadas se ordenan por cercanía: cuanto más cerca, más arriba.</string>
+
+
+    <!-- Crew creation -->
+    <string name="crew_create_title">Crear un crew</string>
+    <string name="crew_create_sub">Reúne a corredores cerca de ti</string>
+    <string name="crew_create_submit">Crear crew</string>
+    <string name="crew_create_preview_name">Nombre del crew</string>
+    <string name="crew_create_preview_tag">Una línea sobre tu crew</string>
+    <string name="crew_create_preview_hint">Serás el anfitrión. Los miembros podrán publicar y unirse a las carreras en grupo.</string>
+    <string name="crew_field_name">NOMBRE DEL CREW</string>
+    <string name="crew_field_name_hint">Sunrise Striders</string>
+    <string name="crew_field_tagline">LEMA</string>
+    <string name="crew_field_tagline_hint">5K suaves cada mañana</string>
+    <string name="crew_field_area">ZONA</string>
+    <string name="crew_field_area_hint">Riverside</string>
+    <string name="crew_owner_badge">ANFITRIÓN</string>
+    <string name="crew_area_here">Cerca</string>
+    <string name="crew_board">Foro</string>
+    <string name="crew_board_empty">Aún no hay publicaciones del crew. Rompe el hielo.</string>
+
+    <!-- Ranking -->
+    <string name="rank_me">Tú</string>
+    <string name="rank_board_steps">Pasos semanales</string>
+    <string name="rank_board_sup">Saldo SUP</string>
+    <string name="rank_my_position">MI POSICIÓN</string>
+    <string name="rank_total_runners">de %1$d corredores esta semana</string>
+    <string name="rank_steps_value">%1$s pasos</string>
+    <string name="ranking_teaser">Vas #%1$d esta semana · %2$s pasos</string>
+
+    <!-- Seed crews -->
+    <string name="seed_crew_trailblazer_tagline">Rutas de trail cada fin de semana</string>
+    <string name="seed_crew_night_tagline">Vueltas urbanas al anochecer</string>
+    <string name="seed_crew_summit_tagline">Cuestas, series y sin excusas</string>
+    <string name="seed_crew_striders_tagline">Para novatos, se puede caminar</string>
+
+    <!-- Seed posts -->
+    <string name="seed_flash1_title">5K nocturnos junto al río, ¿alguien?</string>
+    <string name="seed_flash1_body">Ritmo suave de 6:00/km. Si es tu primera vez, mejor todavía.</string>
+    <string name="seed_flash2_title">Carrera matutina antes del trabajo</string>
+    <string name="seed_flash2_body">Salimos a las 6:30 y terminamos en 40 minutos exactos.</string>
+    <string name="seed_flash3_title">Busco compañero para series</string>
+    <string name="seed_flash3_body">400 m × 8. Mejor aún si puedes aguantar el ritmo conmigo.</string>
+    <string name="seed_flash4_title">Tirada larga del finde, 20K</string>
+    <string name="seed_flash4_body">Despacio y largo. Paramos dos veces a por avituallamiento.</string>
+    <string name="seed_free1_title">Por fin he hecho una media maratón</string>
+    <string name="seed_free1_body">Hace seis meses 3K me destrozaban. Hoy he acabado en 1:58. La constancia lo es todo.</string>
+    <string name="seed_free2_title">¿Qué hacéis los días de lluvia?</string>
+    <string name="seed_free2_body">La cinta me aburre muchísimo. ¿Tenéis alguna rutina de interior que funcione?</string>
+    <string name="seed_free3_title">Acabo de pasar de 1.000 SUP</string>
+    <string name="seed_free3_body">Solo yendo al trabajo andando. Se acumula más rápido de lo que pensaba.</string>
+    <string name="seed_tip1_title">Truco de energía: no la gastes toda por la mañana</string>
+    <string name="seed_tip1_body">La energía se recarga a medianoche: si corres por la tarde, gasta solo la mitad temprano y ganarás más en total.</string>
+    <string name="seed_tip2_title">Mintea con el par de más suerte</string>
+    <string name="seed_tip2_body">La suerte de tus zapatillas equipadas influye directamente en las rarezas altas. Cámbiatelas justo antes de mintear.</string>
+    <string name="seed_tip3_title">Las carreras en grupo compensan desde cuatro personas</string>
+    <string name="seed_tip3_body">El impulso crece con el número de gente, así que gana de largo a correr solo. Todos deben pulsar «listo» en el lobby.</string>
+    <string name="seed_crew1_title">Fijemos el objetivo del crew para esta semana</string>
+    <string name="seed_crew1_body">La semana pasada hicimos 32 km de media. ¿Vamos a por 35?</string>
+    <string name="seed_crew2_title">He actualizado el mapa de nuestra ruta</string>
+    <string name="seed_crew2_body">He añadido un desvío en el tramo 3 por las obras del puente. Míralo antes de la próxima quedada.</string>
+    <string name="seed_crew3_title">Salida del crew esta noche</string>
+    <string name="seed_crew3_body">Salimos a las 8:00 en punto. ¡Alcanzarnos después cuesta!</string>
 </resources>

@@ -41,9 +41,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.giwa.strideup.R
 import com.giwa.strideup.domain.BoostType
+import com.giwa.strideup.domain.Faction
 import com.giwa.strideup.domain.RewardEconomy
+import com.giwa.strideup.domain.VARIANTS_PER_FACTION
 import com.giwa.strideup.ui.components.BarMeter
 import com.giwa.strideup.ui.components.EquippedSneakerCard
+import com.giwa.strideup.ui.components.FactionChip
 import com.giwa.strideup.ui.components.GhostButton
 import com.giwa.strideup.ui.components.GlowCard
 import com.giwa.strideup.ui.components.HexEmblem
@@ -55,6 +58,8 @@ import com.giwa.strideup.ui.components.SneakerHero
 import com.giwa.strideup.ui.components.TokenCard
 import com.giwa.strideup.ui.components.VoltButton
 import com.giwa.strideup.ui.components.Wordmark
+import com.giwa.strideup.ui.components.label
+import com.giwa.strideup.ui.components.tint
 import com.giwa.strideup.ui.theme.Carbon
 import com.giwa.strideup.ui.theme.CarbonHigh
 import com.giwa.strideup.ui.theme.Silver
@@ -73,6 +78,7 @@ fun ItemsScreen(
     val balance by viewModel.balance.collectAsStateWithLifecycle()
     val boosts by viewModel.activeBoosts.collectAsStateWithLifecycle()
     val progress by viewModel.collectionProgress.collectAsStateWithLifecycle()
+    val factions by viewModel.factionProgress.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
     val minted by viewModel.mintResult.collectAsStateWithLifecycle()
 
@@ -243,6 +249,23 @@ fun ItemsScreen(
             }
         }
 
+        // ── 속성별 도감 진행도 ──────────────────────────────
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Faction.entries.forEach { faction ->
+                    FactionProgressCell(
+                        faction = faction,
+                        owned = factions[faction] ?: 0,
+                        total = VARIANTS_PER_FACTION,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+        }
+
         items(inventory.chunked(2).size) { rowIndex ->
             val row = inventory.chunked(2)[rowIndex]
             Row(
@@ -336,7 +359,10 @@ fun ItemsScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
-                    RarityChip(sneaker.rarity)
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        FactionChip(sneaker.faction)
+                        RarityChip(sneaker.rarity)
+                    }
                     SneakerHero(
                         sneaker = sneaker,
                         modifier = Modifier
@@ -344,7 +370,7 @@ fun ItemsScreen(
                             .height(120.dp),
                     )
                     Text(
-                        text = sneaker.displayName,
+                        text = "${sneaker.faction.label()} ${sneaker.variantName}",
                         style = MaterialTheme.typography.titleMedium,
                         color = Snow,
                         textAlign = TextAlign.Center,
@@ -356,6 +382,44 @@ fun ItemsScreen(
                     )
                 }
             },
+        )
+    }
+}
+
+/** 속성 하나의 도감 진행도 — 포스터의 4속성 컬렉션을 한 줄로 요약한다. */
+@Composable
+private fun FactionProgressCell(
+    faction: Faction,
+    owned: Int,
+    total: Int,
+    modifier: Modifier = Modifier,
+) {
+    val c = faction.tint()
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(c.copy(alpha = 0.09f))
+            .padding(vertical = 10.dp, horizontal = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(5.dp),
+    ) {
+        Text(
+            text = faction.label(),
+            color = c,
+            fontSize = 9.sp,
+            fontWeight = FontWeight.Black,
+            letterSpacing = 0.8.sp,
+        )
+        Text(
+            text = "$owned/$total",
+            color = Snow,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+        )
+        BarMeter(
+            fraction = if (total == 0) 0f else (owned.toFloat() / total).coerceIn(0f, 1f),
+            height = 4.dp,
+            color = c,
         )
     }
 }

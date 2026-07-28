@@ -12,9 +12,11 @@ import androidx.room.RoomDatabase
         BoostEntity::class,
         ClaimedEventEntity::class,
         CrewMembershipEntity::class,
+        CrewEntity::class,
+        PostEntity::class,
         NotificationEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -25,5 +27,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun boostDao(): BoostDao
     abstract fun claimedEventDao(): ClaimedEventDao
     abstract fun crewDao(): CrewDao
+    abstract fun crewInfoDao(): CrewInfoDao
+    abstract fun postDao(): PostDao
     abstract fun notificationDao(): NotificationDao
 }

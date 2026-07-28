@@ -151,9 +151,8 @@
     <string name="sneaker_energy_saving">에너지 절감</string>
     <string name="sneaker_durability">내구도</string>
     <string name="sneaker_about">이 NFT 정보</string>
-    <string name="sneaker_about_body">모든 스니커즈는 모델·컬러웨이·스탯이 각각 다르게 민팅돼요. 희귀도가 스탯 상한과 최대 레벨을 정하고, 레전더리일수록 더 강한 수치가 나와요.</string>
+    <string name="sneaker_about_body" formatted="false">모든 스니커즈는 네 가지 속성과 등급을 가집니다. 부스트는 등급당 +1% 정도로 작게 잡았어요. 수집의 재미는 성능이 아니라 외형과 도감 완성에 있습니다.</string>
     <string name="rarity_common">커먼</string>
-    <string name="rarity_uncommon">언커먼</string>
     <string name="rarity_rare">레어</string>
     <string name="rarity_epic">에픽</string>
     <string name="rarity_legendary">레전더리</string>
@@ -356,4 +355,115 @@
     <string name="cd_notifications">알림</string>
     <string name="cd_wallet">지갑</string>
     <string name="cd_back">뒤로</string>
+
+    <!-- Sneaker factions -->
+    <string name="faction_fire">불</string>
+    <string name="faction_water">물</string>
+    <string name="faction_lightning">번개</string>
+    <string name="faction_wind">바람</string>
+    <string name="stat_boost">부스트</string>
+
+    <!-- Community segments -->
+    <string name="community_seg_board">게시판</string>
+    <string name="community_seg_crew">크루</string>
+    <string name="community_flash_nearby">가까운 번개러닝</string>
+    <string name="community_board_empty">아직 글이 없어요. 첫 글을 남겨보세요.</string>
+    <string name="community_my_crews">내 크루</string>
+    <string name="community_no_crew_yet">아직 가입한 크루가 없어요. 아래에서 가입하거나 직접 모임을 만들어보세요.</string>
+    <string name="community_ranking">랭킹</string>
+
+    <!-- Post categories -->
+    <string name="post_cat_all">전체</string>
+    <string name="post_cat_flash">번개러닝</string>
+    <string name="post_cat_free">자유</string>
+    <string name="post_cat_tip">꿀팁</string>
+
+    <!-- Post card -->
+    <string name="post_km_away">%1$s km</string>
+    <string name="post_place_tbd">장소 미정</string>
+    <string name="post_slots">%1$d / %2$d명</string>
+    <string name="post_join">참가</string>
+    <string name="post_joined">참가 중</string>
+    <string name="post_closed">마감</string>
+    <string name="post_started">시작됨</string>
+    <string name="post_starts_in_hours">%1$d시간 %2$d분 후</string>
+    <string name="post_starts_in_minutes">%1$d분 후</string>
+    <string name="post_delete">삭제</string>
+
+    <!-- Compose -->
+    <string name="post_write">글쓰기</string>
+    <string name="post_submit">올리기</string>
+    <string name="post_field_title">제목</string>
+    <string name="post_field_title_hint">무슨 이야기인가요?</string>
+    <string name="post_field_body">내용</string>
+    <string name="post_field_body_hint">자세한 내용을 적어주세요…</string>
+    <string name="post_flash_details">모임 정보</string>
+    <string name="post_field_place">만나는 곳</string>
+    <string name="post_field_place_hint">Riverside Park Gate 3</string>
+    <string name="post_field_distance">거리 (km)</string>
+    <string name="post_field_starts_in">출발까지 (분)</string>
+    <string name="post_field_capacity">정원</string>
+    <string name="post_flash_hint">번개러닝은 가까운 순으로 보여요. 가까울수록 위에 노출됩니다.</string>
+
+
+    <!-- Crew creation -->
+    <string name="crew_create_title">모임 만들기</string>
+    <string name="crew_create_sub">주변 러너들을 모아 함께 달려요</string>
+    <string name="crew_create_submit">모임 개설하기</string>
+    <string name="crew_create_preview_name">모임 이름</string>
+    <string name="crew_create_preview_tag">우리 모임을 한 줄로 소개해요</string>
+    <string name="crew_create_preview_hint">개설하면 내가 모임장이 돼요. 멤버들은 바로 글을 쓰고 파티런에 참여할 수 있어요.</string>
+    <string name="crew_field_name">모임 이름</string>
+    <string name="crew_field_name_hint">Sunrise Striders</string>
+    <string name="crew_field_tagline">소개</string>
+    <string name="crew_field_tagline_hint">매일 아침 가볍게 5K</string>
+    <string name="crew_field_area">활동 지역</string>
+    <string name="crew_field_area_hint">Riverside</string>
+    <string name="crew_owner_badge">모임장</string>
+    <string name="crew_area_here">우리 동네</string>
+    <string name="crew_board">게시판</string>
+    <string name="crew_board_empty">아직 크루 글이 없어요. 먼저 말을 걸어보세요.</string>
+
+    <!-- Ranking -->
+    <string name="rank_me">나</string>
+    <string name="rank_board_steps">주간 걸음</string>
+    <string name="rank_board_sup">보유 SUP</string>
+    <string name="rank_my_position">내 순위</string>
+    <string name="rank_total_runners">이번 주 러너 %1$d명 중</string>
+    <string name="rank_steps_value">%1$s 걸음</string>
+    <string name="ranking_teaser">이번 주 %1$d위 · %2$s 걸음</string>
+
+    <!-- Seed crews -->
+    <string name="seed_crew_trailblazer_tagline">주말마다 트레일 코스</string>
+    <string name="seed_crew_night_tagline">해 지고 나서 도심 한 바퀴</string>
+    <string name="seed_crew_summit_tagline">언덕과 인터벌, 핑계는 없기</string>
+    <string name="seed_crew_striders_tagline">초보 환영, 걸어도 괜찮아요</string>
+
+    <!-- Seed posts -->
+    <string name="seed_flash1_title">한강 야간 5K 같이 뛰실 분</string>
+    <string name="seed_flash1_body">가볍게 6분 페이스로 돕니다. 처음이신 분도 환영이에요.</string>
+    <string name="seed_flash2_title">출근 전 아침 러닝</string>
+    <string name="seed_flash2_body">6:30 출발해서 딱 40분만 뛰고 해산합니다.</string>
+    <string name="seed_flash3_title">인터벌 훈련 파트너 구해요</string>
+    <string name="seed_flash3_body">400m × 8세트. 페이스 맞춰줄 분이면 더 좋습니다.</string>
+    <string name="seed_flash4_title">주말 롱런 20K</string>
+    <string name="seed_flash4_body">천천히 오래 갑니다. 중간에 편의점 두 번 들러요.</string>
+    <string name="seed_free1_title">드디어 하프 완주했습니다</string>
+    <string name="seed_free1_body">6개월 전엔 3km도 힘들었는데 오늘 1:58로 끊었어요. 꾸준함이 답인 것 같습니다.</string>
+    <string name="seed_free2_title">비 오는 날엔 다들 어떻게 하세요?</string>
+    <string name="seed_free2_body">트레드밀은 지루해서 손이 안 가는데, 다들 실내 루틴 있으신가요?</string>
+    <string name="seed_free3_title">오늘 SUP 처음 1000 넘겼네요</string>
+    <string name="seed_free3_body">출퇴근 걷기만 했는데 생각보다 빨리 모입니다.</string>
+    <string name="seed_tip1_title">에너지 관리 팁 — 아침에 몰아 쓰지 마세요</string>
+    <string name="seed_tip1_body">에너지는 자정에 리필되니, 저녁 러닝이 있는 날은 아침에 절반만 쓰는 게 총 적립이 큽니다.</string>
+    <string name="seed_tip2_title">민팅은 행운 높은 신발 신고 하세요</string>
+    <string name="seed_tip2_body">착용 중인 스니커즈의 행운 수치가 상위 등급 확률에 그대로 반영됩니다. 민팅 직전에 갈아신으세요.</string>
+    <string name="seed_tip3_title">파티런은 4명부터가 이득</string>
+    <string name="seed_tip3_body">인원당 부스트가 붙어서 혼자 뛰는 것보다 확실히 많이 쌓입니다. 로비에서 전원 준비를 눌러야 시작돼요.</string>
+    <string name="seed_crew1_title">이번 주 크루 목표 정해요</string>
+    <string name="seed_crew1_body">지난주 평균 32km 나왔으니 이번엔 35km 가봅시다. 다들 어떠세요?</string>
+    <string name="seed_crew2_title">우리 코스 지도 업데이트했습니다</string>
+    <string name="seed_crew2_body">다리 공사 때문에 3구간 우회로 넣었어요. 다음 정모 때 참고하세요.</string>
+    <string name="seed_crew3_title">오늘 밤 크루 정기런</string>
+    <string name="seed_crew3_body">8시 정각 출발. 늦으면 따라잡기 힘듭니다!</string>
 </resources>

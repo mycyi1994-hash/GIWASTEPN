@@ -60,7 +60,9 @@ import com.giwa.strideup.ui.components.StartRunButton
 import com.giwa.strideup.ui.components.TokenCard
 import com.giwa.strideup.ui.components.Wordmark
 import com.giwa.strideup.ui.components.animatedInt
+import com.giwa.strideup.ui.components.label
 import com.giwa.strideup.ui.components.quietClickable
+import com.giwa.strideup.ui.components.tint
 import com.giwa.strideup.ui.theme.CarbonHigh
 import com.giwa.strideup.ui.theme.Night
 import com.giwa.strideup.ui.theme.Silver
@@ -567,7 +569,8 @@ private fun SneakerStrip(
                 verticalArrangement = Arrangement.spacedBy(3.dp),
             ) {
                 Text(
-                    text = sneaker?.model?.displayName ?: "Apex Runner",
+                    text = sneaker?.let { "${it.faction.label()} ${it.variantName}" }
+                        ?: "Wind Runner",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     color = Snow,
@@ -590,13 +593,10 @@ private fun SneakerStrip(
                         )
                     }
                     Text(
-                        text = "×%.2f".format(
-                            sneaker?.earningMultiplier
-                                ?: RewardEconomy.sneakerMultiplier(state.sneakerLevel),
-                        ),
+                        text = "+%.1f%%".format(sneaker?.boostPercent ?: 0.0),
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Silver,
+                        color = sneaker?.faction?.tint() ?: Silver,
                     )
                 }
                 BarMeter(
