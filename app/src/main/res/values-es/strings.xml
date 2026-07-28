@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Notification -->
+    <string name="notification_channel_walk">Sesión de carrera</string>
+    <string name="notification_walk_title">Carrera en curso</string>
+    <string name="notification_steps">%1$d pasos</string>
+
+    <!-- Tabs -->
+    <string name="tab_home">Inicio</string>
+    <string name="tab_community">Comunidad</string>
+    <string name="tab_items">Ítems</string>
+    <string name="tab_events">Eventos</string>
+    <string name="tab_profile">Perfil</string>
+
+    <!-- Common -->
+    <string name="common_view_all">Ver todo</string>
+    <string name="toast_coming_soon">¡Muy pronto!</string>
+    <string name="common_ok">Aceptar</string>
+
+    <!-- Greeting -->
+    <string name="greeting_dawn">Madrugando, ¿eh?</string>
+    <string name="greeting_morning">Buenos días,</string>
+    <string name="greeting_afternoon">Buenas tardes,</string>
+    <string name="greeting_evening">Buenas noches,</string>
+    <string name="greeting_runner">¡Runner! 👋</string>
+    <string name="level_chip">Lv. %1$d</string>
+
+    <!-- Permission / sensor -->
+    <string name="perm_title">Déjanos contar tus pasos</string>
+    <string name="perm_body">Permite el acceso a la actividad física para registrar tus pasos y acumular SUP.</string>
+    <string name="perm_allow">Permitir acceso</string>
+    <string name="sensor_title">No encontramos sensor de pasos</string>
+    <string name="sensor_body">Este dispositivo (o emulador) no tiene sensor de pasos. Usa el botón de simulación en la pantalla de carrera para probar la experiencia.</string>
+
+    <!-- Home -->
+    <string name="home_total_steps">Pasos totales</string>
+    <string name="home_today">Hoy</string>
+    <string name="home_daily_goal">Meta diaria %1$s</string>
+    <string name="home_view_analytics">Ver estadísticas</string>
+    <string name="home_energy">Energía</string>
+    <string name="home_recharge_in">Recarga en %1$s</string>
+    <string name="home_distance">Distancia</string>
+    <string name="home_this_week">Esta semana</string>
+    <string name="home_view_details">Ver detalles</string>
+    <string name="home_durability">Durabilidad</string>
+    <string name="stat_efficiency">Eficiencia</string>
+    <string name="stat_luck">Suerte</string>
+    <string name="stat_comfort">Comodidad</string>
+    <string name="start_run">START RUN</string>
+    <string name="start_run_sub">¡A correr!</string>
+
+    <!-- Community -->
+    <string name="community_search_hint">Busca crews, runners o eventos</string>
+    <string name="community_filter">Filtrar</string>
+    <string name="chip_discover">Descubrir</string>
+    <string name="chip_crews">Crews</string>
+    <string name="chip_events">Eventos</string>
+    <string name="chip_following">Siguiendo</string>
+    <string name="chip_invites">Invitaciones</string>
+    <string name="community_nearby">Crews de running cercanos</string>
+    <string name="community_view_map">Ver mapa</string>
+    <string name="community_members">%1$d miembros</string>
+    <string name="community_km_away">A %1$s km</string>
+    <string name="community_tonight">PARTY RUN DE ESTA NOCHE</string>
+    <string name="community_going">%1$d apuntados</string>
+    <string name="community_im_in">ME APUNTO</string>
+    <string name="community_joined">APUNTADO</string>
+    <string name="community_popular">Posts populares</string>
+    <string name="community_post_body">Correr al amanecer se siente diferente. ¿Quién se apunta el sábado?</string>
+    <string name="time_hours_ago">hace %1$d h</string>
+    <string name="community_looking">Buscando runners</string>
+    <string name="community_beginner">Ideal para principiantes</string>
+    <string name="community_crew_all_levels">¡Todos los niveles son bienvenidos!</string>
+    <string name="community_crew_night">¿Te va la noche? Corramos juntos.</string>
+    <string name="community_join_crew">UNIRME AL CREW</string>
+    <string name="community_activity">Feed de actividad</string>
+    <string name="community_feed_joined">%1$s se unió a %2$s</string>
+    <string name="community_section_soon">Esta sección está en camino. ¡Muy pronto la verás!</string>
+
+    <!-- Items -->
+    <string name="items_sub">Equípate y gana más</string>
+    <string name="items_my_gear">Mi equipo</string>
+    <string name="items_next_level">Para el siguiente nivel</string>
+    <string name="items_upgrade_cost">Mejorar · %1$s SUP</string>
+    <string name="items_upgrade_hint">Cada nivel suma +0.15 de tasa de ganancia y +2 de energía máxima.</string>
+    <string name="items_vault">Bóveda de sneakers</string>
+    <string name="items_owned">En tu colección</string>
+    <string name="items_unlock_at">Se desbloquea en Lv. %1$d</string>
+    <string name="items_boosts">Tienda de boosts</string>
+    <string name="boost_energy_title">Celda de energía</string>
+    <string name="boost_energy_desc">Restaura 2 de energía al instante</string>
+    <string name="boost_shield_title">Escudo de racha</string>
+    <string name="boost_shield_desc">Protege tu racha durante un día</string>
+    <string name="boost_xp_title">Booster de XP</string>
+    <string name="boost_xp_desc">Duplica las recompensas de sesión por 24 h</string>
+    <string name="price_sup">%1$s SUP</string>
+    <string name="toast_upgraded">¡Sneaker mejorada! 🎉</string>
+    <string name="toast_no_balance">Todavía no tienes suficiente SUP</string>
+
+    <!-- Events -->
+    <string name="events_sub">Retos. Recompensas. Progreso.</string>
+    <string name="events_total_rewards">Tus recompensas totales</string>
+    <string name="chip_all_events">Todos</string>
+    <string name="chip_challenges">Retos</string>
+    <string name="chip_campaigns">Campañas</string>
+    <string name="chip_missions">Misiones</string>
+    <string name="events_featured">DESTACADO</string>
+    <string name="events_season">Temporada 05 · Campaña global</string>
+    <string name="events_campaign_desc">Corre, gana y desbloquea recompensas exclusivas on-chain.</string>
+    <string name="events_ends_in">Termina en</string>
+    <string name="events_reward">Recompensa</string>
+    <string name="events_active">Eventos activos</string>
+    <string name="tag_weekly">RETO SEMANAL</string>
+    <string name="tag_mission">MISIÓN</string>
+    <string name="tag_limited">TIEMPO LIMITADO</string>
+    <string name="event_step_surge">Step Surge</string>
+    <string name="event_step_surge_desc">Alcanza %1$s pasos esta semana</string>
+    <string name="event_refer">Invita y gana</string>
+    <string name="event_refer_desc">Invita a 3 amigos a unirse a StrideUp</string>
+    <string name="event_night_quest">Misión Runner Nocturno</string>
+    <string name="event_night_quest_desc">Corre 20 km después de las 8 de la noche</string>
+    <string name="events_view_progress">Ver progreso</string>
+    <string name="events_continue">Continuar</string>
+    <string name="events_claim">Reclamar</string>
+
+    <!-- Profile -->
+    <string name="profile_hello">Hola de nuevo,</string>
+    <string name="profile_next_level">%1$s / %2$s SUP</string>
+    <string name="profile_total_distance">Distancia total</string>
+    <string name="profile_lifetime_steps">Pasos acumulados</string>
+    <string name="profile_current_streak">Racha actual</string>
+    <string name="profile_achievements">Logros</string>
+    <string name="days_count">%1$d días</string>
+    <string name="ach_marathon">Maratón</string>
+    <string name="ach_marathon_desc">100 km</string>
+    <string name="ach_step_king">Rey de los Pasos</string>
+    <string name="ach_step_king_desc">1M de pasos</string>
+    <string name="ach_streak_master">Maestro de la Racha</string>
+    <string name="ach_streak_master_desc">30 días</string>
+    <string name="ach_ultra">Ultra Stride</string>
+    <string name="ach_locked">Bloqueado</string>
+    <string name="profile_my_sneakers">Mis sneakers</string>
+    <string name="profile_owned_count">Tienes %1$d</string>
+    <string name="profile_overview">Resumen del perfil</string>
+    <string name="profile_overview_sub">Tus datos clave de un vistazo</string>
+    <string name="profile_this_month">Este mes</string>
+    <string name="stat_steps">Pasos</string>
+    <string name="stat_distance">Distancia</string>
+    <string name="stat_calories">Calorías</string>
+    <string name="stat_time">Tiempo</string>
+    <string name="stat_tokens_earned">Tokens ganados</string>
+    <string name="profile_account">Cuenta y ajustes</string>
+    <string name="settings_wallet">Wallet y tokens</string>
+    <string name="settings_notifications">Notificaciones</string>
+    <string name="settings_privacy">Privacidad y seguridad</string>
+    <string name="settings_support">Centro de ayuda</string>
+    <string name="settings_connected">Cuentas conectadas</string>
+    <string name="goal_title">Meta diaria</string>
+    <string name="goal_steps_suffix">pasos</string>
+    <string name="goal_about_km">≈ %1$s km</string>
+    <string name="goal_hint">Cumple tu meta y llévate SUP extra cada día: con rachas, el bonus crece.</string>
+    <string name="about_version">Versión</string>
+    <string name="about_network">Red</string>
+    <string name="about_network_value">GIWA Chain (muy pronto)</string>
+
+    <!-- Wallet -->
+    <string name="wallet_balance">Saldo de SUP</string>
+    <string name="wallet_tagline">Cada paso suma</string>
+    <string name="wallet_earned">Total ganado</string>
+    <string name="wallet_spent">Total gastado</string>
+    <string name="wallet_history">Historial</string>
+    <string name="wallet_records">%1$d registros</string>
+    <string name="wallet_empty_title">Aún no hay historial</string>
+    <string name="wallet_empty_body">Una sola carrera basta para ganar tu primer SUP.</string>
+    <string name="wallet_giwa">Wallet GIWA</string>
+    <string name="wallet_giwa_status">Conexión on-chain en camino</string>
+    <string name="wallet_giwa_body">Muy pronto podrás cambiar tus SUP por tokens en GIWA Chain.</string>
+    <string name="wallet_withdraw">Retirar (muy pronto)</string>
+    <string name="ledger_earn_walk">Recompensa de sesión</string>
+    <string name="ledger_bonus_goal">Bonus de meta diaria</string>
+    <string name="ledger_spend_upgrade">Mejora de sneaker</string>
+    <string name="ledger_other">Recompensa</string>
+
+    <!-- Run -->
+    <string name="run_ready">LISTO</string>
+    <string name="run_active">CORRIENDO</string>
+    <string name="run_paused">EN PAUSA</string>
+    <string name="run_earnable">Ahora mismo puedes ganar hasta %1$s pasos</string>
+    <string name="run_complete">¡Carrera completada! 🎉</string>
+    <string name="run_rewarded">%1$s de %2$s pasos recompensados</string>
+    <string name="run_locked_hint">Pantalla bloqueada · toca el candado para desbloquear</string>
+    <string name="run_simulate">+100 pasos (debug)</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_lock">Bloqueo de pantalla</string>
+    <string name="cd_pause">Pausar</string>
+    <string name="cd_resume">Reanudar</string>
+    <string name="cd_stop">Detener</string>
+    <string name="cd_profile">Perfil</string>
+    <string name="cd_notifications">Notificaciones</string>
+    <string name="cd_wallet">Wallet</string>
+    <string name="cd_back">Atrás</string>
+</resources>

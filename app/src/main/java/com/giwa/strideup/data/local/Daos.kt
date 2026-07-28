@@ -17,6 +17,12 @@ interface StepDao {
 
     @Query("SELECT * FROM daily_steps WHERE epochDay = :day")
     suspend fun byDay(day: Long): DailyStepsEntity?
+
+    @Query("SELECT COALESCE(SUM(steps), 0) FROM daily_steps")
+    fun observeTotalSteps(): Flow<Long>
+
+    @Query("SELECT COALESCE(SUM(steps), 0) FROM daily_steps WHERE epochDay >= :fromDay")
+    fun observeStepsSince(fromDay: Long): Flow<Long>
 }
 
 @Dao

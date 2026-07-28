@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Notification -->
+    <string name="notification_channel_walk">ランセッション</string>
+    <string name="notification_walk_title">ラン進行中</string>
+    <string name="notification_steps">%1$d歩</string>
+
+    <!-- Tabs -->
+    <string name="tab_home">ホーム</string>
+    <string name="tab_community">コミュニティ</string>
+    <string name="tab_items">アイテム</string>
+    <string name="tab_events">イベント</string>
+    <string name="tab_profile">プロフィール</string>
+
+    <!-- Common -->
+    <string name="common_view_all">すべて見る</string>
+    <string name="toast_coming_soon">もうすぐ登場!</string>
+    <string name="common_ok">OK</string>
+
+    <!-- Greeting -->
+    <string name="greeting_dawn">早起きだね、</string>
+    <string name="greeting_morning">おはよう、</string>
+    <string name="greeting_afternoon">こんにちは、</string>
+    <string name="greeting_evening">こんばんは、</string>
+    <string name="greeting_runner">ランナーさん!👋</string>
+    <string name="level_chip">Lv. %1$d</string>
+
+    <!-- Permission / sensor -->
+    <string name="perm_title">歩数を数えるには許可が必要です</string>
+    <string name="perm_body">身体活動へのアクセスを許可すると、歩数が記録されてSUPがどんどん貯まります。</string>
+    <string name="perm_allow">アクセスを許可</string>
+    <string name="sensor_title">歩数センサーが見つかりません</string>
+    <string name="sensor_body">このデバイス(またはエミュレーター)には歩数センサーがありません。ラン画面のシミュレーションボタンで流れを試してみてください。</string>
+
+    <!-- Home -->
+    <string name="home_total_steps">合計歩数</string>
+    <string name="home_today">今日</string>
+    <string name="home_daily_goal">1日の目標 %1$s</string>
+    <string name="home_view_analytics">分析を見る</string>
+    <string name="home_energy">エネルギー</string>
+    <string name="home_recharge_in">あと%1$sで回復</string>
+    <string name="home_distance">距離</string>
+    <string name="home_this_week">今週</string>
+    <string name="home_view_details">詳細を見る</string>
+    <string name="home_durability">耐久度</string>
+    <string name="stat_efficiency">効率</string>
+    <string name="stat_luck">運</string>
+    <string name="stat_comfort">快適さ</string>
+    <string name="start_run">START RUN</string>
+    <string name="start_run_sub">さあ、走り出そう</string>
+
+    <!-- Community -->
+    <string name="community_search_hint">クルー、ランナー、イベントを検索</string>
+    <string name="community_filter">フィルター</string>
+    <string name="chip_discover">発見</string>
+    <string name="chip_crews">クルー</string>
+    <string name="chip_events">イベント</string>
+    <string name="chip_following">フォロー中</string>
+    <string name="chip_invites">招待</string>
+    <string name="community_nearby">近くのランクルー</string>
+    <string name="community_view_map">マップを見る</string>
+    <string name="community_members">メンバー%1$d人</string>
+    <string name="community_km_away">%1$s km先</string>
+    <string name="community_tonight">今夜はパーティーラン</string>
+    <string name="community_going">%1$d人参加予定</string>
+    <string name="community_im_in">参加する</string>
+    <string name="community_joined">参加済み</string>
+    <string name="community_popular">人気の投稿</string>
+    <string name="community_post_body">朝日の中を走るのは格別。土曜日、一緒にどう?</string>
+    <string name="time_hours_ago">%1$d時間前</string>
+    <string name="community_looking">ランナー募集中</string>
+    <string name="community_beginner">初心者歓迎</string>
+    <string name="community_crew_all_levels">どのレベルでも大歓迎!</string>
+    <string name="community_crew_night">夜が好きなら、一緒に走ろう。</string>
+    <string name="community_join_crew">クルーに参加</string>
+    <string name="community_activity">アクティビティフィード</string>
+    <string name="community_feed_joined">%1$sさんが%2$sに参加しました</string>
+    <string name="community_section_soon">このセクションは準備中です。お楽しみに!</string>
+
+    <!-- Items -->
+    <string name="items_sub">ギアを整えて、もっと稼ごう</string>
+    <string name="items_my_gear">マイギア</string>
+    <string name="items_next_level">次のレベルまで</string>
+    <string name="items_upgrade_cost">アップグレード · %1$s SUP</string>
+    <string name="items_upgrade_hint">レベルが上がるごとに獲得レート+0.15、最大エネルギー+2が付きます。</string>
+    <string name="items_vault">スニーカー保管庫</string>
+    <string name="items_owned">保有中</string>
+    <string name="items_unlock_at">Lv. %1$dで解放</string>
+    <string name="items_boosts">ブーストショップ</string>
+    <string name="boost_energy_title">エネルギーセル</string>
+    <string name="boost_energy_desc">エネルギーを2つ即回復</string>
+    <string name="boost_shield_title">ストリークシールド</string>
+    <string name="boost_shield_desc">連続記録を1日守ってくれる</string>
+    <string name="boost_xp_title">XPブースター</string>
+    <string name="boost_xp_desc">24時間セッション報酬が2倍</string>
+    <string name="price_sup">%1$s SUP</string>
+    <string name="toast_upgraded">スニーカーをアップグレード!🎉</string>
+    <string name="toast_no_balance">SUPがまだ足りません</string>
+
+    <!-- Events -->
+    <string name="events_sub">挑戦。報酬。成長。</string>
+    <string name="events_total_rewards">累計リワード</string>
+    <string name="chip_all_events">すべて</string>
+    <string name="chip_challenges">チャレンジ</string>
+    <string name="chip_campaigns">キャンペーン</string>
+    <string name="chip_missions">ミッション</string>
+    <string name="events_featured">注目</string>
+    <string name="events_season">シーズン05 · グローバルキャンペーン</string>
+    <string name="events_campaign_desc">走って、稼いで、限定オンチェーン報酬をアンロックしよう。</string>
+    <string name="events_ends_in">終了まで</string>
+    <string name="events_reward">報酬</string>
+    <string name="events_active">開催中のイベント</string>
+    <string name="tag_weekly">週間チャレンジ</string>
+    <string name="tag_mission">ミッション</string>
+    <string name="tag_limited">期間限定</string>
+    <string name="event_step_surge">ステップサージ</string>
+    <string name="event_step_surge_desc">今週%1$s歩を達成しよう</string>
+    <string name="event_refer">友達招待</string>
+    <string name="event_refer_desc">友達3人をStrideUpに招待しよう</string>
+    <string name="event_night_quest">ナイトランナークエスト</string>
+    <string name="event_night_quest_desc">夜8時以降に20 km走る</string>
+    <string name="events_view_progress">進捗を見る</string>
+    <string name="events_continue">続ける</string>
+    <string name="events_claim">受け取る</string>
+
+    <!-- Profile -->
+    <string name="profile_hello">おかえり、</string>
+    <string name="profile_next_level">%1$s / %2$s SUP</string>
+    <string name="profile_total_distance">累計距離</string>
+    <string name="profile_lifetime_steps">累計歩数</string>
+    <string name="profile_current_streak">現在のストリーク</string>
+    <string name="profile_achievements">実績</string>
+    <string name="days_count">%1$d日</string>
+    <string name="ach_marathon">マラソン</string>
+    <string name="ach_marathon_desc">100 km</string>
+    <string name="ach_step_king">ステップキング</string>
+    <string name="ach_step_king_desc">100万歩</string>
+    <string name="ach_streak_master">ストリークマスター</string>
+    <string name="ach_streak_master_desc">30日連続</string>
+    <string name="ach_ultra">ウルトラストライド</string>
+    <string name="ach_locked">未解放</string>
+    <string name="profile_my_sneakers">マイスニーカー</string>
+    <string name="profile_owned_count">%1$d足保有</string>
+    <string name="profile_overview">プロフィール概要</string>
+    <string name="profile_overview_sub">あなたのハイライトをひと目で</string>
+    <string name="profile_this_month">今月</string>
+    <string name="stat_steps">歩数</string>
+    <string name="stat_distance">距離</string>
+    <string name="stat_calories">カロリー</string>
+    <string name="stat_time">時間</string>
+    <string name="stat_tokens_earned">獲得トークン</string>
+    <string name="profile_account">アカウントと設定</string>
+    <string name="settings_wallet">ウォレットとトークン</string>
+    <string name="settings_notifications">通知</string>
+    <string name="settings_privacy">プライバシーとセキュリティ</string>
+    <string name="settings_support">サポートセンター</string>
+    <string name="settings_connected">連携アカウント</string>
+    <string name="goal_title">1日の目標</string>
+    <string name="goal_steps_suffix">歩</string>
+    <string name="goal_about_km">約 %1$s km</string>
+    <string name="goal_hint">目標を達成すると毎日ボーナスSUP!連続達成でさらにアップします。</string>
+    <string name="about_version">バージョン</string>
+    <string name="about_network">ネットワーク</string>
+    <string name="about_network_value">GIWAチェーン(準備中)</string>
+
+    <!-- Wallet -->
+    <string name="wallet_balance">SUP残高</string>
+    <string name="wallet_tagline">一歩ごとに、どんどん貯まる</string>
+    <string name="wallet_earned">累計獲得</string>
+    <string name="wallet_spent">累計使用</string>
+    <string name="wallet_history">履歴</string>
+    <string name="wallet_records">%1$d件</string>
+    <string name="wallet_empty_title">まだ履歴がありません</string>
+    <string name="wallet_empty_body">ラン1回で、最初のSUPが手に入ります。</string>
+    <string name="wallet_giwa">GIWAウォレット</string>
+    <string name="wallet_giwa_status">オンチェーン連携を準備中</string>
+    <string name="wallet_giwa_body">もうすぐSUPをGIWAチェーンのトークンにスワップできるようになります。</string>
+    <string name="wallet_withdraw">出金(準備中)</string>
+    <string name="ledger_earn_walk">ランセッション報酬</string>
+    <string name="ledger_bonus_goal">1日の目標ボーナス</string>
+    <string name="ledger_spend_upgrade">スニーカーアップグレード</string>
+    <string name="ledger_other">リワード</string>
+
+    <!-- Run -->
+    <string name="run_ready">準備完了</string>
+    <string name="run_active">ラン中</string>
+    <string name="run_paused">一時停止中</string>
+    <string name="run_earnable">今は%1$s歩まで獲得できます</string>
+    <string name="run_complete">ラン完了!🎉</string>
+    <string name="run_rewarded">%2$s歩中%1$s歩を獲得しました</string>
+    <string name="run_locked_hint">画面ロック中 · ロックをタップで解除</string>
+    <string name="run_simulate">+100歩(デバッグ)</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_lock">画面ロック</string>
+    <string name="cd_pause">一時停止</string>
+    <string name="cd_resume">再開</string>
+    <string name="cd_stop">停止</string>
+    <string name="cd_profile">プロフィール</string>
+    <string name="cd_notifications">通知</string>
+    <string name="cd_wallet">ウォレット</string>
+    <string name="cd_back">戻る</string>
+</resources>

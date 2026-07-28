@@ -1,42 +1,41 @@
 package com.giwa.strideup.ui.theme
 
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 
-private val StrideUpLightColors = lightColorScheme(
-    primary = Coral,
-    onPrimary = Color.White,
-    primaryContainer = Sand,
-    onPrimaryContainer = CoralDeep,
-    secondary = Sage,
-    onSecondary = Color.White,
-    secondaryContainer = Sand,
-    onSecondaryContainer = Ink,
-    tertiary = Honey,
-    onTertiary = Color.White,
-    background = Cream,
-    onBackground = Ink,
-    surface = CardWhite,
-    onSurface = Ink,
-    surfaceVariant = Sand,
-    onSurfaceVariant = Taupe,
-    surfaceContainer = CardWhite,
-    surfaceContainerHigh = Cream,
-    surfaceContainerHighest = Sand,
-    error = Rose,
-    onError = Color.White,
-    outline = Border,
-    outlineVariant = Border,
-    scrim = Ink,
+private val StrideUpDarkColors = darkColorScheme(
+    primary = Volt,
+    onPrimary = Night,
+    primaryContainer = CarbonHigh,
+    onPrimaryContainer = VoltSoft,
+    secondary = VoltSoft,
+    onSecondary = Night,
+    secondaryContainer = CarbonHigh,
+    onSecondaryContainer = Snow,
+    tertiary = Volt,
+    onTertiary = Night,
+    background = Night,
+    onBackground = Snow,
+    surface = Carbon,
+    onSurface = Snow,
+    surfaceVariant = CarbonHigh,
+    onSurfaceVariant = Silver,
+    surfaceContainer = Carbon,
+    surfaceContainerHigh = CarbonHigh,
+    surfaceContainerHighest = CarbonHigh,
+    error = Alert,
+    onError = Night,
+    outline = Edge,
+    outlineVariant = Edge,
+    scrim = Night,
 )
 
-/** StrideUp은 따뜻한 크림 라이트 테마만 사용한다. */
+/** StrideUp은 네온이 살아나는 딥 블랙 다크 테마만 사용한다. */
 @Composable
 fun StrideUpTheme(content: @Composable () -> Unit) {
     MaterialTheme(
-        colorScheme = StrideUpLightColors,
+        colorScheme = StrideUpDarkColors,
         typography = StrideUpTypography,
         shapes = StrideUpShapes,
         content = content,

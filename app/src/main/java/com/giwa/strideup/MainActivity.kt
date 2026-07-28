@@ -15,10 +15,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // 크림 라이트 테마 고정 — 시스템 다크 모드와 무관하게 어두운 상태바 아이콘을 쓴다.
+        // 딥 블랙 다크 테마 고정 — 시스템 설정과 무관하게 밝은 상태바 아이콘을 쓴다.
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),
-            navigationBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),
+            statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
         )
         // 이미 권한이 있으면 바로 추적 시작 (첫 요청은 StrideUpRoot에서 처리)
         if (StepPermissions.hasActivityRecognition(this)) {

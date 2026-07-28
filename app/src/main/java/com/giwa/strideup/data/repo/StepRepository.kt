@@ -57,6 +57,15 @@ class StepRepository(
         return stepDao.observeSince(from)
     }
 
+    /** 앱 설치 후 누적 걸음 수 */
+    fun observeLifetimeSteps(): Flow<Long> = stepDao.observeTotalSteps()
+
+    /** 이번 달 1일부터의 걸음 수 */
+    fun observeMonthSteps(): Flow<Long> {
+        val from = LocalDate.now().withDayOfMonth(1).toEpochDay()
+        return stepDao.observeStepsSince(from)
+    }
+
     /** 에뮬레이터 데모용 걸음 시뮬레이션 */
     fun simulateSteps(count: Int) = tracker.simulateSteps(count)
 

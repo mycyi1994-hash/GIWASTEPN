@@ -180,7 +180,7 @@ class WalkSessionService : Service() {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_stat_walk)
             .setContentTitle(getString(R.string.notification_walk_title))
-            .setContentText("${steps}걸음")
+            .setContentText(getString(R.string.notification_steps, steps))
             .setContentIntent(contentIntent)
             .setOngoing(true)
             .setOnlyAlertOnce(true)

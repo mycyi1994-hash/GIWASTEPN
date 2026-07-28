@@ -5,7 +5,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,26 +15,26 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Hexagon
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.WorkspacePremium
+import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,28 +44,35 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.giwa.strideup.R
 import com.giwa.strideup.core.ServiceLocator
-import com.giwa.strideup.ui.components.AmbientBackdrop
+import com.giwa.strideup.ui.components.HairlineDivider
+import com.giwa.strideup.ui.components.NightCanvas
 import com.giwa.strideup.ui.components.quietClickable
+import com.giwa.strideup.ui.screens.community.CommunityScreen
+import com.giwa.strideup.ui.screens.events.EventsScreen
 import com.giwa.strideup.ui.screens.home.HomeScreen
+import com.giwa.strideup.ui.screens.items.ItemsScreen
 import com.giwa.strideup.ui.screens.profile.ProfileScreen
-import com.giwa.strideup.ui.screens.rewards.RewardsScreen
-import com.giwa.strideup.ui.screens.walk.WalkScreen
-import com.giwa.strideup.ui.theme.Border
-import com.giwa.strideup.ui.theme.CardWhite
-import com.giwa.strideup.ui.theme.Coral
-import com.giwa.strideup.ui.theme.Ink
-import com.giwa.strideup.ui.theme.SunsetPlate
-import com.giwa.strideup.ui.theme.TaupeLight
+import com.giwa.strideup.ui.screens.rewards.WalletScreen
+import com.giwa.strideup.ui.screens.walk.RunScreen
+import com.giwa.strideup.ui.theme.Carbon
+import com.giwa.strideup.ui.theme.Night
+import com.giwa.strideup.ui.theme.Slate
+import com.giwa.strideup.ui.theme.Volt
 
-sealed class Screen(val route: String, val label: String, val icon: ImageVector) {
-    data object Home : Screen("home", "홈", Icons.Filled.Home)
-    data object Walk : Screen("walk", "워킹", Icons.AutoMirrored.Filled.DirectionsWalk)
-    data object Rewards : Screen("rewards", "리워드", Icons.Filled.WorkspacePremium)
-    data object Profile : Screen("profile", "프로필", Icons.Filled.Person)
+sealed class Screen(val route: String, val labelRes: Int, val icon: ImageVector) {
+    data object Home : Screen("home", R.string.tab_home, Icons.Filled.Hexagon)
+    data object Community : Screen("community", R.string.tab_community, Icons.Filled.Groups)
+    data object Items : Screen("items", R.string.tab_items, Icons.Filled.ShoppingBag)
+    data object Events : Screen("events", R.string.tab_events, Icons.Filled.Event)
+    data object Profile : Screen("profile", R.string.tab_profile, Icons.Filled.Person)
 }
 
-private val bottomTabs = listOf(Screen.Home, Screen.Walk, Screen.Rewards, Screen.Profile)
+private val bottomTabs = listOf(Screen.Home, Screen.Community, Screen.Items, Screen.Events, Screen.Profile)
+
+const val ROUTE_RUN = "run"
+const val ROUTE_WALLET = "wallet"
 
 @Composable
 fun StrideUpRoot() {
@@ -90,11 +96,11 @@ fun StrideUpRoot() {
     val navController = rememberNavController()
 
     Box(Modifier.fillMaxSize()) {
-        AmbientBackdrop(Modifier.fillMaxSize())
+        NightCanvas(Modifier.fillMaxSize())
 
         Scaffold(
             containerColor = Color.Transparent,
-            bottomBar = { FloatingDock(navController) },
+            bottomBar = { VoltNavBar(navController) },
         ) { innerPadding ->
             NavHost(
                 navController = navController,
@@ -102,11 +108,22 @@ fun StrideUpRoot() {
                 modifier = Modifier.padding(innerPadding),
             ) {
                 composable(Screen.Home.route) {
-                    HomeScreen(onStartWalk = { navController.switchTab(Screen.Walk) })
+                    HomeScreen(
+                        onStartRun = { navController.navigate(ROUTE_RUN) },
+                        onOpenWallet = { navController.navigate(ROUTE_WALLET) },
+                        onOpenEvents = { navController.switchTab(Screen.Events) },
+                        onOpenProfile = { navController.switchTab(Screen.Profile) },
+                        onOpenItems = { navController.switchTab(Screen.Items) },
+                    )
                 }
-                composable(Screen.Walk.route) { WalkScreen() }
-                composable(Screen.Rewards.route) { RewardsScreen() }
-                composable(Screen.Profile.route) { ProfileScreen() }
+                composable(Screen.Community.route) { CommunityScreen() }
+                composable(Screen.Items.route) { ItemsScreen() }
+                composable(Screen.Events.route) { EventsScreen() }
+                composable(Screen.Profile.route) {
+                    ProfileScreen(onOpenWallet = { navController.navigate(ROUTE_WALLET) })
+                }
+                composable(ROUTE_RUN) { RunScreen(onBack = { navController.popBackStack() }) }
+                composable(ROUTE_WALLET) { WalletScreen(onBack = { navController.popBackStack() }) }
             }
         }
     }
@@ -121,36 +138,30 @@ private fun NavHostController.switchTab(screen: Screen) {
     }
 }
 
-/** 떠 있는 pill 독 내비게이션. 활성 탭은 코럴, 인디케이터는 작은 선셋 점 하나. */
+/** 딥 블랙 하단 내비게이션 — 활성 탭은 볼트 + 라벨 아래 점. */
 @Composable
-private fun FloatingDock(navController: NavHostController) {
+private fun VoltNavBar(navController: NavHostController) {
     val backStack by navController.currentBackStackEntryAsState()
     val currentRoute = backStack?.destination?.route
-    val shape = RoundedCornerShape(34.dp)
 
-    Box(
-        modifier = Modifier
+    Column(
+        Modifier
             .fillMaxWidth()
-            .navigationBarsPadding()
-            .padding(start = 24.dp, end = 24.dp, bottom = 12.dp),
+            .background(
+                Brush.verticalGradient(listOf(Carbon.copy(alpha = 0.97f), Night)),
+            ),
     ) {
+        HairlineDivider()
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .shadow(
-                    elevation = 18.dp,
-                    shape = shape,
-                    spotColor = Ink.copy(alpha = 0.22f),
-                    ambientColor = Ink.copy(alpha = 0.10f),
-                )
-                .background(CardWhite, shape)
-                .border(1.dp, Border, shape)
-                .padding(vertical = 10.dp, horizontal = 6.dp),
+                .navigationBarsPadding()
+                .padding(top = 10.dp, bottom = 8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             bottomTabs.forEach { screen ->
-                DockTab(
+                NavTab(
                     screen = screen,
                     selected = currentRoute == screen.route,
                     onClick = { navController.switchTab(screen) },
@@ -161,41 +172,40 @@ private fun FloatingDock(navController: NavHostController) {
 }
 
 @Composable
-private fun DockTab(screen: Screen, selected: Boolean, onClick: () -> Unit) {
+private fun NavTab(screen: Screen, selected: Boolean, onClick: () -> Unit) {
     val tint by animateColorAsState(
-        targetValue = if (selected) Coral else TaupeLight,
-        label = "dockTabTint",
+        targetValue = if (selected) Volt else Slate,
+        label = "navTabTint",
     )
     val dotAlpha by animateFloatAsState(
         targetValue = if (selected) 1f else 0f,
-        label = "dockTabDot",
+        label = "navTabDot",
     )
     Column(
         modifier = Modifier
-            .clip(RoundedCornerShape(20.dp))
             .quietClickable(onClick)
-            .padding(horizontal = 14.dp, vertical = 4.dp),
+            .padding(horizontal = 10.dp, vertical = 2.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Icon(
             imageVector = screen.icon,
-            contentDescription = screen.label,
+            contentDescription = stringResource(screen.labelRes),
             tint = tint,
             modifier = Modifier.size(22.dp),
         )
         Text(
-            text = screen.label,
+            text = stringResource(screen.labelRes),
             color = tint,
             fontSize = 10.sp,
-            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
-            letterSpacing = 0.4.sp,
+            fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+            letterSpacing = 0.3.sp,
         )
         Box(
             modifier = Modifier
                 .size(4.dp)
                 .alpha(dotAlpha)
-                .background(SunsetPlate, CircleShape),
+                .background(Volt, CircleShape),
         )
     }
 }
