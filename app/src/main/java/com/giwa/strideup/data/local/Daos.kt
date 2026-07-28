@@ -71,7 +71,23 @@ interface SneakerDao {
     @Delete
     suspend fun delete(sneaker: SneakerEntity)
 
-    @Query("SELECT * FROM sneakers ORDER BY equipped DESC, rarity DESC, acquiredAt DESC")
+    /**
+     * rarity는 TEXT라 그냥 정렬하면 사전순(RARE > LEGENDARY > EPIC > COMMON)이 된다.
+     * 도감은 등급이 높은 순으로 보여야 하므로 정렬 키를 따로 만든다.
+     */
+    @Query(
+        """
+        SELECT * FROM sneakers
+        ORDER BY equipped DESC,
+            CASE rarity
+                WHEN 'LEGENDARY' THEN 3
+                WHEN 'EPIC' THEN 2
+                WHEN 'RARE' THEN 1
+                ELSE 0
+            END DESC,
+            acquiredAt DESC
+        """
+    )
     fun observeAll(): Flow<List<SneakerEntity>>
 
     @Query("SELECT * FROM sneakers WHERE equipped = 1 LIMIT 1")
