@@ -1,8 +1,10 @@
 package com.giwa.strideup.data.local
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
@@ -33,6 +35,12 @@ interface WalkSessionDao {
 
     @Query("SELECT * FROM walk_sessions ORDER BY startedAt DESC LIMIT :limit")
     fun observeRecent(limit: Int): Flow<List<WalkSessionEntity>>
+
+    @Query("SELECT COUNT(*) FROM walk_sessions")
+    fun observeSessionCount(): Flow<Int>
+
+    @Query("SELECT COALESCE(SUM(durationSec), 0) FROM walk_sessions WHERE startedAt >= :fromMillis")
+    fun observeDurationSince(fromMillis: Long): Flow<Long>
 }
 
 @Dao
@@ -49,4 +57,102 @@ interface RewardDao {
 
     @Query("SELECT * FROM rewards ORDER BY timestamp DESC, id DESC LIMIT :limit")
     fun observeLedger(limit: Int): Flow<List<RewardEntity>>
+}
+
+@Dao
+interface SneakerDao {
+
+    @Insert
+    suspend fun insert(sneaker: SneakerEntity): Long
+
+    @Update
+    suspend fun update(sneaker: SneakerEntity)
+
+    @Delete
+    suspend fun delete(sneaker: SneakerEntity)
+
+    @Query("SELECT * FROM sneakers ORDER BY equipped DESC, rarity DESC, acquiredAt DESC")
+    fun observeAll(): Flow<List<SneakerEntity>>
+
+    @Query("SELECT * FROM sneakers WHERE equipped = 1 LIMIT 1")
+    fun observeEquipped(): Flow<SneakerEntity?>
+
+    @Query("SELECT * FROM sneakers WHERE equipped = 1 LIMIT 1")
+    suspend fun equippedNow(): SneakerEntity?
+
+    @Query("SELECT * FROM sneakers WHERE id = :id")
+    suspend fun byId(id: Long): SneakerEntity?
+
+    @Query("UPDATE sneakers SET equipped = 0")
+    suspend fun clearEquipped()
+
+    @Query("SELECT COUNT(*) FROM sneakers")
+    suspend fun count(): Int
+
+    @Query("SELECT COUNT(*) FROM sneakers")
+    fun observeCount(): Flow<Int>
+
+    @Query("SELECT COALESCE(MAX(mintNumber), 0) FROM sneakers")
+    suspend fun maxMintNumber(): Int
+}
+
+@Dao
+interface BoostDao {
+
+    @Insert
+    suspend fun insert(boost: BoostEntity)
+
+    @Query("SELECT * FROM boosts WHERE expiresAt > :now ORDER BY expiresAt ASC")
+    fun observeActive(now: Long): Flow<List<BoostEntity>>
+
+    @Query("SELECT * FROM boosts WHERE type = :type AND expiresAt > :now LIMIT 1")
+    suspend fun activeOf(type: String, now: Long): BoostEntity?
+
+    @Query("DELETE FROM boosts WHERE expiresAt <= :now")
+    suspend fun purgeExpired(now: Long)
+}
+
+@Dao
+interface ClaimedEventDao {
+
+    @Insert
+    suspend fun insert(entity: ClaimedEventEntity)
+
+    @Query("SELECT * FROM claimed_events")
+    fun observeAll(): Flow<List<ClaimedEventEntity>>
+
+    @Query("SELECT * FROM claimed_events WHERE eventId = :id")
+    suspend fun byId(id: String): ClaimedEventEntity?
+}
+
+@Dao
+interface CrewDao {
+
+    @Insert
+    suspend fun insert(entity: CrewMembershipEntity)
+
+    @Query("SELECT * FROM crew_memberships")
+    fun observeAll(): Flow<List<CrewMembershipEntity>>
+
+    @Query("DELETE FROM crew_memberships WHERE crewId = :id")
+    suspend fun leave(id: String)
+}
+
+@Dao
+interface NotificationDao {
+
+    @Insert
+    suspend fun insert(entity: NotificationEntity)
+
+    @Query("SELECT * FROM notifications ORDER BY timestamp DESC LIMIT :limit")
+    fun observeAll(limit: Int): Flow<List<NotificationEntity>>
+
+    @Query("SELECT COUNT(*) FROM notifications WHERE read = 0")
+    fun observeUnreadCount(): Flow<Int>
+
+    @Query("UPDATE notifications SET read = 1")
+    suspend fun markAllRead()
+
+    @Query("DELETE FROM notifications")
+    suspend fun clear()
 }

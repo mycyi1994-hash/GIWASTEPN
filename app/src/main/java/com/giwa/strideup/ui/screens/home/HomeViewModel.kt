@@ -7,9 +7,12 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.giwa.strideup.core.ServiceLocator
 import com.giwa.strideup.data.local.DailyStepsEntity
 import com.giwa.strideup.data.prefs.UserPrefs
+import com.giwa.strideup.data.repo.NotificationRepository
 import com.giwa.strideup.data.repo.RewardRepository
+import com.giwa.strideup.data.repo.SneakerRepository
 import com.giwa.strideup.data.repo.StepRepository
 import com.giwa.strideup.domain.RewardEconomy
+import com.giwa.strideup.domain.Sneaker
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -18,6 +21,8 @@ import kotlinx.coroutines.flow.stateIn
 class HomeViewModel(
     private val stepRepository: StepRepository,
     rewardRepository: RewardRepository,
+    sneakerRepository: SneakerRepository,
+    notificationRepository: NotificationRepository,
 ) : ViewModel() {
 
     data class UiState(
@@ -30,12 +35,18 @@ class HomeViewModel(
         val sneakerLevel: Int = 1,
         val week: List<DailyStepsEntity> = emptyList(),
         val sensorAvailable: Boolean = true,
+        val equipped: Sneaker? = null,
     ) {
         val energyPercent: Int
             get() = if (maxEnergy > 0) ((energy / maxEnergy) * 100).toInt().coerceIn(0, 100) else 0
         val goalPercent: Int
             get() = if (goal > 0) (todaySteps * 100 / goal) else 0
+        val level: Int
+            get() = equipped?.level ?: sneakerLevel
     }
+
+    val unreadCount: StateFlow<Int> = notificationRepository.unreadCount
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
 
     val uiState: StateFlow<UiState> = combine(
         combine(
@@ -49,17 +60,19 @@ class HomeViewModel(
             rewardRepository.sneakerLevel,
         ) { balance, streak, level -> Triple(balance, streak, level) },
         stepRepository.observeWeek(),
-    ) { (steps, goal, energy), (balance, streak, level), week ->
+        sneakerRepository.equipped,
+    ) { (steps, goal, energy), (balance, streak, level), week, equipped ->
         UiState(
             todaySteps = steps,
             goal = goal,
             energy = energy,
-            maxEnergy = RewardEconomy.maxEnergy(level),
+            maxEnergy = RewardEconomy.maxEnergy(equipped?.level ?: level),
             balance = balance,
             streak = streak,
             sneakerLevel = level,
             week = week,
             sensorAvailable = stepRepository.stepSensorAvailable,
+            equipped = equipped,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState())
 
@@ -69,7 +82,12 @@ class HomeViewModel(
     companion object {
         val Factory = viewModelFactory {
             initializer {
-                HomeViewModel(ServiceLocator.stepRepository, ServiceLocator.rewardRepository)
+                HomeViewModel(
+                    ServiceLocator.stepRepository,
+                    ServiceLocator.rewardRepository,
+                    ServiceLocator.sneakerRepository,
+                    ServiceLocator.notificationRepository,
+                )
             }
         }
     }

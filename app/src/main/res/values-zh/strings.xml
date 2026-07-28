@@ -1,24 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Notification -->
-    <string name="notification_channel_walk">跑步会话</string>
-    <string name="notification_walk_title">跑步进行中</string>
+    <string name="notification_channel_walk">跑步记录</string>
+    <string name="notification_walk_title">正在跑步</string>
     <string name="notification_steps">%1$d 步</string>
 
     <!-- Tabs -->
     <string name="tab_home">首页</string>
     <string name="tab_community">社区</string>
-    <string name="tab_items">道具</string>
+    <string name="tab_items">装备</string>
     <string name="tab_events">活动</string>
     <string name="tab_profile">我的</string>
 
     <!-- Common -->
     <string name="common_view_all">查看全部</string>
-    <string name="toast_coming_soon">马上就来！</string>
-    <string name="common_ok">确定</string>
+    <string name="common_ok">好的</string>
+    <string name="common_close">关闭</string>
+    <string name="common_cancel">取消</string>
+    <string name="common_confirm">确认</string>
+    <string name="common_none">还没有</string>
+
+    <!-- Splash -->
+    <string name="splash_tagline">Every Step. Every Stride. Every Day.</string>
+    <string name="splash_loading">LOADING</string>
+    <string name="splash_syncing">正在同步跑步数据</string>
+    <string name="splash_preparing">正在帮你热身…</string>
 
     <!-- Greeting -->
-    <string name="greeting_dawn">起得真早，</string>
+    <string name="greeting_dawn">早起的鸟儿，</string>
     <string name="greeting_morning">早上好，</string>
     <string name="greeting_afternoon">下午好，</string>
     <string name="greeting_evening">晚上好，</string>
@@ -26,28 +35,28 @@
     <string name="level_chip">Lv. %1$d</string>
 
     <!-- Permission / sensor -->
-    <string name="perm_title">让我们帮你记步数吧</string>
-    <string name="perm_body">开启身体活动权限，步数就能记录下来，SUP 也会越攒越多。</string>
+    <string name="perm_title">让我们帮你数步数</string>
+    <string name="perm_body">允许身体活动权限，步数才能被记录，SUP 也会一直累积。</string>
     <string name="perm_allow">允许访问</string>
-    <string name="sensor_title">没有找到计步传感器</string>
+    <string name="sensor_title">没找到计步传感器</string>
     <string name="sensor_body">这台设备（或模拟器）没有计步传感器。可以在跑步页面用模拟按钮体验一下流程。</string>
 
     <!-- Home -->
     <string name="home_total_steps">总步数</string>
     <string name="home_today">今天</string>
     <string name="home_daily_goal">每日目标 %1$s</string>
-    <string name="home_view_analytics">查看统计</string>
+    <string name="home_view_analytics">查看数据</string>
     <string name="home_energy">能量</string>
-    <string name="home_recharge_in">%1$s 后恢复</string>
+    <string name="home_recharge_in">%1$s 后回满</string>
     <string name="home_distance">距离</string>
     <string name="home_this_week">本周</string>
     <string name="home_view_details">查看详情</string>
     <string name="home_durability">耐久度</string>
     <string name="stat_efficiency">效率</string>
     <string name="stat_luck">幸运</string>
-    <string name="stat_comfort">舒适度</string>
+    <string name="stat_comfort">舒适</string>
     <string name="start_run">START RUN</string>
-    <string name="start_run_sub">一起跑起来吧</string>
+    <string name="start_run_sub">出发吧</string>
 
     <!-- Community -->
     <string name="community_search_hint">搜索跑团、跑者或活动</string>
@@ -55,144 +64,291 @@
     <string name="chip_discover">发现</string>
     <string name="chip_crews">跑团</string>
     <string name="chip_events">活动</string>
-    <string name="chip_following">关注</string>
+    <string name="chip_following">关注中</string>
     <string name="chip_invites">邀请</string>
     <string name="community_nearby">附近的跑团</string>
     <string name="community_view_map">查看地图</string>
-    <string name="community_members">%1$d 位成员</string>
-    <string name="community_km_away">距离 %1$s km</string>
-    <string name="community_tonight">今晚派对夜跑</string>
+    <string name="community_members">%1$d 名成员</string>
+    <string name="community_km_away">%1$s km 外</string>
+    <string name="community_tonight">今晚的组队跑</string>
     <string name="community_going">%1$d 人参加</string>
-    <string name="community_im_in">我要参加</string>
-    <string name="community_joined">已参加</string>
+    <string name="community_im_in">我要来</string>
+    <string name="community_joined">已加入</string>
     <string name="community_popular">热门帖子</string>
-    <string name="community_post_body">日出时跑步的感觉真的不一样。周六有人一起吗？</string>
+    <string name="community_post_body">日出跑的感觉真的不一样。周六有人一起吗？</string>
     <string name="time_hours_ago">%1$d 小时前</string>
-    <string name="community_looking">跑者招募中</string>
+    <string name="time_just_now">刚刚</string>
+    <string name="time_minutes_ago">%1$d 分钟前</string>
+    <string name="time_days_ago">%1$d 天前</string>
+    <string name="community_looking">正在招跑者</string>
     <string name="community_beginner">新手友好</string>
-    <string name="community_crew_all_levels">不管什么水平都欢迎！</string>
-    <string name="community_crew_night">喜欢夜晚？一起跑吧。</string>
+    <string name="community_crew_all_levels">什么水平都欢迎！</string>
+    <string name="community_crew_night">喜欢夜跑？一起来吧。</string>
     <string name="community_join_crew">加入跑团</string>
+    <string name="community_leave_crew">退出</string>
     <string name="community_activity">动态</string>
     <string name="community_feed_joined">%1$s 加入了 %2$s</string>
-    <string name="community_section_soon">这个板块正在准备中，敬请期待！</string>
+    <string name="community_no_results">没有匹配 \"%1$s\" 的跑团</string>
+
+    <!-- Crew party run -->
+    <string name="crew_lobby">组队跑大厅</string>
+    <string name="crew_open_lobby">打开大厅</string>
+    <string name="crew_ready">我准备好了</string>
+    <string name="crew_ready_cancel">取消准备</string>
+    <string name="crew_ready_count">%1$d / %2$d 人已准备</string>
+    <string name="crew_waiting">正在等队友…</string>
+    <string name="crew_all_ready">全员准备完毕！</string>
+    <string name="crew_you">我</string>
+    <string name="crew_state_ready">已准备</string>
+    <string name="crew_state_waiting">等待中</string>
+    <string name="crew_go">出发！</string>
+    <string name="crew_boost">组队加成 +%1$d%%</string>
+    <string name="crew_boost_hint" formatted="false">每多一位队友，收益 +10%，最高叠到 +50%。</string>
+    <string name="crew_running_together">正和 %1$d 位跑者一起跑</string>
+    <string name="crew_result_title">组队跑完成！🎉</string>
+    <string name="crew_result_body">%1$s 步已结算 · 组队加成 %2$d%%</string>
+    <string name="crew_leave_lobby">离开大厅</string>
+    <string name="crew_join_first">先加入跑团才能一起跑</string>
 
     <!-- Items -->
     <string name="items_sub">装备到位，赚得更多</string>
     <string name="items_my_gear">我的装备</string>
-    <string name="items_next_level">距下一级</string>
+    <string name="items_next_level">距离下一级</string>
     <string name="items_upgrade_cost">升级 · %1$s SUP</string>
-    <string name="items_upgrade_hint">每升一级，收益倍率 +0.15、能量上限 +2。</string>
-    <string name="items_vault">跑鞋收藏库</string>
+    <string name="items_upgrade_hint">每升一级，收益倍率 +0.15，属性也会一起涨。</string>
+    <string name="items_max_level">已经是最高等级了</string>
+    <string name="items_vault">球鞋仓库</string>
     <string name="items_owned">已拥有</string>
-    <string name="items_unlock_at">Lv. %1$d 解锁</string>
+    <string name="items_equipped">已装备</string>
+    <string name="items_equip">装备</string>
     <string name="items_boosts">加成商店</string>
+    <string name="items_active_boosts">生效中的加成</string>
+    <string name="items_collection">图鉴</string>
+    <string name="items_collection_progress">%1$d / %2$d 种组合</string>
+    <string name="items_mint_title">铸造新球鞋</string>
+    <string name="items_mint_desc">装备球鞋的幸运越高，开出稀有款的概率就越大。</string>
+    <string name="items_mint_button">铸造 · %1$s SUP</string>
+    <string name="mint_result_title">新球鞋到手！</string>
     <string name="boost_energy_title">能量电池</string>
-    <string name="boost_energy_desc">立即恢复 2 点能量</string>
-    <string name="boost_shield_title">连跑护盾</string>
-    <string name="boost_shield_desc">守护你一天的连跑记录</string>
+    <string name="boost_energy_desc">立即回复 2 点能量</string>
+    <string name="boost_shield_title">连击护盾</string>
+    <string name="boost_shield_desc">24 小时内保住你的连续记录</string>
     <string name="boost_xp_title">XP 加速器</string>
-    <string name="boost_xp_desc">24 小时内跑步奖励翻倍</string>
+    <string name="boost_xp_desc">24 小时内单次收益翻倍</string>
+    <string name="boost_time_left">剩余 %1$s</string>
     <string name="price_sup">%1$s SUP</string>
-    <string name="toast_upgraded">跑鞋升级成功！🎉</string>
-    <string name="toast_no_balance">SUP 还不够哦</string>
+    <string name="toast_upgraded">球鞋升级成功！🎉</string>
+    <string name="toast_no_balance">SUP 还不够</string>
+    <string name="toast_boost_active">这个加成已经在生效了</string>
+    <string name="toast_boost_bought">加成已激活！</string>
+    <string name="toast_equipped">已装备 %1$s</string>
+    <string name="toast_max_level">已经满级啦</string>
+
+    <!-- Sneaker detail -->
+    <string name="sneaker_stats">属性</string>
+    <string name="sneaker_mint_no">铸造 #%1$04d</string>
+    <string name="sneaker_earning">收益倍率</string>
+    <string name="sneaker_energy_saving">能量节省</string>
+    <string name="sneaker_durability">耐久度</string>
+    <string name="sneaker_about">关于这枚 NFT</string>
+    <string name="sneaker_about_body">每一双球鞋在铸造时都会随机生成型号、配色和属性。稀有度决定属性上限——传说级能开出最强的数值，也能升到最高等级。</string>
+    <string name="rarity_common">普通</string>
+    <string name="rarity_uncommon">精良</string>
+    <string name="rarity_rare">稀有</string>
+    <string name="rarity_epic">史诗</string>
+    <string name="rarity_legendary">传说</string>
 
     <!-- Events -->
     <string name="events_sub">挑战。奖励。成长。</string>
-    <string name="events_total_rewards">你的累计奖励</string>
+    <string name="events_total_rewards">我的累计奖励</string>
     <string name="chip_all_events">全部活动</string>
     <string name="chip_challenges">挑战</string>
-    <string name="chip_campaigns">主题活动</string>
+    <string name="chip_campaigns">赛季活动</string>
     <string name="chip_missions">任务</string>
     <string name="events_featured">精选</string>
-    <string name="events_season">赛季 05 · 全球主题活动</string>
-    <string name="events_campaign_desc">边跑边赚，解锁限定链上奖励。</string>
+    <string name="events_season">第 05 赛季 · 全球活动</string>
+    <string name="events_campaign_desc">跑起来、赚起来，解锁限定链上奖励。</string>
     <string name="events_ends_in">距结束</string>
     <string name="events_reward">奖励</string>
     <string name="events_active">进行中的活动</string>
     <string name="tag_weekly">每周挑战</string>
     <string name="tag_mission">任务</string>
     <string name="tag_limited">限时</string>
-    <string name="event_step_surge">步数冲刺</string>
-    <string name="event_step_surge_desc">本周达成 %1$s 步</string>
-    <string name="event_refer">邀请有礼</string>
+    <string name="event_step_surge">步数狂飙</string>
+    <string name="event_step_surge_desc">本周跑满 %1$s 步</string>
+    <string name="event_refer">邀请好友赚奖励</string>
     <string name="event_refer_desc">邀请 3 位好友加入 StrideUp</string>
     <string name="event_night_quest">夜跑者任务</string>
-    <string name="event_night_quest_desc">晚上 8 点后跑 20 km</string>
-    <string name="events_view_progress">查看进度</string>
-    <string name="events_continue">继续</string>
+    <string name="event_night_quest_desc">晚上 8 点后跑够 20 km</string>
+    <string name="events_view_progress">进度</string>
+    <string name="events_invite">邀请</string>
     <string name="events_claim">领取</string>
+    <string name="events_claimed">已领取</string>
+    <string name="toast_claimed">已领取 +%1$s SUP！</string>
+    <string name="toast_not_finished">还没完成 —— 再加把劲！</string>
+    <string name="invite_subject">来 StrideUp 一起跑</string>
+    <string name="invite_text">我在 StrideUp 上走走路就能赚 SUP，一起来跑吧！</string>
+
+    <!-- Notifications -->
+    <string name="notif_title">通知</string>
+    <string name="notif_mark_read">全部标为已读</string>
+    <string name="notif_empty_title">这里还空着</string>
+    <string name="notif_empty_body">奖励、跑团邀请和活动更新都会出现在这里。</string>
+    <string name="notif_reward_earned">%1$s 步赚到 %2$s SUP</string>
+    <string name="notif_goal_reached">每日目标达成！连续 %1$s 天 · +%2$s SUP</string>
+    <string name="notif_sneaker_minted">已铸造 %1$s</string>
+    <string name="notif_sneaker_upgraded">%1$s 升到新等级了</string>
+    <string name="notif_boost_activated">加成已激活</string>
+    <string name="notif_crew_joined">你加入了 %1$s</string>
+    <string name="notif_party_finished">和 %1$s 位跑者组队跑 · +%2$s SUP</string>
+    <string name="notif_event_claimed">活动奖励已领取 · +%2$s SUP</string>
 
     <!-- Profile -->
     <string name="profile_hello">嗨，</string>
     <string name="profile_next_level">%1$s / %2$s SUP</string>
     <string name="profile_total_distance">累计距离</string>
     <string name="profile_lifetime_steps">累计步数</string>
-    <string name="profile_current_streak">当前连跑</string>
+    <string name="profile_current_streak">当前连续天数</string>
     <string name="profile_achievements">成就</string>
     <string name="days_count">%1$d 天</string>
     <string name="ach_marathon">马拉松</string>
     <string name="ach_marathon_desc">100 km</string>
     <string name="ach_step_king">步数之王</string>
     <string name="ach_step_king_desc">100 万步</string>
-    <string name="ach_streak_master">连跑大师</string>
-    <string name="ach_streak_master_desc">连续 30 天</string>
-    <string name="ach_ultra">超凡步伐</string>
+    <string name="ach_streak_master">连击大师</string>
+    <string name="ach_streak_master_desc">30 天</string>
+    <string name="ach_ultra">超级步伐</string>
+    <string name="ach_ultra_desc">500 km</string>
+    <string name="ach_first_run">第一步</string>
+    <string name="ach_first_run_desc">完成 1 次跑步</string>
+    <string name="ach_collector">收藏家</string>
+    <string name="ach_collector_desc">拥有 3 双球鞋</string>
+    <string name="ach_party_animal">派对达人</string>
+    <string name="ach_party_animal_desc">加入一个跑团</string>
+    <string name="ach_rich">SUP 巨鲸</string>
+    <string name="ach_rich_desc">持有 1,000 SUP</string>
     <string name="ach_locked">未解锁</string>
-    <string name="profile_my_sneakers">我的跑鞋</string>
+    <string name="ach_all_title">全部成就</string>
+    <string name="ach_progress">已解锁 %1$d / %2$d</string>
+    <string name="profile_my_sneakers">我的球鞋</string>
     <string name="profile_owned_count">拥有 %1$d 双</string>
     <string name="profile_overview">个人概览</string>
-    <string name="profile_overview_sub">你的亮点一目了然</string>
+    <string name="profile_overview_sub">一眼看完你的高光</string>
     <string name="profile_this_month">本月</string>
     <string name="stat_steps">步数</string>
     <string name="stat_distance">距离</string>
     <string name="stat_calories">卡路里</string>
     <string name="stat_time">时长</string>
-    <string name="stat_tokens_earned">获得代币</string>
-    <string name="profile_account">账号与设置</string>
+    <string name="stat_sessions">跑步次数</string>
+    <string name="stat_tokens_earned">已赚代币</string>
+    <string name="profile_account">账户与设置</string>
     <string name="settings_wallet">钱包与代币</string>
     <string name="settings_notifications">通知</string>
     <string name="settings_privacy">隐私与安全</string>
     <string name="settings_support">帮助中心</string>
-    <string name="settings_connected">已关联账号</string>
+    <string name="settings_connected">已连接账户</string>
     <string name="goal_title">每日目标</string>
     <string name="goal_steps_suffix">步</string>
     <string name="goal_about_km">≈ %1$s km</string>
-    <string name="goal_hint">达成目标就能拿每日 SUP 奖励，连续达成奖励更多哦。</string>
+    <string name="goal_hint">达成目标就有每日 SUP 奖励 —— 连续打卡奖励更大。</string>
     <string name="about_version">版本</string>
     <string name="about_network">网络</string>
     <string name="about_network_value">GIWA 链（即将上线）</string>
 
+    <!-- Analytics -->
+    <string name="analytics_title">数据</string>
+    <string name="analytics_week">周</string>
+    <string name="analytics_month">月</string>
+    <string name="analytics_all">全部</string>
+    <string name="analytics_daily_avg">日均</string>
+    <string name="analytics_best_day">最佳单日</string>
+    <string name="analytics_goal_rate">目标达成率</string>
+    <string name="analytics_recent_runs">最近的跑步</string>
+    <string name="analytics_no_runs">还没有跑步记录</string>
+
+    <!-- Notification settings -->
+    <string name="pref_push">推送通知</string>
+    <string name="pref_push_desc">跑步总结和奖励提醒</string>
+    <string name="pref_goal_reminder">每日目标提醒</string>
+    <string name="pref_goal_reminder_desc">傍晚还没达标就提醒我</string>
+    <string name="pref_party_invite">跑团与组队邀请</string>
+    <string name="pref_party_invite_desc">允许队友喊我一起跑</string>
+    <string name="pref_event_news">活动公告</string>
+    <string name="pref_event_news_desc">新赛季活动和限时任务</string>
+    <string name="pref_saved">设置已保存</string>
+
+    <!-- Privacy -->
+    <string name="privacy_data_title">我们存了什么</string>
+    <string name="privacy_data_body">所有数据 —— 步数、跑步记录、SUP 账本和球鞋 —— 都只存在这台设备的本地。没有账号，也不会上传到服务器。</string>
+    <string name="privacy_perm_title">正在使用的权限</string>
+    <string name="privacy_perm_activity">身体活动 —— 统计你的步数</string>
+    <string name="privacy_perm_notification">通知 —— 显示进行中的跑步</string>
+    <string name="privacy_reset_title">重置本地数据</string>
+    <string name="privacy_reset_body">只会清空通知记录。步数、SUP 和球鞋都会保留。</string>
+    <string name="privacy_reset_button">清空通知</string>
+    <string name="privacy_reset_done">通知记录已清空</string>
+
+    <!-- Support -->
+    <string name="support_faq">常见问题</string>
+    <string name="faq_q_earn">怎么赚 SUP？</string>
+    <string name="faq_a_earn">在首页开始一次跑步。只有跑步过程中记录到的步数才能赚 SUP，倍率取决于你的球鞋和生效中的加成。</string>
+    <string name="faq_q_energy">为什么不赚 SUP 了？</string>
+    <string name="faq_a_energy">能量用完了。1 点能量对应 600 步，每天午夜会自动回满。</string>
+    <string name="faq_q_rarity">稀有度是怎么运作的？</string>
+    <string name="faq_a_rarity">稀有度决定属性上限和最高等级。装备球鞋的幸运越高，铸造时开出好货的概率就越大。</string>
+    <string name="faq_q_withdraw">什么时候能提现？</string>
+    <string name="faq_a_withdraw">转到 GIWA 链的链上功能还在开发中。在那之前，你的余额都很安全。</string>
+    <string name="support_contact">联系我们</string>
+    <string name="support_contact_body">有问题或想报 bug，欢迎到项目仓库找我们。</string>
+
+    <!-- Connected accounts -->
+    <string name="connected_giwa">GIWA 钱包</string>
+    <string name="connected_health">Health Connect</string>
+    <string name="connected_social">社交账号</string>
+    <string name="connected_status_soon">即将上线</string>
+    <string name="connected_status_off">未连接</string>
+    <string name="connected_body">绑定账号后，就能把 SUP 带上链，还能在多台设备之间同步步数。</string>
+
     <!-- Wallet -->
     <string name="wallet_balance">SUP 余额</string>
-    <string name="wallet_tagline">每一步都在累积</string>
-    <string name="wallet_earned">累计获得</string>
-    <string name="wallet_spent">累计支出</string>
-    <string name="wallet_history">历史记录</string>
+    <string name="wallet_tagline">每一步都在攒</string>
+    <string name="wallet_earned">累计赚取</string>
+    <string name="wallet_spent">累计消耗</string>
+    <string name="wallet_history">记录</string>
     <string name="wallet_records">%1$d 条记录</string>
     <string name="wallet_empty_title">还没有记录</string>
-    <string name="wallet_empty_body">跑一次就能赚到你的第一笔 SUP。</string>
+    <string name="wallet_empty_body">跑一次，就能赚到第一笔 SUP。</string>
     <string name="wallet_giwa">GIWA 钱包</string>
-    <string name="wallet_giwa_status">链上连接准备中</string>
-    <string name="wallet_giwa_body">很快你就可以把 SUP 兑换成 GIWA 链上的代币啦。</string>
-    <string name="wallet_withdraw">提现（即将上线）</string>
+    <string name="wallet_giwa_status">链上打通中</string>
+    <string name="wallet_giwa_body">很快你就能把 SUP 换成 GIWA 链上的代币。</string>
+    <string name="wallet_withdraw">提现</string>
+    <string name="wallet_withdraw_title">提现到 GIWA 链</string>
+    <string name="wallet_withdraw_body">链上结算会在主网上线时开放。到那时余额会 1:1 平移过去。</string>
+    <string name="wallet_withdraw_min">最低提现 · 1,000 SUP</string>
+    <string name="wallet_withdraw_eligible">上线后你就能直接提现啦 🎉</string>
+    <string name="wallet_withdraw_short">还差 %1$s SUP 就到最低额度</string>
     <string name="ledger_earn_walk">跑步奖励</string>
     <string name="ledger_bonus_goal">每日目标奖励</string>
-    <string name="ledger_spend_upgrade">跑鞋升级</string>
+    <string name="ledger_spend_upgrade">球鞋升级</string>
+    <string name="ledger_spend_mint">球鞋铸造</string>
+    <string name="ledger_spend_boost">购买加成</string>
+    <string name="ledger_earn_event">活动奖励</string>
+    <string name="ledger_earn_party">组队跑奖励</string>
     <string name="ledger_other">奖励</string>
 
     <!-- Run -->
     <string name="run_ready">准备就绪</string>
     <string name="run_active">跑步中</string>
     <string name="run_paused">已暂停</string>
-    <string name="run_earnable">当前最多可累积 %1$s 步</string>
+    <string name="run_earnable">现在最多能结算 %1$s 步</string>
     <string name="run_complete">跑步完成！🎉</string>
-    <string name="run_rewarded">共 %2$s 步，其中 %1$s 步已计入奖励</string>
-    <string name="run_locked_hint">屏幕已锁定 · 点击锁图标解锁</string>
+    <string name="run_rewarded">%2$s 步中已结算 %1$s 步</string>
+    <string name="run_locked_hint">屏幕已锁定 · 点锁图标解锁</string>
     <string name="run_simulate">+100 步（调试）</string>
+    <string name="run_boost_active">XP 加速器生效中 · 2×</string>
 
     <!-- Content descriptions -->
-    <string name="cd_lock">屏幕锁定</string>
+    <string name="cd_lock">锁定屏幕</string>
     <string name="cd_pause">暂停</string>
     <string name="cd_resume">继续</string>
     <string name="cd_stop">停止</string>

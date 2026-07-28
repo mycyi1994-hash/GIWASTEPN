@@ -2,12 +2,10 @@ package com.giwa.strideup.ui.screens.home
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,16 +16,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -41,10 +38,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -58,12 +51,11 @@ import com.giwa.strideup.domain.RewardEconomy
 import com.giwa.strideup.ui.StepPermissions
 import com.giwa.strideup.ui.components.BarMeter
 import com.giwa.strideup.ui.components.DarkIconButton
-import com.giwa.strideup.ui.components.GhostButton
 import com.giwa.strideup.ui.components.GlowCard
-import com.giwa.strideup.ui.components.HexEmblem
 import com.giwa.strideup.ui.components.LevelAvatar
 import com.giwa.strideup.ui.components.NeonRing
 import com.giwa.strideup.ui.components.RouteMap
+import com.giwa.strideup.ui.components.SneakerArt
 import com.giwa.strideup.ui.components.StartRunButton
 import com.giwa.strideup.ui.components.TokenCard
 import com.giwa.strideup.ui.components.Wordmark
@@ -90,17 +82,24 @@ fun runnerTier(level: Int): String = when {
     else -> "Rookie"
 }
 
+/**
+ * 홈 — 스크롤 없이 한 화면에 전부 담는다.
+ *
+ * 고정 높이 요소(상단바 · 인사 · CTA)를 먼저 잡고, 남는 공간을 카드들이
+ * weight로 나눠 갖는다. 화면이 작아도 잘리지 않고 비율대로 줄어든다.
+ */
 @Composable
 fun HomeScreen(
     onStartRun: () -> Unit = {},
     onOpenWallet: () -> Unit = {},
-    onOpenEvents: () -> Unit = {},
+    onOpenNotifications: () -> Unit = {},
     onOpenProfile: () -> Unit = {},
     onOpenItems: () -> Unit = {},
     viewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
+    val unread by viewModel.unreadCount.collectAsStateWithLifecycle()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     var hasPermission by remember {
         mutableStateOf(StepPermissions.hasActivityRecognition(context))
@@ -112,7 +111,6 @@ fun HomeScreen(
         if (hasPermission) viewModel.onPermissionGranted()
     }
 
-    // 시스템 설정에서 권한이 허용된 경우에도 카드가 남지 않도록 재개 시 재확인.
     LifecycleResumeEffect(Unit) {
         val granted = StepPermissions.hasActivityRecognition(context)
         if (granted != hasPermission) {
@@ -122,109 +120,89 @@ fun HomeScreen(
         onPauseOrDispose { }
     }
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 10.dp, bottom = 22.dp),
-        verticalArrangement = Arrangement.spacedBy(15.dp),
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
+            .padding(top = 8.dp, bottom = 10.dp),
+        verticalArrangement = Arrangement.spacedBy(9.dp),
     ) {
-        item { TopBar(onOpenEvents, onOpenWallet) }
+        TopBar(unread, onOpenNotifications, onOpenWallet)
 
-        item { GreetingRow(level = state.sneakerLevel, balance = state.balance, onOpenWallet = onOpenWallet) }
+        GreetingRow(
+            level = state.level,
+            balance = state.balance,
+            onOpenWallet = onOpenWallet,
+            onOpenProfile = onOpenProfile,
+        )
 
         if (!hasPermission) {
-            item {
-                GlowCard(accent = true, spacing = 11.dp) {
-                    Text(
-                        stringResource(R.string.perm_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Snow,
-                    )
-                    Text(
-                        stringResource(R.string.perm_body),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Silver,
-                    )
-                    GhostButton(
-                        text = stringResource(R.string.perm_allow),
-                        onClick = { permissionLauncher.launch(StepPermissions.missing(context)) },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-            }
-        }
-
-        item { StepsHeroCard(state, onOpenProfile) }
-
-        item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Max),
-                horizontalArrangement = Arrangement.spacedBy(13.dp),
-            ) {
-                EnergyCard(
-                    energy = state.energy,
-                    maxEnergy = state.maxEnergy,
-                    percent = state.energyPercent,
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
-                )
-                DistanceCard(
-                    week = state.week,
-                    onOpenProfile = onOpenProfile,
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
-                )
-            }
-        }
-
-        item { SneakerCard(level = state.sneakerLevel, onOpenItems = onOpenItems) }
-
-        item {
-            StartRunButton(
-                title = stringResource(R.string.start_run),
-                subtitle = stringResource(R.string.start_run_sub),
-                onClick = onStartRun,
+            PermissionStrip(
+                onClick = { permissionLauncher.launch(StepPermissions.missing(context)) },
             )
         }
 
-        if (!state.sensorAvailable) {
-            item {
-                GlowCard(spacing = 7.dp) {
-                    Text(
-                        stringResource(R.string.sensor_title),
-                        style = MaterialTheme.typography.titleSmall,
-                        color = Snow,
-                    )
-                    Text(
-                        stringResource(R.string.sensor_body),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Silver,
-                    )
-                }
-            }
+        StepsHeroCard(
+            state = state,
+            onOpenProfile = onOpenProfile,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1.30f),
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1.12f),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            EnergyCard(
+                energy = state.energy,
+                maxEnergy = state.maxEnergy,
+                percent = state.energyPercent,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+            )
+            DistanceCard(
+                week = state.week,
+                onOpenProfile = onOpenProfile,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+            )
         }
+
+        SneakerStrip(
+            state = state,
+            onOpenItems = onOpenItems,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(0.74f),
+        )
+
+        StartRunButton(
+            title = stringResource(R.string.start_run),
+            subtitle = stringResource(R.string.start_run_sub),
+            onClick = onStartRun,
+        )
     }
 }
 
 @Composable
-private fun TopBar(onOpenEvents: () -> Unit, onOpenWallet: () -> Unit) {
+private fun TopBar(unread: Int, onOpenNotifications: () -> Unit, onOpenWallet: () -> Unit) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 4.dp),
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Wordmark(fontSize = 22.sp)
-        Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+        Wordmark(fontSize = 20.sp)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             DarkIconButton(
                 icon = Icons.Filled.Notifications,
                 contentDescription = stringResource(R.string.cd_notifications),
-                onClick = onOpenEvents,
-                badge = true,
+                onClick = onOpenNotifications,
+                badge = unread > 0,
             )
             DarkIconButton(
                 icon = Icons.Filled.AccountBalanceWallet,
@@ -236,7 +214,12 @@ private fun TopBar(onOpenEvents: () -> Unit, onOpenWallet: () -> Unit) {
 }
 
 @Composable
-private fun GreetingRow(level: Int, balance: Double, onOpenWallet: () -> Unit) {
+private fun GreetingRow(
+    level: Int,
+    balance: Double,
+    onOpenWallet: () -> Unit,
+    onOpenProfile: () -> Unit,
+) {
     val greetingRes = when (LocalTime.now().hour) {
         in 0..4 -> R.string.greeting_dawn
         in 5..10 -> R.string.greeting_morning
@@ -246,143 +229,143 @@ private fun GreetingRow(level: Int, balance: Double, onOpenWallet: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        LevelAvatar(level = level, size = 54.dp, contentDescription = stringResource(R.string.cd_profile))
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(3.dp),
-        ) {
+        LevelAvatar(
+            level = level,
+            size = 46.dp,
+            modifier = Modifier.quietClickable(onOpenProfile),
+            contentDescription = stringResource(R.string.cd_profile),
+        )
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(1.dp)) {
             Text(
                 text = stringResource(greetingRes),
-                style = MaterialTheme.typography.bodySmall,
+                fontSize = 11.sp,
                 color = Silver,
             )
             Text(
                 text = stringResource(R.string.greeting_runner),
-                style = MaterialTheme.typography.headlineSmall,
+                fontSize = 19.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.4).sp,
                 color = Snow,
             )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(7.dp),
-            ) {
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(50))
-                        .background(Volt.copy(alpha = 0.12f))
-                        .padding(horizontal = 9.dp, vertical = 3.dp),
-                ) {
-                    Text(
-                        text = stringResource(R.string.level_chip, level),
-                        color = Volt,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
-                Text(
-                    text = runnerTier(level),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Slate,
-                )
-            }
+            Text(
+                text = stringResource(R.string.level_chip, level) + " · " + runnerTier(level),
+                fontSize = 10.sp,
+                color = Volt,
+                fontWeight = FontWeight.SemiBold,
+            )
         }
         TokenCard(balance = balance, onClick = onOpenWallet)
     }
 }
 
+@Composable
+private fun PermissionStrip(onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(Volt.copy(alpha = 0.12f))
+            .quietClickable(onClick)
+            .padding(horizontal = 14.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(9.dp),
+    ) {
+        Icon(
+            Icons.AutoMirrored.Filled.DirectionsWalk,
+            contentDescription = null,
+            tint = Volt,
+            modifier = Modifier.size(16.dp),
+        )
+        Text(
+            text = stringResource(R.string.perm_allow),
+            modifier = Modifier.weight(1f),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            color = Volt,
+        )
+        Icon(
+            Icons.Filled.ChevronRight,
+            contentDescription = null,
+            tint = Volt,
+            modifier = Modifier.size(15.dp),
+        )
+    }
+}
+
 /** 오늘 걸음 히어로 — 좌측 큰 숫자 + 우측 루트 맵 + 목표 진행 바 */
 @Composable
-private fun StepsHeroCard(state: HomeViewModel.UiState, onOpenProfile: () -> Unit) {
+private fun StepsHeroCard(
+    state: HomeViewModel.UiState,
+    onOpenProfile: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val fraction = if (state.goal > 0) state.todaySteps.toFloat() / state.goal else 0f
     val steps = animatedInt(state.todaySteps)
 
-    GlowCard(accent = true, contentPadding = PaddingValues(20.dp), spacing = 14.dp) {
+    GlowCard(
+        modifier = modifier,
+        accent = true,
+        contentPadding = PaddingValues(15.dp),
+        spacing = 8.dp,
+    ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(3.dp),
+                verticalArrangement = Arrangement.spacedBy(1.dp),
             ) {
                 Text(
                     text = stringResource(R.string.home_total_steps),
-                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 11.sp,
                     color = Silver,
                 )
                 Text(
                     text = "%,d".format(steps),
-                    fontSize = 48.sp,
+                    fontSize = 40.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    letterSpacing = (-2).sp,
+                    letterSpacing = (-1.8).sp,
                     color = Snow,
                 )
                 Text(
-                    text = stringResource(R.string.home_today),
-                    style = MaterialTheme.typography.bodySmall,
+                    text = stringResource(R.string.home_daily_goal, "%,d".format(state.goal)),
+                    fontSize = 10.sp,
                     color = Slate,
                 )
-                Spacer(Modifier.height(6.dp))
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.DirectionsWalk,
-                        contentDescription = null,
-                        tint = Silver,
-                        modifier = Modifier.size(14.dp),
-                    )
-                    Text(
-                        text = stringResource(R.string.home_daily_goal, "%,d".format(state.goal)),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Silver,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                }
             }
             RouteMap(
                 modifier = Modifier
-                    .weight(0.85f)
-                    .height(128.dp),
+                    .weight(0.82f)
+                    .fillMaxHeight()
+                    .padding(vertical = 2.dp),
             )
         }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(9.dp),
         ) {
-            BarMeter(fraction = fraction, modifier = Modifier.weight(1f))
+            BarMeter(fraction = fraction, modifier = Modifier.weight(1f), height = 7.dp)
             Text(
                 text = "${state.goalPercent.coerceAtMost(999)}%",
                 color = Volt,
-                fontSize = 14.sp,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
-            )
-        }
-
-        Row(
-            modifier = Modifier
-                .clip(RoundedCornerShape(50))
-                .background(CarbonHigh)
-                .quietClickable(onOpenProfile)
-                .padding(horizontal = 13.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(5.dp),
-        ) {
-            Text(
-                text = stringResource(R.string.home_view_analytics),
-                style = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.SemiBold,
-                color = Snow,
             )
             Icon(
                 Icons.Filled.ChevronRight,
-                contentDescription = null,
-                tint = Volt,
-                modifier = Modifier.size(14.dp),
+                contentDescription = stringResource(R.string.home_view_analytics),
+                tint = Slate,
+                modifier = Modifier
+                    .size(16.dp)
+                    .quietClickable(onOpenProfile),
             )
         }
     }
@@ -409,34 +392,40 @@ private fun EnergyCard(
         secondsLeft % 60,
     )
 
-    GlowCard(modifier = modifier, contentPadding = PaddingValues(16.dp), spacing = 12.dp) {
+    GlowCard(modifier = modifier, contentPadding = PaddingValues(13.dp), spacing = 6.dp) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(7.dp),
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
         ) {
-            Icon(Icons.Filled.Bolt, contentDescription = null, tint = Volt, modifier = Modifier.size(15.dp))
+            Icon(Icons.Filled.Bolt, contentDescription = null, tint = Volt, modifier = Modifier.size(13.dp))
             Text(
                 text = stringResource(R.string.home_energy),
-                style = MaterialTheme.typography.titleSmall,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
                 color = Snow,
             )
         }
-        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            contentAlignment = Alignment.Center,
+        ) {
             NeonRing(
                 progress = percent / 100f,
-                modifier = Modifier.size(108.dp),
-                ringWidth = 9.dp,
+                modifier = Modifier.fillMaxHeight(),
+                ringWidth = 7.dp,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = "$percent%",
-                        fontSize = 24.sp,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = Snow,
                     )
                     Text(
                         text = "%.0f / %.0f".format(energy, maxEnergy),
-                        fontSize = 10.sp,
+                        fontSize = 9.sp,
                         color = Slate,
                     )
                 }
@@ -444,7 +433,7 @@ private fun EnergyCard(
         }
         Text(
             text = stringResource(R.string.home_recharge_in, countdown),
-            style = MaterialTheme.typography.bodySmall,
+            fontSize = 10.sp,
             color = Volt,
             fontWeight = FontWeight.SemiBold,
         )
@@ -465,44 +454,44 @@ private fun DistanceCard(
     val weekKm = RewardEconomy.distanceMeters(weekSteps.toInt()) / 1000
     val maxSteps = maxOf(week.maxOfOrNull { it.steps } ?: 0, 1)
 
-    GlowCard(modifier = modifier, contentPadding = PaddingValues(16.dp), spacing = 12.dp) {
+    GlowCard(
+        modifier = modifier.quietClickable(onOpenProfile),
+        contentPadding = PaddingValues(13.dp),
+        spacing = 6.dp,
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(7.dp),
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
         ) {
-            Icon(Icons.Filled.LocationOn, contentDescription = null, tint = Volt, modifier = Modifier.size(15.dp))
+            Icon(Icons.Filled.LocationOn, contentDescription = null, tint = Volt, modifier = Modifier.size(13.dp))
             Text(
                 text = stringResource(R.string.home_distance),
-                style = MaterialTheme.typography.titleSmall,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
                 color = Snow,
             )
         }
         Row(verticalAlignment = Alignment.Bottom) {
             Text(
                 text = "%.2f".format(weekKm),
-                fontSize = 27.sp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.ExtraBold,
                 letterSpacing = (-1).sp,
                 color = Snow,
             )
-            Spacer(Modifier.width(4.dp))
+            Spacer(Modifier.width(3.dp))
             Text(
                 text = "km",
-                style = MaterialTheme.typography.bodySmall,
+                fontSize = 11.sp,
                 color = Slate,
-                modifier = Modifier.padding(bottom = 4.dp),
+                modifier = Modifier.padding(bottom = 3.dp),
             )
         }
-        Text(
-            text = stringResource(R.string.home_this_week),
-            style = MaterialTheme.typography.bodySmall,
-            color = Slate,
-        )
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(52.dp),
-            horizontalArrangement = Arrangement.spacedBy(7.dp),
+                .weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
             verticalAlignment = Alignment.Bottom,
         ) {
             days.forEach { day ->
@@ -519,7 +508,7 @@ private fun DistanceCard(
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(7.dp),
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
         ) {
             days.forEach { day ->
                 val label = LocalDate.ofEpochDay(day).dayOfWeek
@@ -528,172 +517,99 @@ private fun DistanceCard(
                     if (day == today) {
                         Box(
                             modifier = Modifier
-                                .size(16.dp)
+                                .size(14.dp)
                                 .background(Volt, CircleShape),
                             contentAlignment = Alignment.Center,
                         ) {
-                            Text(label, color = Night, fontSize = 8.sp, fontWeight = FontWeight.Bold)
+                            Text(label, color = Night, fontSize = 7.sp, fontWeight = FontWeight.Bold)
                         }
                     } else {
-                        Text(label, color = Slate, fontSize = 9.sp)
+                        Text(label, color = Slate, fontSize = 8.sp)
                     }
                 }
             }
         }
+    }
+}
+
+/** 착용 스니커즈 요약 — 실제 NFT 아트를 보여준다 */
+@Composable
+private fun SneakerStrip(
+    state: HomeViewModel.UiState,
+    onOpenItems: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val sneaker = state.equipped
+    GlowCard(
+        modifier = modifier.quietClickable(onOpenItems),
+        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp),
+        spacing = 6.dp,
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(50))
-                .background(CarbonHigh)
-                .quietClickable(onOpenProfile)
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.Center,
+                .weight(1f),
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Text(
-                text = stringResource(R.string.home_view_details),
-                style = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.SemiBold,
-                color = Snow,
-            )
+            if (sneaker != null) {
+                SneakerArt(
+                    sneaker = sneaker,
+                    modifier = Modifier
+                        .weight(0.62f)
+                        .fillMaxHeight(),
+                )
+            } else {
+                Spacer(Modifier.weight(0.62f))
+            }
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(3.dp),
+            ) {
+                Text(
+                    text = sneaker?.model?.displayName ?: "Apex Runner",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Snow,
+                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(50))
+                            .background(CarbonHigh)
+                            .padding(horizontal = 7.dp, vertical = 2.dp),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.level_chip, state.level),
+                            color = Volt,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                    Text(
+                        text = "×%.2f".format(
+                            sneaker?.earningMultiplier
+                                ?: RewardEconomy.sneakerMultiplier(state.sneakerLevel),
+                        ),
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Silver,
+                    )
+                }
+                BarMeter(
+                    fraction = (sneaker?.durability ?: 85) / 100f,
+                    height = 5.dp,
+                )
+            }
             Icon(
                 Icons.Filled.ChevronRight,
                 contentDescription = null,
-                tint = Volt,
-                modifier = Modifier.size(14.dp),
+                tint = Slate,
+                modifier = Modifier.size(16.dp),
             )
         }
-    }
-}
-
-/** 스니커즈 카드 — 헥사곤 플랫폼 위 스니커 + 능력치 */
-@Composable
-private fun SneakerCard(level: Int, onOpenItems: () -> Unit) {
-    val multiplier = RewardEconomy.sneakerMultiplier(level)
-
-    GlowCard(
-        modifier = Modifier.quietClickable(onOpenItems),
-        contentPadding = PaddingValues(18.dp),
-        spacing = 13.dp,
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            SneakerVisual(modifier = Modifier.size(96.dp))
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(7.dp),
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text("Apex Runner", style = MaterialTheme.typography.titleMedium, color = Snow)
-                    Icon(
-                        Icons.Filled.ChevronRight,
-                        contentDescription = null,
-                        tint = Slate,
-                        modifier = Modifier.size(18.dp),
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(50))
-                        .background(Volt.copy(alpha = 0.12f))
-                        .padding(horizontal = 9.dp, vertical = 3.dp),
-                ) {
-                    Text(
-                        text = stringResource(R.string.level_chip, level),
-                        color = Volt,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Text(
-                        text = stringResource(R.string.home_durability),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Silver,
-                    )
-                    Text(
-                        text = "85/100",
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Bold,
-                        color = Snow,
-                    )
-                }
-                BarMeter(fraction = 0.85f, height = 6.dp)
-            }
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(9.dp),
-        ) {
-            MiniStat(
-                label = stringResource(R.string.stat_efficiency),
-                value = "×%.2f".format(multiplier),
-                modifier = Modifier.weight(1f),
-            )
-            MiniStat(
-                label = stringResource(R.string.stat_luck),
-                value = "3.6",
-                modifier = Modifier.weight(1f),
-            )
-            MiniStat(
-                label = stringResource(R.string.stat_comfort),
-                value = "4.2",
-                modifier = Modifier.weight(1f),
-            )
-        }
-    }
-}
-
-@Composable
-private fun MiniStat(label: String, value: String, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .clip(RoundedCornerShape(14.dp))
-            .background(CarbonHigh)
-            .padding(vertical = 10.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(2.dp),
-    ) {
-        Text(label, color = Slate, fontSize = 10.sp)
-        Text(value, color = Snow, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-    }
-}
-
-/** 글로우 플랫폼 위 스니커즈 비주얼 */
-@Composable
-private fun SneakerVisual(modifier: Modifier = Modifier) {
-    Box(modifier = modifier, contentAlignment = Alignment.Center) {
-        Canvas(Modifier.fillMaxSize()) {
-            val cx = size.width / 2f
-            val platformY = size.height * 0.82f
-            // 바닥 글로우 타원
-            drawOval(
-                brush = Brush.radialGradient(
-                    colors = listOf(Volt.copy(alpha = 0.45f), Color.Transparent),
-                    center = Offset(cx, platformY),
-                    radius = size.width * 0.55f,
-                ),
-                topLeft = Offset(cx - size.width * 0.48f, platformY - size.height * 0.10f),
-                size = androidx.compose.ui.geometry.Size(size.width * 0.96f, size.height * 0.20f),
-            )
-        }
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.DirectionsWalk,
-            contentDescription = null,
-            tint = Volt,
-            modifier = Modifier
-                .size(54.dp)
-                .padding(bottom = 8.dp),
-        )
     }
 }

@@ -7,24 +7,23 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Bolt
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Shield
-import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,21 +34,28 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.giwa.strideup.R
+import com.giwa.strideup.domain.BoostType
+import com.giwa.strideup.domain.RewardEconomy
 import com.giwa.strideup.ui.components.BarMeter
+import com.giwa.strideup.ui.components.EquippedSneakerCard
 import com.giwa.strideup.ui.components.GhostButton
 import com.giwa.strideup.ui.components.GlowCard
 import com.giwa.strideup.ui.components.HexEmblem
 import com.giwa.strideup.ui.components.IconSquare
+import com.giwa.strideup.ui.components.RarityChip
 import com.giwa.strideup.ui.components.SectionHeader
-import com.giwa.strideup.ui.components.StartRunButton
+import com.giwa.strideup.ui.components.SneakerCollectionCard
+import com.giwa.strideup.ui.components.SneakerHero
 import com.giwa.strideup.ui.components.TokenCard
 import com.giwa.strideup.ui.components.VoltButton
 import com.giwa.strideup.ui.components.Wordmark
+import com.giwa.strideup.ui.theme.Carbon
 import com.giwa.strideup.ui.theme.CarbonHigh
 import com.giwa.strideup.ui.theme.Silver
 import com.giwa.strideup.ui.theme.Slate
@@ -57,28 +63,38 @@ import com.giwa.strideup.ui.theme.Snow
 import com.giwa.strideup.ui.theme.Volt
 
 @Composable
-fun ItemsScreen(viewModel: ItemsViewModel = viewModel(factory = ItemsViewModel.Factory)) {
+fun ItemsScreen(
+    onOpenSneaker: (Long) -> Unit = {},
+    viewModel: ItemsViewModel = viewModel(factory = ItemsViewModel.Factory),
+) {
     val context = LocalContext.current
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val result by viewModel.upgradeResult.collectAsStateWithLifecycle()
+    val inventory by viewModel.inventory.collectAsStateWithLifecycle()
+    val equipped by viewModel.equipped.collectAsStateWithLifecycle()
+    val balance by viewModel.balance.collectAsStateWithLifecycle()
+    val boosts by viewModel.activeBoosts.collectAsStateWithLifecycle()
+    val progress by viewModel.collectionProgress.collectAsStateWithLifecycle()
+    val message by viewModel.message.collectAsStateWithLifecycle()
+    val minted by viewModel.mintResult.collectAsStateWithLifecycle()
 
-    val comingSoon = stringResource(R.string.toast_coming_soon)
-    val upgradedMsg = stringResource(R.string.toast_upgraded)
-    val noBalanceMsg = stringResource(R.string.toast_no_balance)
-    val showComingSoon = { Toast.makeText(context, comingSoon, Toast.LENGTH_SHORT).show() }
+    val msgNoBalance = stringResource(R.string.toast_no_balance)
+    val msgBoostActive = stringResource(R.string.toast_boost_active)
+    val msgBoostBought = stringResource(R.string.toast_boost_bought)
+    val msgMaxLevel = stringResource(R.string.toast_max_level)
+    val msgUpgraded = stringResource(R.string.toast_upgraded)
+    val equippedFmt = stringResource(R.string.toast_equipped, "%s")
 
-    LaunchedEffect(result) {
-        result?.let { success ->
-            Toast.makeText(context, if (success) upgradedMsg else noBalanceMsg, Toast.LENGTH_SHORT).show()
-            viewModel.consumeResult()
+    LaunchedEffect(message) {
+        val m = message ?: return@LaunchedEffect
+        val text = when (m) {
+            ItemsMessage.NotEnoughBalance -> msgNoBalance
+            ItemsMessage.BoostAlreadyActive -> msgBoostActive
+            ItemsMessage.BoostBought -> msgBoostBought
+            ItemsMessage.MaxLevel -> msgMaxLevel
+            is ItemsMessage.Upgraded -> msgUpgraded
+            is ItemsMessage.Equipped -> equippedFmt.format(m.name)
         }
-    }
-
-    val affordable = state.balance >= state.upgradeCost
-    val progress = if (state.upgradeCost > 0) {
-        (state.balance / state.upgradeCost).coerceIn(0.0, 1.0).toFloat()
-    } else {
-        0f
+        Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
+        viewModel.consumeMessage()
     }
 
     LazyColumn(
@@ -95,7 +111,7 @@ fun ItemsScreen(viewModel: ItemsViewModel = viewModel(factory = ItemsViewModel.F
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Wordmark(fontSize = 22.sp)
-                TokenCard(balance = state.balance)
+                TokenCard(balance = balance)
             }
         }
 
@@ -116,232 +132,236 @@ fun ItemsScreen(viewModel: ItemsViewModel = viewModel(factory = ItemsViewModel.F
             }
         }
 
-        item { GearCard(state, affordable, progress, viewModel::upgradeSneaker) }
-
-        item {
-            SectionHeader(title = stringResource(R.string.items_vault))
-        }
-
-        item {
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(11.dp)) {
-                item {
-                    VaultCard(
-                        name = "Apex Runner",
-                        owned = true,
-                        subtitle = stringResource(R.string.level_chip, state.sneakerLevel),
-                    )
-                }
-                item {
-                    VaultCard(
-                        name = "Neon Dash",
-                        owned = false,
-                        subtitle = stringResource(R.string.items_unlock_at, 5),
-                    )
-                }
-                item {
-                    VaultCard(
-                        name = "Phantom Stride",
-                        owned = false,
-                        subtitle = stringResource(R.string.items_unlock_at, 10),
-                    )
+        // ── 착용 중인 스니커즈 ──────────────────────────────
+        equipped?.let { sneaker ->
+            item {
+                EquippedSneakerCard(
+                    sneaker = sneaker,
+                    onClick = { onOpenSneaker(sneaker.id) },
+                )
+            }
+            item {
+                GlowCard(contentPadding = PaddingValues(16.dp), spacing = 11.dp) {
+                    if (sneaker.canUpgrade) {
+                        val cost = sneaker.upgradeCost
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Text(
+                                text = stringResource(R.string.items_next_level),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Silver,
+                            )
+                            Text(
+                                text = "%,.0f / %,.0f SUP".format(balance.coerceAtMost(cost), cost),
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Bold,
+                                color = if (balance >= cost) Volt else Slate,
+                            )
+                        }
+                        BarMeter(
+                            fraction = (balance / cost).coerceIn(0.0, 1.0).toFloat(),
+                            height = 7.dp,
+                        )
+                        VoltButton(
+                            text = stringResource(R.string.items_upgrade_cost, "%,.0f".format(cost)),
+                            onClick = { viewModel.upgrade(sneaker.id) },
+                            enabled = balance >= cost,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        Text(
+                            text = stringResource(R.string.items_upgrade_hint),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Slate,
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(R.string.items_max_level),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = Volt,
+                        )
+                    }
                 }
             }
         }
 
+        // ── 민팅 ────────────────────────────────────────────
+        item {
+            GlowCard(contentPadding = PaddingValues(18.dp), spacing = 12.dp) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(13.dp),
+                ) {
+                    HexEmblem(size = 44.dp)
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                        Text(
+                            text = stringResource(R.string.items_mint_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Snow,
+                        )
+                        Text(
+                            text = stringResource(R.string.items_mint_desc),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Silver,
+                        )
+                    }
+                }
+                VoltButton(
+                    text = stringResource(
+                        R.string.items_mint_button,
+                        "%,.0f".format(RewardEconomy.MINT_COST),
+                    ),
+                    onClick = { viewModel.mint() },
+                    enabled = balance >= RewardEconomy.MINT_COST,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
+
+        // ── 컬렉션 ──────────────────────────────────────────
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(R.string.items_vault),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Snow,
+                )
+                Text(
+                    text = stringResource(
+                        R.string.items_collection_progress,
+                        progress.first,
+                        progress.second,
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Slate,
+                )
+            }
+        }
+
+        items(inventory.chunked(2).size) { rowIndex ->
+            val row = inventory.chunked(2)[rowIndex]
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                row.forEach { sneaker ->
+                    SneakerCollectionCard(
+                        sneaker = sneaker,
+                        modifier = Modifier.weight(1f),
+                        onClick = { onOpenSneaker(sneaker.id) },
+                    )
+                }
+                if (row.size == 1) Spacer(Modifier.weight(1f))
+            }
+        }
+
+        // ── 활성 부스트 ─────────────────────────────────────
+        if (boosts.isNotEmpty()) {
+            item { SectionHeader(title = stringResource(R.string.items_active_boosts)) }
+            items(boosts.size) { index ->
+                val boost = boosts[index]
+                GlowCard(
+                    accent = true,
+                    contentPadding = PaddingValues(horizontal = 15.dp, vertical = 13.dp),
+                    shape = RoundedCornerShape(18.dp),
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        IconSquare(icon = boostIcon(boost.type), size = 36.dp)
+                        Text(
+                            text = stringResource(boostTitle(boost.type)),
+                            modifier = Modifier.weight(1f),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = Snow,
+                        )
+                        Text(
+                            text = stringResource(
+                                R.string.boost_time_left,
+                                remainingLabel(boost.expiresAt),
+                            ),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Volt,
+                        )
+                    }
+                }
+            }
+        }
+
+        // ── 부스트 상점 ─────────────────────────────────────
         item { SectionHeader(title = stringResource(R.string.items_boosts)) }
 
         item {
             GlowCard(contentPadding = PaddingValues(16.dp), spacing = 11.dp) {
-                BoostRow(
-                    icon = Icons.Filled.Bolt,
-                    title = stringResource(R.string.boost_energy_title),
-                    desc = stringResource(R.string.boost_energy_desc),
-                    price = stringResource(R.string.price_sup, "50"),
-                    onBuy = showComingSoon,
-                )
-                BoostRow(
-                    icon = Icons.Filled.Shield,
-                    title = stringResource(R.string.boost_shield_title),
-                    desc = stringResource(R.string.boost_shield_desc),
-                    price = stringResource(R.string.price_sup, "120"),
-                    onBuy = showComingSoon,
-                )
-                BoostRow(
-                    icon = Icons.Filled.AutoAwesome,
-                    title = stringResource(R.string.boost_xp_title),
-                    desc = stringResource(R.string.boost_xp_desc),
-                    price = stringResource(R.string.price_sup, "200"),
-                    onBuy = showComingSoon,
-                )
+                BoostType.entries.forEach { type ->
+                    BoostRow(
+                        type = type,
+                        affordable = balance >= type.cost,
+                        onBuy = { viewModel.buyBoost(type) },
+                    )
+                }
             }
         }
     }
-}
 
-/** 내 장비 — 현재 스니커즈 + 업그레이드 (실제 SUP 차감) */
-@Composable
-private fun GearCard(
-    state: ItemsViewModel.UiState,
-    affordable: Boolean,
-    progress: Float,
-    onUpgrade: () -> Unit,
-) {
-    GlowCard(accent = true, contentPadding = PaddingValues(20.dp), spacing = 14.dp) {
-        SectionHeader(title = stringResource(R.string.items_my_gear))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                HexEmblem(size = 74.dp)
-                Icon(
-                    Icons.AutoMirrored.Filled.DirectionsWalk,
-                    contentDescription = null,
-                    tint = Snow,
-                    modifier = Modifier.size(28.dp),
+    // ── 민팅 결과 ───────────────────────────────────────────
+    minted?.let { sneaker ->
+        AlertDialog(
+            onDismissRequest = { viewModel.dismissMintResult() },
+            containerColor = Carbon,
+            titleContentColor = Snow,
+            textContentColor = Silver,
+            confirmButton = {
+                TextButton(onClick = { viewModel.dismissMintResult() }) {
+                    Text(stringResource(R.string.common_ok), color = Volt, fontWeight = FontWeight.Bold)
+                }
+            },
+            title = {
+                Text(
+                    text = stringResource(R.string.mint_result_title),
+                    fontWeight = FontWeight.Black,
                 )
-            }
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(5.dp),
-            ) {
-                Text("Apex Runner", style = MaterialTheme.typography.titleMedium, color = Snow)
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(50))
-                        .background(Volt.copy(alpha = 0.12f))
-                        .padding(horizontal = 9.dp, vertical = 3.dp),
+            },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
+                    RarityChip(sneaker.rarity)
+                    SneakerHero(
+                        sneaker = sneaker,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(120.dp),
+                    )
                     Text(
-                        text = stringResource(R.string.level_chip, state.sneakerLevel),
-                        color = Volt,
+                        text = sneaker.displayName,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Snow,
+                        textAlign = TextAlign.Center,
+                    )
+                    Text(
+                        text = stringResource(R.string.sneaker_mint_no, sneaker.mintNumber),
                         fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
+                        color = Slate,
                     )
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
-                        Icon(Icons.Filled.TrendingUp, contentDescription = null, tint = Volt, modifier = Modifier.size(12.dp))
-                        Text(
-                            text = "×%.2f".format(state.multiplier),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Snow,
-                        )
-                    }
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
-                        Icon(Icons.Filled.Bolt, contentDescription = null, tint = Volt, modifier = Modifier.size(12.dp))
-                        Text(
-                            text = "%.0f".format(state.maxEnergy),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Snow,
-                        )
-                    }
-                }
-            }
-        }
-
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text(
-                    text = stringResource(R.string.items_next_level),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Silver,
-                )
-                Text(
-                    text = "%,.0f / %,.0f SUP".format(
-                        state.balance.coerceAtMost(state.upgradeCost),
-                        state.upgradeCost,
-                    ),
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold,
-                    color = if (affordable) Volt else Slate,
-                )
-            }
-            BarMeter(fraction = progress, height = 7.dp)
-        }
-
-        VoltButton(
-            text = stringResource(R.string.items_upgrade_cost, "%,.0f".format(state.upgradeCost)),
-            onClick = onUpgrade,
-            enabled = affordable,
-            modifier = Modifier.fillMaxWidth(),
-        )
-
-        Text(
-            text = stringResource(R.string.items_upgrade_hint),
-            style = MaterialTheme.typography.bodySmall,
-            color = Slate,
+            },
         )
     }
 }
 
 @Composable
-private fun VaultCard(name: String, owned: Boolean, subtitle: String) {
-    GlowCard(
-        modifier = Modifier.width(150.dp),
-        contentPadding = PaddingValues(16.dp),
-        spacing = 9.dp,
-        accent = owned,
-    ) {
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center,
-        ) {
-            if (owned) {
-                Box(contentAlignment = Alignment.Center) {
-                    HexEmblem(size = 58.dp)
-                    Icon(
-                        Icons.AutoMirrored.Filled.DirectionsWalk,
-                        contentDescription = null,
-                        tint = Snow,
-                        modifier = Modifier.size(22.dp),
-                    )
-                }
-            } else {
-                Box(contentAlignment = Alignment.Center) {
-                    HexEmblem(size = 58.dp, glow = false)
-                    Icon(
-                        Icons.Filled.Lock,
-                        contentDescription = null,
-                        tint = Slate,
-                        modifier = Modifier.size(20.dp),
-                    )
-                }
-            }
-        }
-        Text(
-            text = name,
-            style = MaterialTheme.typography.titleSmall,
-            color = if (owned) Snow else Silver,
-        )
-        Text(
-            text = if (owned) stringResource(R.string.items_owned) + " · " + subtitle else subtitle,
-            fontSize = 11.sp,
-            color = if (owned) Volt else Slate,
-        )
-    }
-}
-
-@Composable
-private fun BoostRow(
-    icon: ImageVector,
-    title: String,
-    desc: String,
-    price: String,
-    onBuy: () -> Unit,
-) {
+private fun BoostRow(type: BoostType, affordable: Boolean, onBuy: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -351,11 +371,49 @@ private fun BoostRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        IconSquare(icon = icon, size = 40.dp)
+        IconSquare(icon = boostIcon(type), size = 40.dp)
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(title, style = MaterialTheme.typography.titleSmall, color = Snow)
-            Text(desc, fontSize = 11.sp, color = Silver)
+            Text(
+                text = stringResource(boostTitle(type)),
+                style = MaterialTheme.typography.titleSmall,
+                color = Snow,
+            )
+            Text(
+                text = stringResource(boostDesc(type)),
+                fontSize = 11.sp,
+                color = Silver,
+            )
         }
-        GhostButton(text = price, onClick = onBuy)
+        GhostButton(
+            text = stringResource(R.string.price_sup, "%,.0f".format(type.cost)),
+            onClick = onBuy,
+            enabled = affordable,
+        )
     }
+}
+
+private fun boostIcon(type: BoostType): ImageVector = when (type) {
+    BoostType.ENERGY_CELL -> Icons.Filled.Bolt
+    BoostType.STREAK_SHIELD -> Icons.Filled.Shield
+    BoostType.XP_BOOSTER -> Icons.Filled.AutoAwesome
+}
+
+private fun boostTitle(type: BoostType): Int = when (type) {
+    BoostType.ENERGY_CELL -> R.string.boost_energy_title
+    BoostType.STREAK_SHIELD -> R.string.boost_shield_title
+    BoostType.XP_BOOSTER -> R.string.boost_xp_title
+}
+
+private fun boostDesc(type: BoostType): Int = when (type) {
+    BoostType.ENERGY_CELL -> R.string.boost_energy_desc
+    BoostType.STREAK_SHIELD -> R.string.boost_shield_desc
+    BoostType.XP_BOOSTER -> R.string.boost_xp_desc
+}
+
+/** 남은 시간 라벨 (h/m) */
+private fun remainingLabel(expiresAt: Long): String {
+    val left = ((expiresAt - System.currentTimeMillis()) / 1000).coerceAtLeast(0)
+    val h = left / 3600
+    val m = (left % 3600) / 60
+    return if (h > 0) "${h}h ${m}m" else "${m}m"
 }

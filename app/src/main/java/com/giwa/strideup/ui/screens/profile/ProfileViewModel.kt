@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.giwa.strideup.core.ServiceLocator
 import com.giwa.strideup.data.prefs.UserPrefs
 import com.giwa.strideup.data.repo.RewardRepository
+import com.giwa.strideup.data.repo.SneakerRepository
 import com.giwa.strideup.data.repo.StepRepository
 import com.giwa.strideup.domain.RewardEconomy
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,6 +19,7 @@ import kotlinx.coroutines.launch
 class ProfileViewModel(
     private val stepRepository: StepRepository,
     rewardRepository: RewardRepository,
+    sneakerRepository: SneakerRepository,
 ) : ViewModel() {
 
     data class UiState(
@@ -27,6 +29,7 @@ class ProfileViewModel(
         val streak: Int = 0,
         val lifetimeSteps: Long = 0,
         val monthSteps: Long = 0,
+        val ownedSneakers: Int = 0,
     ) {
         val multiplier: Double get() = RewardEconomy.sneakerMultiplier(sneakerLevel)
         val upgradeCost: Double get() = RewardEconomy.upgradeCost(sneakerLevel)
@@ -46,7 +49,8 @@ class ProfileViewModel(
             stepRepository.observeLifetimeSteps(),
             stepRepository.observeMonthSteps(),
         ) { streak, lifetime, month -> Triple(streak, lifetime, month) },
-    ) { (goal, level, balance), (streak, lifetime, month) ->
+        sneakerRepository.ownedCount,
+    ) { (goal, level, balance), (streak, lifetime, month), owned ->
         UiState(
             goal = goal,
             sneakerLevel = level,
@@ -54,6 +58,7 @@ class ProfileViewModel(
             streak = streak,
             lifetimeSteps = lifetime,
             monthSteps = month,
+            ownedSneakers = owned,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState())
 
@@ -64,7 +69,11 @@ class ProfileViewModel(
     companion object {
         val Factory = viewModelFactory {
             initializer {
-                ProfileViewModel(ServiceLocator.stepRepository, ServiceLocator.rewardRepository)
+                ProfileViewModel(
+                    ServiceLocator.stepRepository,
+                    ServiceLocator.rewardRepository,
+                    ServiceLocator.sneakerRepository,
+                )
             }
         }
     }

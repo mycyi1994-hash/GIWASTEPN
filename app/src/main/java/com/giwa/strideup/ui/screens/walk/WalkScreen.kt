@@ -83,6 +83,8 @@ fun RunScreen(
     val session by viewModel.session.collectAsStateWithLifecycle()
     val energy by viewModel.energy.collectAsStateWithLifecycle()
     val sneakerLevel by viewModel.sneakerLevel.collectAsStateWithLifecycle()
+    val equipped by viewModel.equipped.collectAsStateWithLifecycle()
+    val xpBoosted by viewModel.xpBoosted.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     // 화면 잠금(오조작 방지). 잠금 상태에서는 일시정지/종료가 비활성.
@@ -96,8 +98,20 @@ fun RunScreen(
         }
     }
 
-    val estimate = RewardEconomy.sessionReward(session.steps, energy, sneakerLevel)
-    val earnableSteps = (energy * RewardEconomy.STEPS_PER_ENERGY).toInt()
+    // 착용 스니커즈 · 파티 인원 · XP 부스터를 모두 반영한 예상 적립
+    val earningMultiplier = equipped?.earningMultiplier
+        ?: RewardEconomy.sneakerMultiplier(sneakerLevel)
+    val energyEfficiency = equipped?.energyEfficiency ?: 1.0
+    val estimate = RewardEconomy.sessionReward(
+        walkedSteps = session.steps,
+        energyRemaining = energy,
+        earningMultiplier = earningMultiplier,
+        energyEfficiency = energyEfficiency,
+        partyMultiplier = RewardEconomy.partyMultiplier(session.partySize),
+        boostMultiplier = if (xpBoosted) RewardEconomy.XP_BOOST_MULTIPLIER else 1.0,
+    )
+    val earnableSteps = RewardEconomy.earnableSteps(energy, energyEfficiency)
+    val maxEnergy = RewardEconomy.maxEnergy(equipped?.level ?: sneakerLevel)
     val distanceKm = RewardEconomy.distanceMeters(session.steps) / 1000
     val calories = RewardEconomy.calories(session.steps)
     val running = session.isActive && !session.isPaused
@@ -206,12 +220,28 @@ fun RunScreen(
                         color = Volt,
                     )
                 }
-                EnergyMeter(current = energy, max = RewardEconomy.maxEnergy(sneakerLevel))
+                EnergyMeter(current = energy, max = maxEnergy)
                 Text(
                     text = stringResource(R.string.run_earnable, "%,d".format(earnableSteps)),
                     style = MaterialTheme.typography.bodySmall,
                     color = Slate,
                 )
+                if (xpBoosted) {
+                    Text(
+                        text = stringResource(R.string.run_boost_active),
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Volt,
+                    )
+                }
+                if (session.partySize > 1) {
+                    Text(
+                        text = stringResource(R.string.crew_boost, RewardEconomy.partyBonusPercent(session.partySize)),
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Volt,
+                    )
+                }
             }
         }
 
@@ -254,6 +284,17 @@ fun RunScreen(
                             style = MaterialTheme.typography.bodySmall,
                             color = Silver,
                         )
+                        if (session.lastPartySize > 1) {
+                            Text(
+                                text = stringResource(
+                                    R.string.crew_boost,
+                                    RewardEconomy.partyBonusPercent(session.lastPartySize),
+                                ),
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Bold,
+                                color = Volt,
+                            )
+                        }
                     }
                     GhostButton(
                         text = stringResource(R.string.common_ok),

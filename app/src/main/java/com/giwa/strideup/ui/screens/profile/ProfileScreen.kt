@@ -1,7 +1,5 @@
 package com.giwa.strideup.ui.screens.profile
 
-import android.widget.Toast
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,16 +14,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.AccountBalanceWallet
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MilitaryTech
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Security
@@ -44,12 +39,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -69,25 +60,26 @@ import com.giwa.strideup.ui.components.SectionHeader
 import com.giwa.strideup.ui.components.TokenCard
 import com.giwa.strideup.ui.components.VerticalHairline
 import com.giwa.strideup.ui.components.Wordmark
+import com.giwa.strideup.ui.components.quietClickable
 import com.giwa.strideup.ui.screens.home.runnerTier
-import com.giwa.strideup.ui.theme.Edge
 import com.giwa.strideup.ui.theme.Silver
 import com.giwa.strideup.ui.theme.Slate
 import com.giwa.strideup.ui.theme.Snow
 import com.giwa.strideup.ui.theme.Volt
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.sin
 
 @Composable
 fun ProfileScreen(
     onOpenWallet: () -> Unit = {},
+    onOpenAchievements: () -> Unit = {},
+    onOpenAnalytics: () -> Unit = {},
+    onOpenNotificationSettings: () -> Unit = {},
+    onOpenPrivacy: () -> Unit = {},
+    onOpenSupport: () -> Unit = {},
+    onOpenConnected: () -> Unit = {},
+    onOpenItems: () -> Unit = {},
     viewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory),
 ) {
-    val context = LocalContext.current
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val comingSoon = stringResource(R.string.toast_coming_soon)
-    val showComingSoon = { Toast.makeText(context, comingSoon, Toast.LENGTH_SHORT).show() }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -111,11 +103,11 @@ fun ProfileScreen(
 
         item { StatsRow(state) }
 
-        item { AchievementsCard(state, showComingSoon) }
+        item { AchievementsCard(state, onOpenAchievements) }
 
-        item { SneakersCard(state.sneakerLevel) }
+        item { SneakersCard(state.sneakerLevel, state.ownedSneakers, onOpenItems) }
 
-        item { OverviewCard(state) }
+        item { OverviewCard(state, onOpenAnalytics) }
 
         item { GoalCard(goal = state.goal, onGoalChange = viewModel::setGoal) }
 
@@ -130,29 +122,29 @@ fun ProfileScreen(
                 ListRow(
                     icon = Icons.Filled.Notifications,
                     title = stringResource(R.string.settings_notifications),
-                    onClick = showComingSoon,
+                    onClick = onOpenNotificationSettings,
                 )
                 ListRow(
                     icon = Icons.Filled.Security,
                     title = stringResource(R.string.settings_privacy),
-                    onClick = showComingSoon,
+                    onClick = onOpenPrivacy,
                 )
                 ListRow(
                     icon = Icons.Filled.SupportAgent,
                     title = stringResource(R.string.settings_support),
-                    onClick = showComingSoon,
+                    onClick = onOpenSupport,
                 )
                 ListRow(
                     icon = Icons.Filled.Link,
                     title = stringResource(R.string.settings_connected),
-                    onClick = showComingSoon,
+                    onClick = onOpenConnected,
                 )
             }
         }
 
         item {
             GlowCard(contentPadding = PaddingValues(16.dp), spacing = 9.dp) {
-                AboutRow(label = stringResource(R.string.about_version), value = "StrideUp 1.2.0")
+                AboutRow(label = stringResource(R.string.about_version), value = "StrideUp 1.3.0")
                 AboutRow(
                     label = stringResource(R.string.about_network),
                     value = stringResource(R.string.about_network_value),
@@ -243,9 +235,17 @@ private fun ProfileHeader(state: ProfileViewModel.UiState) {
     }
 }
 
+/** 실데이터 기반 업적 미리보기: 마라톤 / 스텝 킹 / 스트릭 / 컬렉터 */
+private fun previewAchievements(state: ProfileViewModel.UiState): List<Boolean> = listOf(
+    state.lifetimeKm >= 100.0,
+    state.lifetimeSteps >= 1_000_000L,
+    state.streak >= 30,
+    state.ownedSneakers >= 3,
+)
+
 @Composable
 private fun StatsRow(state: ProfileViewModel.UiState) {
-    val unlocked = achievementStates(state).count { it }
+    val unlocked = previewAchievements(state).count { it }
     GlowCard(contentPadding = PaddingValues(vertical = 17.dp, horizontal = 6.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -272,7 +272,7 @@ private fun StatsRow(state: ProfileViewModel.UiState) {
             MiniStatCell(
                 icon = Icons.Filled.EmojiEvents,
                 label = stringResource(R.string.profile_achievements),
-                value = "$unlocked / 4",
+                value = "$unlocked / 8",
             )
         }
     }
@@ -306,17 +306,9 @@ private fun RowScope.MiniStatCell(
     }
 }
 
-/** 실데이터 기반 업적 해금 여부: 마라톤 / 스텝 킹 / 스트릭 마스터 / 울트라(잠김) */
-private fun achievementStates(state: ProfileViewModel.UiState): List<Boolean> = listOf(
-    state.lifetimeKm >= 100.0,
-    state.lifetimeSteps >= 1_000_000L,
-    state.streak >= 30,
-    false,
-)
-
 @Composable
 private fun AchievementsCard(state: ProfileViewModel.UiState, onViewAll: () -> Unit) {
-    val states = achievementStates(state)
+    val states = previewAchievements(state)
     GlowCard(contentPadding = PaddingValues(18.dp), spacing = 14.dp) {
         SectionHeader(
             title = stringResource(R.string.profile_achievements),
@@ -327,32 +319,28 @@ private fun AchievementsCard(state: ProfileViewModel.UiState, onViewAll: () -> U
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(9.dp),
         ) {
-            AchBadge(
+            AchPreview(
                 name = stringResource(R.string.ach_marathon),
-                desc = stringResource(R.string.ach_marathon_desc),
                 unlocked = states[0],
                 icon = Icons.AutoMirrored.Filled.DirectionsWalk,
                 modifier = Modifier.weight(1f),
             )
-            AchBadge(
+            AchPreview(
                 name = stringResource(R.string.ach_step_king),
-                desc = stringResource(R.string.ach_step_king_desc),
                 unlocked = states[1],
                 icon = Icons.Filled.MilitaryTech,
                 modifier = Modifier.weight(1f),
             )
-            AchBadge(
+            AchPreview(
                 name = stringResource(R.string.ach_streak_master),
-                desc = stringResource(R.string.ach_streak_master_desc),
                 unlocked = states[2],
                 icon = Icons.Filled.Whatshot,
                 modifier = Modifier.weight(1f),
             )
-            AchBadge(
-                name = stringResource(R.string.ach_ultra),
-                desc = stringResource(R.string.ach_locked),
+            AchPreview(
+                name = stringResource(R.string.ach_collector),
                 unlocked = states[3],
-                icon = Icons.Filled.Lock,
+                icon = Icons.Filled.TrendingUp,
                 modifier = Modifier.weight(1f),
             )
         }
@@ -360,9 +348,8 @@ private fun AchievementsCard(state: ProfileViewModel.UiState, onViewAll: () -> U
 }
 
 @Composable
-private fun AchBadge(
+private fun AchPreview(
     name: String,
-    desc: String,
     unlocked: Boolean,
     icon: ImageVector,
     modifier: Modifier = Modifier,
@@ -373,44 +360,39 @@ private fun AchBadge(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.size(56.dp)) {
-            Canvas(Modifier.fillMaxSize()) {
-                val cx = size.width / 2f
-                val cy = size.height / 2f
-                val r = size.minDimension / 2f * 0.92f
-                val path = Path().apply {
-                    for (i in 0 until 6) {
-                        val a = (-90f + i * 60f) * (PI / 180.0)
-                        val x = cx + r * cos(a).toFloat()
-                        val y = cy + r * sin(a).toFloat()
-                        if (i == 0) moveTo(x, y) else lineTo(x, y)
-                    }
-                    close()
-                }
-                drawPath(path, color = if (unlocked) Volt.copy(alpha = 0.10f) else Color.Transparent)
-                drawPath(
-                    path,
-                    color = if (unlocked) Volt else Edge,
-                    style = Stroke(width = 1.5.dp.toPx()),
-                )
-            }
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .background(
+                    tint.copy(alpha = if (unlocked) 0.13f else 0.06f),
+                    RoundedCornerShape(14.dp),
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
             Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(20.dp))
         }
         Text(
             text = name,
-            fontSize = 10.sp,
+            fontSize = 9.5.sp,
             fontWeight = FontWeight.SemiBold,
             color = if (unlocked) Snow else Slate,
             textAlign = TextAlign.Center,
         )
-        Text(text = desc, fontSize = 9.sp, color = Slate, textAlign = TextAlign.Center)
     }
 }
 
 @Composable
-private fun SneakersCard(level: Int) {
-    GlowCard(contentPadding = PaddingValues(18.dp), spacing = 12.dp) {
-        SectionHeader(title = stringResource(R.string.profile_my_sneakers))
+private fun SneakersCard(level: Int, owned: Int, onOpenItems: () -> Unit) {
+    GlowCard(
+        modifier = Modifier.quietClickable(onOpenItems),
+        contentPadding = PaddingValues(18.dp),
+        spacing = 12.dp,
+    ) {
+        SectionHeader(
+            title = stringResource(R.string.profile_my_sneakers),
+            actionText = stringResource(R.string.common_view_all),
+            onAction = onOpenItems,
+        )
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(14.dp),
@@ -433,7 +415,7 @@ private fun SneakersCard(level: Int) {
                 )
             }
             Text(
-                text = stringResource(R.string.profile_owned_count, 1),
+                text = stringResource(R.string.profile_owned_count, owned),
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Bold,
                 color = Volt,
@@ -443,9 +425,13 @@ private fun SneakersCard(level: Int) {
 }
 
 @Composable
-private fun OverviewCard(state: ProfileViewModel.UiState) {
+private fun OverviewCard(state: ProfileViewModel.UiState, onOpenAnalytics: () -> Unit) {
     val tokensEarned = state.monthSteps * RewardEconomy.POINTS_PER_STEP * state.multiplier
-    GlowCard(contentPadding = PaddingValues(18.dp), spacing = 13.dp) {
+    GlowCard(
+        modifier = Modifier.quietClickable(onOpenAnalytics),
+        contentPadding = PaddingValues(18.dp),
+        spacing = 13.dp,
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -465,8 +451,7 @@ private fun OverviewCard(state: ProfileViewModel.UiState) {
             }
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .background(Volt.copy(alpha = 0.10f))
+                    .background(Volt.copy(alpha = 0.10f), RoundedCornerShape(50))
                     .padding(horizontal = 11.dp, vertical = 5.dp),
             ) {
                 Text(

@@ -1,6 +1,5 @@
 package com.giwa.strideup.ui.screens.community
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -22,7 +21,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -40,21 +39,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.giwa.strideup.R
+import com.giwa.strideup.data.repo.Crew
+import com.giwa.strideup.domain.RewardEconomy
 import com.giwa.strideup.ui.components.AvatarStack
 import com.giwa.strideup.ui.components.DarkIconButton
 import com.giwa.strideup.ui.components.GhostButton
@@ -73,30 +74,27 @@ import com.giwa.strideup.ui.theme.Slate
 import com.giwa.strideup.ui.theme.Snow
 import com.giwa.strideup.ui.theme.Volt
 
-private data class Crew(val monogram: String, val name: String, val kmAway: String, val members: Int)
-
-private val demoCrews = listOf(
-    Crew("TB", "Trailblazer Crew", "0.8", 128),
-    Crew("NR", "Night Runners", "1.3", 86),
-    Crew("SS", "Summit Seekers", "2.1", 142),
-)
-
 @Composable
-fun CommunityScreen() {
-    val context = LocalContext.current
-    val comingSoon = stringResource(R.string.toast_coming_soon)
-    val showComingSoon = { Toast.makeText(context, comingSoon, Toast.LENGTH_SHORT).show() }
-
+fun CommunityScreen(
+    onOpenLobby: (String) -> Unit = {},
+    onOpenNotifications: () -> Unit = {},
+    viewModel: CommunityViewModel = viewModel(factory = CommunityViewModel.Factory),
+) {
+    val joined by viewModel.joinedCrewIds.collectAsStateWithLifecycle()
     var query by rememberSaveable { mutableStateOf("") }
     var selectedChip by rememberSaveable { mutableIntStateOf(0) }
 
     val chipLabels = listOf(
         stringResource(R.string.chip_discover),
         stringResource(R.string.chip_crews),
-        stringResource(R.string.chip_events),
         stringResource(R.string.chip_following),
-        stringResource(R.string.chip_invites),
     )
+
+    val filtered = viewModel.crews.filter { it.name.contains(query, ignoreCase = true) }
+    val visibleCrews = when (selectedChip) {
+        2 -> filtered.filter { joined.contains(it.id) }
+        else -> filtered
+    }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -129,19 +127,12 @@ fun CommunityScreen() {
                         color = Volt,
                     )
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-                    DarkIconButton(
-                        icon = Icons.Filled.Notifications,
-                        contentDescription = stringResource(R.string.cd_notifications),
-                        onClick = showComingSoon,
-                        badge = true,
-                    )
-                    DarkIconButton(
-                        icon = Icons.Filled.Add,
-                        contentDescription = null,
-                        onClick = showComingSoon,
-                    )
-                }
+                DarkIconButton(
+                    icon = Icons.Filled.Notifications,
+                    contentDescription = stringResource(R.string.cd_notifications),
+                    onClick = onOpenNotifications,
+                    badge = true,
+                )
             }
         }
 
@@ -151,28 +142,16 @@ fun CommunityScreen() {
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                SearchField(
-                    query = query,
-                    onQueryChange = { query = it },
-                    modifier = Modifier.weight(1f),
-                )
-                Row(
+                SearchField(query, { query = it }, Modifier.weight(1f))
+                Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(16.dp))
                         .background(CarbonHigh)
                         .border(1.dp, Edge, RoundedCornerShape(16.dp))
-                        .quietClickable(showComingSoon)
-                        .padding(horizontal = 14.dp, vertical = 13.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        .quietClickable { query = "" }
+                        .padding(13.dp),
                 ) {
-                    Icon(Icons.Filled.Tune, contentDescription = null, tint = Snow, modifier = Modifier.size(16.dp))
-                    Text(
-                        text = stringResource(R.string.community_filter),
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Snow,
-                    )
+                    Icon(Icons.Filled.Tune, contentDescription = null, tint = Snow, modifier = Modifier.size(17.dp))
                 }
             }
         }
@@ -184,46 +163,46 @@ fun CommunityScreen() {
                         text = chipLabels[index],
                         selected = selectedChip == index,
                         onClick = { selectedChip = index },
-                        badge = if (index == 4) 3 else 0,
+                        badge = if (index == 2) joined.size else 0,
                     )
                 }
             }
         }
 
-        if (selectedChip != 0) {
+        item {
+            SectionHeader(title = stringResource(R.string.community_nearby))
+        }
+
+        if (visibleCrews.isEmpty()) {
             item {
-                GlowCard(contentPadding = PaddingValues(26.dp)) {
+                GlowCard(contentPadding = PaddingValues(24.dp)) {
                     Text(
-                        text = stringResource(R.string.community_section_soon),
+                        text = if (query.isBlank()) {
+                            stringResource(R.string.common_none)
+                        } else {
+                            stringResource(R.string.community_no_results, query)
+                        },
                         style = MaterialTheme.typography.bodyMedium,
                         color = Silver,
                     )
                 }
             }
         } else {
-            item {
-                SectionHeader(
-                    title = stringResource(R.string.community_nearby),
-                    actionText = stringResource(R.string.community_view_map),
-                    onAction = showComingSoon,
+            items(visibleCrews, key = { it.id }) { crew ->
+                CrewCard(
+                    crew = crew,
+                    joined = joined.contains(crew.id),
+                    onToggleJoin = { viewModel.toggleJoin(crew.id) },
+                    onOpenLobby = { onOpenLobby(crew.id) },
                 )
             }
-
-            item {
-                val filtered = demoCrews.filter { it.name.contains(query, ignoreCase = true) }
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(11.dp)) {
-                    items(filtered) { crew -> CrewCard(crew) }
-                }
-            }
-
-            item { PartyRunCard() }
-
-            item { PopularPostCard() }
-
-            item { LookingForRunners(onJoinToast = showComingSoon) }
-
-            item { ActivityFeed() }
         }
+
+        item { PartyRunCard(joined = joined.isNotEmpty(), onOpenLobby = onOpenLobby) }
+
+        item { PopularPostCard() }
+
+        item { ActivityFeed() }
     }
 }
 
@@ -260,48 +239,74 @@ private fun SearchField(query: String, onQueryChange: (String) -> Unit, modifier
 }
 
 @Composable
-private fun CrewCard(crew: Crew) {
-    GlowCard(
-        modifier = Modifier.width(168.dp),
-        contentPadding = PaddingValues(16.dp),
-        spacing = 9.dp,
-    ) {
+private fun CrewCard(
+    crew: Crew,
+    joined: Boolean,
+    onToggleJoin: () -> Unit,
+    onOpenLobby: () -> Unit,
+) {
+    GlowCard(contentPadding = PaddingValues(16.dp), spacing = 12.dp, accent = joined) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top,
-        ) {
-            HexBadge(text = crew.monogram, size = 44.dp)
-            Box(
-                modifier = Modifier
-                    .size(7.dp)
-                    .background(Volt, CircleShape),
-            )
-        }
-        Text(crew.name, style = MaterialTheme.typography.titleSmall, color = Snow)
-        Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(13.dp),
         ) {
-            Icon(Icons.Filled.LocationOn, contentDescription = null, tint = Slate, modifier = Modifier.size(11.dp))
-            Text(
-                text = stringResource(R.string.community_km_away, crew.kmAway),
-                fontSize = 11.sp,
-                color = Slate,
-            )
+            HexBadge(text = crew.monogram, size = 46.dp)
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                Text(crew.name, style = MaterialTheme.typography.titleSmall, color = Snow)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    Icon(
+                        Icons.Filled.LocationOn,
+                        contentDescription = null,
+                        tint = Slate,
+                        modifier = Modifier.size(11.dp),
+                    )
+                    Text(
+                        text = stringResource(R.string.community_km_away, crew.kmAway),
+                        fontSize = 11.sp,
+                        color = Slate,
+                    )
+                    Text("·", fontSize = 11.sp, color = Slate)
+                    Text(
+                        text = stringResource(R.string.community_members, crew.memberCount),
+                        fontSize = 11.sp,
+                        color = Silver,
+                    )
+                }
+            }
+            AvatarStack(visible = 3, extra = crew.memberCount / 10, dot = 22.dp)
         }
-        AvatarStack(visible = 4, extra = crew.members / 10)
-        Text(
-            text = stringResource(R.string.community_members, crew.members),
-            fontSize = 11.sp,
-            color = Silver,
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(9.dp),
+        ) {
+            if (joined) {
+                VoltButton(
+                    text = stringResource(R.string.crew_open_lobby),
+                    onClick = onOpenLobby,
+                    modifier = Modifier.weight(1f),
+                )
+                GhostButton(
+                    text = stringResource(R.string.community_leave_crew),
+                    onClick = onToggleJoin,
+                    accent = Silver,
+                )
+            } else {
+                GhostButton(
+                    text = stringResource(R.string.community_join_crew),
+                    onClick = onToggleJoin,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
     }
 }
 
 @Composable
-private fun PartyRunCard() {
-    var joined by rememberSaveable { mutableStateOf(false) }
+private fun PartyRunCard(joined: Boolean, onOpenLobby: (String) -> Unit) {
     GlowCard(accent = true, contentPadding = PaddingValues(18.dp), spacing = 12.dp) {
         Text(
             text = stringResource(R.string.community_tonight),
@@ -312,10 +317,7 @@ private fun PartyRunCard() {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(9.dp),
-            ) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(9.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("Neon Night Run", style = MaterialTheme.typography.titleLarge, color = Snow)
                     Spacer(Modifier.width(6.dp))
@@ -333,41 +335,43 @@ private fun PartyRunCard() {
                     Icon(Icons.Filled.Schedule, contentDescription = null, tint = Silver, modifier = Modifier.size(12.dp))
                     Text("8:00 PM", fontSize = 12.sp, color = Silver)
                     Text("·", fontSize = 12.sp, color = Slate)
-                    Icon(Icons.Filled.LocationOn, contentDescription = null, tint = Silver, modifier = Modifier.size(12.dp))
                     Text("Riverside Park", fontSize = 12.sp, color = Silver)
                     Text("·", fontSize = 12.sp, color = Slate)
                     Text("6.2 km", fontSize = 12.sp, color = Silver)
                 }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
-                    AvatarStack(visible = 5, extra = 0, dot = 22.dp)
+                    Icon(Icons.Filled.Bolt, contentDescription = null, tint = Volt, modifier = Modifier.size(13.dp))
                     Text(
-                        text = stringResource(R.string.community_going, if (joined) 25 else 24),
+                        text = stringResource(
+                            R.string.crew_boost,
+                            RewardEconomy.partyBonusPercent(4),
+                        ),
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = FontWeight.Bold,
                         color = Volt,
                     )
                 }
             }
             RouteMap(
                 modifier = Modifier
-                    .width(120.dp)
-                    .height(96.dp),
+                    .width(112.dp)
+                    .height(94.dp),
             )
         }
         if (joined) {
-            GhostButton(
-                text = stringResource(R.string.community_joined) + " ✓",
-                onClick = { joined = false },
+            VoltButton(
+                text = stringResource(R.string.community_im_in),
+                onClick = { onOpenLobby("night_runners") },
                 modifier = Modifier.fillMaxWidth(),
             )
         } else {
-            VoltButton(
-                text = stringResource(R.string.community_im_in),
-                onClick = { joined = true },
-                modifier = Modifier.fillMaxWidth(),
+            Text(
+                text = stringResource(R.string.crew_join_first),
+                style = MaterialTheme.typography.bodySmall,
+                color = Slate,
             )
         }
     }
@@ -432,77 +436,16 @@ private fun PopularPostCard() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(5.dp),
             ) {
-                Icon(Icons.Filled.ChatBubbleOutline, contentDescription = null, tint = Silver, modifier = Modifier.size(16.dp))
+                Icon(
+                    Icons.Filled.ChatBubbleOutline,
+                    contentDescription = null,
+                    tint = Silver,
+                    modifier = Modifier.size(16.dp),
+                )
                 Text("12", fontSize = 12.sp, color = Silver)
             }
             Spacer(Modifier.weight(1f))
             Icon(Icons.Filled.Share, contentDescription = null, tint = Silver, modifier = Modifier.size(16.dp))
-        }
-    }
-}
-
-@Composable
-private fun LookingForRunners(onJoinToast: () -> Unit) {
-    GlowCard(contentPadding = PaddingValues(18.dp), spacing = 13.dp) {
-        SectionHeader(title = stringResource(R.string.community_looking))
-        RecruitRow(
-            icon = Icons.Filled.FavoriteBorder,
-            tag = stringResource(R.string.community_beginner),
-            name = "New Striders",
-            desc = stringResource(R.string.community_crew_all_levels),
-            count = "8 / 12",
-            onJoin = onJoinToast,
-        )
-        RecruitRow(
-            icon = Icons.Filled.NightsStay,
-            tag = null,
-            name = "Night Owls",
-            desc = stringResource(R.string.community_crew_night),
-            count = "6 / 10",
-            onJoin = onJoinToast,
-        )
-    }
-}
-
-@Composable
-private fun RecruitRow(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    tag: String?,
-    name: String,
-    desc: String,
-    count: String,
-    onJoin: () -> Unit,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
-            .background(CarbonHigh.copy(alpha = 0.6f))
-            .padding(14.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        if (tag != null) {
-            Text(tag, fontSize = 11.sp, color = Volt, fontWeight = FontWeight.SemiBold)
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(9.dp),
-        ) {
-            Icon(icon, contentDescription = null, tint = Volt, modifier = Modifier.size(16.dp))
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(1.dp)) {
-                Text(name, style = MaterialTheme.typography.titleSmall, color = Snow)
-                Text(desc, fontSize = 11.sp, color = Silver)
-            }
-            Text(count, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Snow)
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            AvatarStack(visible = 4, extra = 4, dot = 20.dp)
-            GhostButton(text = stringResource(R.string.community_join_crew), onClick = onJoin)
         }
     }
 }

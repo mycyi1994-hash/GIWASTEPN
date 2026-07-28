@@ -22,11 +22,16 @@ import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Upgrade
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,6 +60,7 @@ import com.giwa.strideup.ui.components.VerticalHairline
 import com.giwa.strideup.ui.components.Wordmark
 import com.giwa.strideup.ui.components.sheen
 import com.giwa.strideup.ui.theme.Alert
+import com.giwa.strideup.ui.theme.Carbon
 import com.giwa.strideup.ui.theme.Night
 import com.giwa.strideup.ui.theme.Silver
 import com.giwa.strideup.ui.theme.Slate
@@ -115,7 +121,7 @@ fun WalletScreen(
 
         item { SummaryRow(earned = earned, spent = spent) }
 
-        item { GiwaCard() }
+        item { GiwaCard(balance) }
 
         item {
             Row(
@@ -278,7 +284,8 @@ private fun RowScope.SummaryCell(label: String, value: String, tint: Color) {
 }
 
 @Composable
-private fun GiwaCard() {
+private fun GiwaCard(balance: Double) {
+    var showWithdraw by rememberSaveable { mutableStateOf(false) }
     GlowCard(spacing = 12.dp) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -309,9 +316,59 @@ private fun GiwaCard() {
         )
         GhostButton(
             text = stringResource(R.string.wallet_withdraw),
-            onClick = {},
-            enabled = false,
+            onClick = { showWithdraw = true },
             modifier = Modifier.fillMaxWidth(),
+        )
+    }
+
+    if (showWithdraw) {
+        AlertDialog(
+            onDismissRequest = { showWithdraw = false },
+            containerColor = Carbon,
+            titleContentColor = Snow,
+            textContentColor = Silver,
+            confirmButton = {
+                TextButton(onClick = { showWithdraw = false }) {
+                    Text(
+                        text = stringResource(R.string.common_ok),
+                        color = Volt,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            },
+            title = { Text(stringResource(R.string.wallet_withdraw_title), fontWeight = FontWeight.Black) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
+                    Text(
+                        text = stringResource(R.string.wallet_withdraw_body),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Silver,
+                    )
+                    Text(
+                        text = stringResource(R.string.wallet_withdraw_min),
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Snow,
+                    )
+                    if (balance >= 1_000.0) {
+                        Text(
+                            text = stringResource(R.string.wallet_withdraw_eligible),
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.Bold,
+                            color = Volt,
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(
+                                R.string.wallet_withdraw_short,
+                                "%,.0f".format(1_000.0 - balance),
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Slate,
+                        )
+                    }
+                }
+            },
         )
     }
 }

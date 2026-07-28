@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <!-- Notification -->
     <string name="notification_channel_walk">ランセッション</string>
-    <string name="notification_walk_title">ラン進行中</string>
+    <string name="notification_walk_title">ラン中</string>
     <string name="notification_steps">%1$d歩</string>
 
     <!-- Tabs -->
@@ -14,43 +15,52 @@
 
     <!-- Common -->
     <string name="common_view_all">すべて見る</string>
-    <string name="toast_coming_soon">もうすぐ登場!</string>
     <string name="common_ok">OK</string>
+    <string name="common_close">閉じる</string>
+    <string name="common_cancel">キャンセル</string>
+    <string name="common_confirm">決定</string>
+    <string name="common_none">まだありません</string>
+
+    <!-- Splash -->
+    <string name="splash_tagline">Every Step. Every Stride. Every Day.</string>
+    <string name="splash_loading">LOADING</string>
+    <string name="splash_syncing">ランデータを同期中</string>
+    <string name="splash_preparing">走る準備をしています…</string>
 
     <!-- Greeting -->
     <string name="greeting_dawn">早起きだね、</string>
     <string name="greeting_morning">おはよう、</string>
     <string name="greeting_afternoon">こんにちは、</string>
     <string name="greeting_evening">こんばんは、</string>
-    <string name="greeting_runner">ランナーさん!👋</string>
+    <string name="greeting_runner">ランナーさん！ 👋</string>
     <string name="level_chip">Lv. %1$d</string>
 
     <!-- Permission / sensor -->
-    <string name="perm_title">歩数を数えるには許可が必要です</string>
-    <string name="perm_body">身体活動へのアクセスを許可すると、歩数が記録されてSUPがどんどん貯まります。</string>
-    <string name="perm_allow">アクセスを許可</string>
+    <string name="perm_title">歩数を数えるには権限が必要です</string>
+    <string name="perm_body">身体活動の権限を許可すると歩数が記録されて、SUPがどんどん貯まります。</string>
+    <string name="perm_allow">権限を許可する</string>
     <string name="sensor_title">歩数センサーが見つかりません</string>
-    <string name="sensor_body">このデバイス(またはエミュレーター)には歩数センサーがありません。ラン画面のシミュレーションボタンで流れを試してみてください。</string>
+    <string name="sensor_body">この端末（またはエミュレータ）には歩数センサーがありません。ラン画面のシミュレーションボタンで動きを試してみてください。</string>
 
     <!-- Home -->
     <string name="home_total_steps">合計歩数</string>
     <string name="home_today">今日</string>
     <string name="home_daily_goal">1日の目標 %1$s</string>
-    <string name="home_view_analytics">分析を見る</string>
-    <string name="home_energy">エネルギー</string>
-    <string name="home_recharge_in">あと%1$sで回復</string>
+    <string name="home_view_analytics">統計を見る</string>
+    <string name="home_energy">エナジー</string>
+    <string name="home_recharge_in">%1$s後に回復</string>
     <string name="home_distance">距離</string>
     <string name="home_this_week">今週</string>
     <string name="home_view_details">詳細を見る</string>
     <string name="home_durability">耐久度</string>
     <string name="stat_efficiency">効率</string>
     <string name="stat_luck">運</string>
-    <string name="stat_comfort">快適さ</string>
+    <string name="stat_comfort">快適性</string>
     <string name="start_run">START RUN</string>
-    <string name="start_run_sub">さあ、走り出そう</string>
+    <string name="start_run_sub">さあ走ろう</string>
 
     <!-- Community -->
-    <string name="community_search_hint">クルー、ランナー、イベントを検索</string>
+    <string name="community_search_hint">クルー・ランナー・イベントを検索</string>
     <string name="community_filter">フィルター</string>
     <string name="chip_discover">発見</string>
     <string name="chip_crews">クルー</string>
@@ -61,44 +71,96 @@
     <string name="community_view_map">マップを見る</string>
     <string name="community_members">メンバー%1$d人</string>
     <string name="community_km_away">%1$s km先</string>
-    <string name="community_tonight">今夜はパーティーラン</string>
-    <string name="community_going">%1$d人参加予定</string>
+    <string name="community_tonight">今夜のパーティーラン</string>
+    <string name="community_going">%1$d人が参加</string>
     <string name="community_im_in">参加する</string>
-    <string name="community_joined">参加済み</string>
+    <string name="community_joined">参加中</string>
     <string name="community_popular">人気の投稿</string>
-    <string name="community_post_body">朝日の中を走るのは格別。土曜日、一緒にどう?</string>
+    <string name="community_post_body">朝日を浴びながらのランはやっぱり格別。土曜、一緒に走る人いる？</string>
     <string name="time_hours_ago">%1$d時間前</string>
+    <string name="time_just_now">たった今</string>
+    <string name="time_minutes_ago">%1$d分前</string>
+    <string name="time_days_ago">%1$d日前</string>
     <string name="community_looking">ランナー募集中</string>
     <string name="community_beginner">初心者歓迎</string>
-    <string name="community_crew_all_levels">どのレベルでも大歓迎!</string>
-    <string name="community_crew_night">夜が好きなら、一緒に走ろう。</string>
+    <string name="community_crew_all_levels">どんなレベルでも大歓迎！</string>
+    <string name="community_crew_night">夜ランが好きなら、一緒に走ろう。</string>
     <string name="community_join_crew">クルーに参加</string>
-    <string name="community_activity">アクティビティフィード</string>
+    <string name="community_leave_crew">脱退</string>
+    <string name="community_activity">アクティビティ</string>
     <string name="community_feed_joined">%1$sさんが%2$sに参加しました</string>
-    <string name="community_section_soon">このセクションは準備中です。お楽しみに!</string>
+    <string name="community_no_results">「%1$s」に一致するクルーはありません</string>
+
+    <!-- Crew party run -->
+    <string name="crew_lobby">パーティーランロビー</string>
+    <string name="crew_open_lobby">ロビーを開く</string>
+    <string name="crew_ready">準備OK</string>
+    <string name="crew_ready_cancel">準備を取り消す</string>
+    <string name="crew_ready_count">%1$d / %2$d人 準備完了</string>
+    <string name="crew_waiting">クルーを待っています…</string>
+    <string name="crew_all_ready">全員準備完了！</string>
+    <string name="crew_you">あなた</string>
+    <string name="crew_state_ready">準備完了</string>
+    <string name="crew_state_waiting">待機中</string>
+    <string name="crew_go">スタート！</string>
+    <string name="crew_boost">パーティーブースト +%1$d%%</string>
+    <string name="crew_boost_hint" formatted="false">クルーメイト1人につき獲得量が+10%、最大+50%までアップします。</string>
+    <string name="crew_running_together">%1$d人のランナーと一緒に走行中</string>
+    <string name="crew_result_title">パーティーラン完了！ 🎉</string>
+    <string name="crew_result_body">%1$s歩ぶんをパーティーブースト%2$d%%で獲得しました</string>
+    <string name="crew_leave_lobby">ロビーを出る</string>
+    <string name="crew_join_first">一緒に走るにはクルーに参加してね</string>
 
     <!-- Items -->
-    <string name="items_sub">ギアを整えて、もっと稼ごう</string>
+    <string name="items_sub">装備を整えて、もっと稼ごう</string>
     <string name="items_my_gear">マイギア</string>
     <string name="items_next_level">次のレベルまで</string>
-    <string name="items_upgrade_cost">アップグレード · %1$s SUP</string>
-    <string name="items_upgrade_hint">レベルが上がるごとに獲得レート+0.15、最大エネルギー+2が付きます。</string>
-    <string name="items_vault">スニーカー保管庫</string>
-    <string name="items_owned">保有中</string>
-    <string name="items_unlock_at">Lv. %1$dで解放</string>
+    <string name="items_upgrade_cost">強化 · %1$s SUP</string>
+    <string name="items_upgrade_hint">レベルが上がるたびに獲得レート+0.15、ステータスもアップします。</string>
+    <string name="items_max_level">最大レベルに到達しました</string>
+    <string name="items_vault">スニーカーボールト</string>
+    <string name="items_owned">所持中</string>
+    <string name="items_equipped">装備中</string>
+    <string name="items_equip">装備する</string>
     <string name="items_boosts">ブーストショップ</string>
-    <string name="boost_energy_title">エネルギーセル</string>
-    <string name="boost_energy_desc">エネルギーを2つ即回復</string>
+    <string name="items_active_boosts">発動中のブースト</string>
+    <string name="items_collection">コレクション</string>
+    <string name="items_collection_progress">%1$d / %2$d 組み合わせ</string>
+    <string name="items_mint_title">新しいスニーカーをミント</string>
+    <string name="items_mint_desc">装備中のスニーカーの運が高いほど、レアなスニーカーが出やすくなります。</string>
+    <string name="items_mint_button">ミント · %1$s SUP</string>
+    <string name="mint_result_title">新しいスニーカーをミントしました！</string>
+    <string name="boost_energy_title">エナジーセル</string>
+    <string name="boost_energy_desc">エナジーを2つ即回復</string>
     <string name="boost_shield_title">ストリークシールド</string>
-    <string name="boost_shield_desc">連続記録を1日守ってくれる</string>
-    <string name="boost_xp_title">XPブースター</string>
-    <string name="boost_xp_desc">24時間セッション報酬が2倍</string>
+    <string name="boost_shield_desc">24時間、連続記録を守ります</string>
+    <string name="boost_xp_title">XP ブースター</string>
+    <string name="boost_xp_desc">24時間、セッション報酬が2倍</string>
+    <string name="boost_time_left">残り%1$s</string>
     <string name="price_sup">%1$s SUP</string>
-    <string name="toast_upgraded">スニーカーをアップグレード!🎉</string>
+    <string name="toast_upgraded">スニーカーを強化しました！ 🎉</string>
     <string name="toast_no_balance">SUPがまだ足りません</string>
+    <string name="toast_boost_active">そのブーストはもう発動中です</string>
+    <string name="toast_boost_bought">ブーストを発動しました！</string>
+    <string name="toast_equipped">%1$sを装備しました</string>
+    <string name="toast_max_level">すでに最大レベルです</string>
+
+    <!-- Sneaker detail -->
+    <string name="sneaker_stats">ステータス</string>
+    <string name="sneaker_mint_no">ミント #%1$04d</string>
+    <string name="sneaker_earning">獲得レート</string>
+    <string name="sneaker_energy_saving">エナジー節約</string>
+    <string name="sneaker_durability">耐久度</string>
+    <string name="sneaker_about">このNFTについて</string>
+    <string name="sneaker_about_body">スニーカーはモデル・カラーウェイ・ステータスがそれぞれ違う状態でミントされます。レアリティが上限を決めていて、レジェンダリーほど強い数値が出て、レベルも高くまで上げられます。</string>
+    <string name="rarity_common">コモン</string>
+    <string name="rarity_uncommon">アンコモン</string>
+    <string name="rarity_rare">レア</string>
+    <string name="rarity_epic">エピック</string>
+    <string name="rarity_legendary">レジェンダリー</string>
 
     <!-- Events -->
-    <string name="events_sub">挑戦。報酬。成長。</string>
+    <string name="events_sub">チャレンジ。報酬。成長。</string>
     <string name="events_total_rewards">累計リワード</string>
     <string name="chip_all_events">すべて</string>
     <string name="chip_challenges">チャレンジ</string>
@@ -106,30 +168,49 @@
     <string name="chip_missions">ミッション</string>
     <string name="events_featured">注目</string>
     <string name="events_season">シーズン05 · グローバルキャンペーン</string>
-    <string name="events_campaign_desc">走って、稼いで、限定オンチェーン報酬をアンロックしよう。</string>
+    <string name="events_campaign_desc">走って、貯めて、限定オンチェーン報酬をアンロックしよう。</string>
     <string name="events_ends_in">終了まで</string>
     <string name="events_reward">報酬</string>
     <string name="events_active">開催中のイベント</string>
-    <string name="tag_weekly">週間チャレンジ</string>
+    <string name="tag_weekly">ウィークリーチャレンジ</string>
     <string name="tag_mission">ミッション</string>
     <string name="tag_limited">期間限定</string>
     <string name="event_step_surge">ステップサージ</string>
     <string name="event_step_surge_desc">今週%1$s歩を達成しよう</string>
-    <string name="event_refer">友達招待</string>
+    <string name="event_refer">招待して稼ごう</string>
     <string name="event_refer_desc">友達3人をStrideUpに招待しよう</string>
     <string name="event_night_quest">ナイトランナークエスト</string>
-    <string name="event_night_quest_desc">夜8時以降に20 km走る</string>
-    <string name="events_view_progress">進捗を見る</string>
-    <string name="events_continue">続ける</string>
+    <string name="event_night_quest_desc">20時以降に20 km走ろう</string>
+    <string name="events_view_progress">進捗</string>
+    <string name="events_invite">招待する</string>
     <string name="events_claim">受け取る</string>
+    <string name="events_claimed">受取済み</string>
+    <string name="toast_claimed">+%1$s SUP を受け取りました！</string>
+    <string name="toast_not_finished">まだ達成していません — あともう少し！</string>
+    <string name="invite_subject">StrideUpで一緒に走ろう</string>
+    <string name="invite_text">StrideUpなら歩くだけでSUPが貯まるよ。一緒に走ろう！</string>
+
+    <!-- Notifications -->
+    <string name="notif_title">通知</string>
+    <string name="notif_mark_read">すべて既読</string>
+    <string name="notif_empty_title">まだ何もありません</string>
+    <string name="notif_empty_body">報酬・クルーの招待・イベント情報がここに届きます。</string>
+    <string name="notif_reward_earned">%1$s歩で %2$s SUP を獲得</string>
+    <string name="notif_goal_reached">1日の目標を達成！ %1$s日連続 · +%2$s SUP</string>
+    <string name="notif_sneaker_minted">%1$sをミントしました</string>
+    <string name="notif_sneaker_upgraded">%1$sのレベルが上がりました</string>
+    <string name="notif_boost_activated">ブーストを発動しました</string>
+    <string name="notif_crew_joined">%1$sに参加しました</string>
+    <string name="notif_party_finished">%1$s人とパーティーラン · +%2$s SUP</string>
+    <string name="notif_event_claimed">イベント報酬を受け取りました · +%2$s SUP</string>
 
     <!-- Profile -->
-    <string name="profile_hello">おかえり、</string>
+    <string name="profile_hello">やあ、</string>
     <string name="profile_next_level">%1$s / %2$s SUP</string>
     <string name="profile_total_distance">累計距離</string>
     <string name="profile_lifetime_steps">累計歩数</string>
     <string name="profile_current_streak">現在のストリーク</string>
-    <string name="profile_achievements">実績</string>
+    <string name="profile_achievements">アチーブメント</string>
     <string name="days_count">%1$d日</string>
     <string name="ach_marathon">マラソン</string>
     <string name="ach_marathon_desc">100 km</string>
@@ -138,58 +219,134 @@
     <string name="ach_streak_master">ストリークマスター</string>
     <string name="ach_streak_master_desc">30日連続</string>
     <string name="ach_ultra">ウルトラストライド</string>
-    <string name="ach_locked">未解放</string>
+    <string name="ach_ultra_desc">500 km</string>
+    <string name="ach_first_run">ファーストステップ</string>
+    <string name="ach_first_run_desc">ランを1回完了</string>
+    <string name="ach_collector">コレクター</string>
+    <string name="ach_collector_desc">スニーカーを3足所持</string>
+    <string name="ach_party_animal">パーティーアニマル</string>
+    <string name="ach_party_animal_desc">クルーに参加</string>
+    <string name="ach_rich">SUPクジラ</string>
+    <string name="ach_rich_desc">1,000 SUP を保有</string>
+    <string name="ach_locked">ロック中</string>
+    <string name="ach_all_title">すべてのアチーブメント</string>
+    <string name="ach_progress">%2$d個中%1$d個を達成</string>
     <string name="profile_my_sneakers">マイスニーカー</string>
-    <string name="profile_owned_count">%1$d足保有</string>
+    <string name="profile_owned_count">%1$d足所持</string>
     <string name="profile_overview">プロフィール概要</string>
-    <string name="profile_overview_sub">あなたのハイライトをひと目で</string>
+    <string name="profile_overview_sub">記録をひと目でチェック</string>
     <string name="profile_this_month">今月</string>
     <string name="stat_steps">歩数</string>
     <string name="stat_distance">距離</string>
     <string name="stat_calories">カロリー</string>
     <string name="stat_time">時間</string>
+    <string name="stat_sessions">ラン回数</string>
     <string name="stat_tokens_earned">獲得トークン</string>
-    <string name="profile_account">アカウントと設定</string>
-    <string name="settings_wallet">ウォレットとトークン</string>
+    <string name="profile_account">アカウント &amp; 設定</string>
+    <string name="settings_wallet">ウォレット &amp; トークン</string>
     <string name="settings_notifications">通知</string>
-    <string name="settings_privacy">プライバシーとセキュリティ</string>
+    <string name="settings_privacy">プライバシー &amp; セキュリティ</string>
     <string name="settings_support">サポートセンター</string>
     <string name="settings_connected">連携アカウント</string>
     <string name="goal_title">1日の目標</string>
     <string name="goal_steps_suffix">歩</string>
     <string name="goal_about_km">約 %1$s km</string>
-    <string name="goal_hint">目標を達成すると毎日ボーナスSUP!連続達成でさらにアップします。</string>
+    <string name="goal_hint">目標を達成するとボーナスSUP！ 連続で達成するほど大きくなります。</string>
     <string name="about_version">バージョン</string>
     <string name="about_network">ネットワーク</string>
-    <string name="about_network_value">GIWAチェーン(準備中)</string>
+    <string name="about_network_value">GIWA チェーン（近日公開）</string>
+
+    <!-- Analytics -->
+    <string name="analytics_title">統計</string>
+    <string name="analytics_week">週</string>
+    <string name="analytics_month">月</string>
+    <string name="analytics_all">全期間</string>
+    <string name="analytics_daily_avg">1日平均</string>
+    <string name="analytics_best_day">ベスト記録</string>
+    <string name="analytics_goal_rate">目標達成率</string>
+    <string name="analytics_recent_runs">最近のラン</string>
+    <string name="analytics_no_runs">まだランの記録がありません</string>
+
+    <!-- Notification settings -->
+    <string name="pref_push">プッシュ通知</string>
+    <string name="pref_push_desc">セッションのまとめと獲得のお知らせ</string>
+    <string name="pref_goal_reminder">目標リマインダー</string>
+    <string name="pref_goal_reminder_desc">夕方に目標が残っていたら教えてもらう</string>
+    <string name="pref_party_invite">クルー &amp; パーティー招待</string>
+    <string name="pref_party_invite_desc">クルーメイトからランに誘ってもらう</string>
+    <string name="pref_event_news">イベントのお知らせ</string>
+    <string name="pref_event_news_desc">新しいキャンペーンや期間限定クエスト</string>
+    <string name="pref_saved">設定を保存しました</string>
+
+    <!-- Privacy -->
+    <string name="privacy_data_title">保存されるデータ</string>
+    <string name="privacy_data_body">歩数・セッション・SUPの履歴・スニーカーまで、すべてこの端末のローカルストレージにだけ保存されます。アカウントもサーバーへのアップロードもありません。</string>
+    <string name="privacy_perm_title">使用中の権限</string>
+    <string name="privacy_perm_activity">身体活動 — 歩数のカウント</string>
+    <string name="privacy_perm_notification">通知 — ラン中のセッション表示</string>
+    <string name="privacy_reset_title">ローカルデータをリセット</string>
+    <string name="privacy_reset_body">通知履歴だけを消去します。歩数・SUP・スニーカーはそのまま残ります。</string>
+    <string name="privacy_reset_button">通知を消去</string>
+    <string name="privacy_reset_done">通知履歴を消去しました</string>
+
+    <!-- Support -->
+    <string name="support_faq">よくある質問</string>
+    <string name="faq_q_earn">SUPはどうやって貯めるの？</string>
+    <string name="faq_a_earn">ホーム画面からランをスタート。セッション中にカウントされた歩数がSUPになり、スニーカーやブーストに応じて倍率がかかります。</string>
+    <string name="faq_q_energy">獲得が止まったのはなぜ？</string>
+    <string name="faq_a_energy">エナジー切れです。エナジー1つで600歩ぶん、毎日0時に満タンまで回復します。</string>
+    <string name="faq_q_rarity">レアリティのしくみは？</string>
+    <string name="faq_a_rarity">レアリティでステータスの上限と最大レベルが決まります。装備中のスニーカーの運が高いほど、ミントで良いものが出る確率もアップします。</string>
+    <string name="faq_q_withdraw">出金はいつできるの？</string>
+    <string name="faq_a_withdraw">GIWA チェーンへのオンチェーン送金はまだ開発中です。それまで残高は安全に保管されます。</string>
+    <string name="support_contact">お問い合わせ</string>
+    <string name="support_contact_body">質問やバグ報告はプロジェクトのリポジトリからどうぞ。</string>
+
+    <!-- Connected accounts -->
+    <string name="connected_giwa">GIWA ウォレット</string>
+    <string name="connected_health">Health Connect</string>
+    <string name="connected_social">ソーシャルアカウント</string>
+    <string name="connected_status_soon">近日公開</string>
+    <string name="connected_status_off">未連携</string>
+    <string name="connected_body">アカウントを連携すると、SUPをオンチェーンに持ち出したり、複数の端末で歩数を同期できるようになります。</string>
 
     <!-- Wallet -->
-    <string name="wallet_balance">SUP残高</string>
-    <string name="wallet_tagline">一歩ごとに、どんどん貯まる</string>
+    <string name="wallet_balance">SUP 残高</string>
+    <string name="wallet_tagline">一歩ずつ、どんどん貯まる</string>
     <string name="wallet_earned">累計獲得</string>
     <string name="wallet_spent">累計使用</string>
     <string name="wallet_history">履歴</string>
     <string name="wallet_records">%1$d件</string>
     <string name="wallet_empty_title">まだ履歴がありません</string>
-    <string name="wallet_empty_body">ラン1回で、最初のSUPが手に入ります。</string>
-    <string name="wallet_giwa">GIWAウォレット</string>
+    <string name="wallet_empty_body">1回走るだけで、最初のSUPが手に入ります。</string>
+    <string name="wallet_giwa">GIWA ウォレット</string>
     <string name="wallet_giwa_status">オンチェーン連携を準備中</string>
-    <string name="wallet_giwa_body">もうすぐSUPをGIWAチェーンのトークンにスワップできるようになります。</string>
-    <string name="wallet_withdraw">出金(準備中)</string>
+    <string name="wallet_giwa_body">もうすぐSUPをGIWA チェーンのトークンに交換できるようになります。</string>
+    <string name="wallet_withdraw">出金する</string>
+    <string name="wallet_withdraw_title">GIWA チェーンへ出金</string>
+    <string name="wallet_withdraw_body">オンチェーン決済はメインネットのローンチと同時にスタート。そのとき残高は1:1でそのまま引き継がれます。</string>
+    <string name="wallet_withdraw_min">最低出金額 · 1,000 SUP</string>
+    <string name="wallet_withdraw_eligible">ローンチしたらすぐ出金できます 🎉</string>
+    <string name="wallet_withdraw_short">最低額まであと %1$s SUP</string>
     <string name="ledger_earn_walk">ランセッション報酬</string>
     <string name="ledger_bonus_goal">1日の目標ボーナス</string>
-    <string name="ledger_spend_upgrade">スニーカーアップグレード</string>
+    <string name="ledger_spend_upgrade">スニーカー強化</string>
+    <string name="ledger_spend_mint">スニーカーミント</string>
+    <string name="ledger_spend_boost">ブースト購入</string>
+    <string name="ledger_earn_event">イベント報酬</string>
+    <string name="ledger_earn_party">パーティーラン報酬</string>
     <string name="ledger_other">リワード</string>
 
     <!-- Run -->
     <string name="run_ready">準備完了</string>
     <string name="run_active">ラン中</string>
     <string name="run_paused">一時停止中</string>
-    <string name="run_earnable">今は%1$s歩まで獲得できます</string>
-    <string name="run_complete">ラン完了!🎉</string>
-    <string name="run_rewarded">%2$s歩中%1$s歩を獲得しました</string>
+    <string name="run_earnable">いまは %1$s歩まで獲得できます</string>
+    <string name="run_complete">ラン完了！ 🎉</string>
+    <string name="run_rewarded">%2$s歩のうち %1$s歩を獲得</string>
     <string name="run_locked_hint">画面ロック中 · ロックをタップで解除</string>
-    <string name="run_simulate">+100歩(デバッグ)</string>
+    <string name="run_simulate">+100歩（デバッグ）</string>
+    <string name="run_boost_active">XP ブースター発動中 · 2×</string>
 
     <!-- Content descriptions -->
     <string name="cd_lock">画面ロック</string>

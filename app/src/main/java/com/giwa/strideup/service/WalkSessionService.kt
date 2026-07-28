@@ -34,10 +34,13 @@ data class WalkSessionState(
     val steps: Int = 0,
     val elapsedSec: Long = 0,
     val startedAt: Long = 0,
+    /** 파티런 인원 (본인 포함). 1이면 개인 러닝. */
+    val partySize: Int = 1,
     /** 마지막 세션 정산 결과 (종료 직후 화면 표시용) */
     val lastRewardPoints: Double? = null,
     val lastRewardedSteps: Int = 0,
     val lastSessionSteps: Int = 0,
+    val lastPartySize: Int = 1,
 )
 
 /**
@@ -59,7 +62,7 @@ class WalkSessionService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
-            ACTION_START -> startSession()
+            ACTION_START -> startSession(intent.getIntExtra(EXTRA_PARTY_SIZE, 1).coerceAtLeast(1))
             ACTION_PAUSE -> setPaused(true)
             ACTION_RESUME -> setPaused(false)
             ACTION_STOP -> stopSession()
@@ -67,7 +70,7 @@ class WalkSessionService : Service() {
         return START_NOT_STICKY
     }
 
-    private fun startSession() {
+    private fun startSession(partySize: Int) {
         if (_state.value.isActive) return
         createChannel()
         ServiceCompat.startForeground(
@@ -76,7 +79,11 @@ class WalkSessionService : Service() {
             buildNotification(0),
             ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH,
         )
-        _state.value = WalkSessionState(isActive = true, startedAt = System.currentTimeMillis())
+        _state.value = WalkSessionState(
+            isActive = true,
+            startedAt = System.currentTimeMillis(),
+            partySize = partySize,
+        )
 
         // 일별 기록/목표 보너스 수집기까지 함께 보장한다 (중복 호출에 안전).
         ServiceLocator.stepRepository.startTracking()
@@ -129,7 +136,7 @@ class WalkSessionService : Service() {
         stepJob?.cancel()
         timerJob?.cancel()
         scope.launch {
-            val reward = ServiceLocator.rewardRepository.settleSession(session.steps)
+            val reward = ServiceLocator.rewardRepository.settleSession(session.steps, session.partySize)
             ServiceLocator.database.walkSessionDao().insert(
                 WalkSessionEntity(
                     startedAt = session.startedAt,
@@ -145,7 +152,12 @@ class WalkSessionService : Service() {
                 lastRewardPoints = reward.points,
                 lastRewardedSteps = reward.rewardedSteps,
                 lastSessionSteps = session.steps,
+                lastPartySize = session.partySize,
             )
+            // 파티런이었다면 크루 로비를 결과 화면으로 전환한다.
+            if (session.partySize > 1) {
+                ServiceLocator.crewRepository.finishParty(reward.points, reward.rewardedSteps)
+            }
             settling = false
             ServiceCompat.stopForeground(this@WalkSessionService, ServiceCompat.STOP_FOREGROUND_REMOVE)
             stopSelf()
@@ -196,6 +208,8 @@ class WalkSessionService : Service() {
         private val _state = MutableStateFlow(WalkSessionState())
         val state: StateFlow<WalkSessionState> = _state
 
+        const val EXTRA_PARTY_SIZE = "com.giwa.strideup.extra.PARTY_SIZE"
+
         const val ACTION_START = "com.giwa.strideup.action.SESSION_START"
         const val ACTION_PAUSE = "com.giwa.strideup.action.SESSION_PAUSE"
         const val ACTION_RESUME = "com.giwa.strideup.action.SESSION_RESUME"
@@ -204,8 +218,11 @@ class WalkSessionService : Service() {
         private const val CHANNEL_ID = "walk_session"
         private const val NOTIFICATION_ID = 1001
 
-        fun start(context: Context) {
-            ContextCompat.startForegroundService(context, intent(context, ACTION_START))
+        /** @param partySize 파티런 인원(본인 포함). 1이면 개인 러닝. */
+        fun start(context: Context, partySize: Int = 1) {
+            val intent = intent(context, ACTION_START)
+                .putExtra(EXTRA_PARTY_SIZE, partySize.coerceAtLeast(1))
+            ContextCompat.startForegroundService(context, intent)
         }
 
         fun pause(context: Context) {

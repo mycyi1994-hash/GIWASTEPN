@@ -1,5 +1,6 @@
 package com.giwa.strideup.ui.screens.events
 
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -8,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -42,7 +42,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -51,6 +50,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.giwa.strideup.R
+import com.giwa.strideup.data.repo.EventDef
+import com.giwa.strideup.data.repo.Events
 import com.giwa.strideup.ui.components.BarMeter
 import com.giwa.strideup.ui.components.DarkIconButton
 import com.giwa.strideup.ui.components.GhostButton
@@ -61,7 +62,6 @@ import com.giwa.strideup.ui.components.SectionHeader
 import com.giwa.strideup.ui.components.VoltButton
 import com.giwa.strideup.ui.components.Wordmark
 import com.giwa.strideup.ui.theme.CarbonHigh
-import com.giwa.strideup.ui.theme.Edge
 import com.giwa.strideup.ui.theme.Night
 import com.giwa.strideup.ui.theme.Silver
 import com.giwa.strideup.ui.theme.Slate
@@ -72,16 +72,40 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlinx.coroutines.delay
 
-private enum class EventKind { CHALLENGE, CAMPAIGN, MISSION }
-
 @Composable
-fun EventsScreen(viewModel: EventsViewModel = viewModel(factory = EventsViewModel.Factory)) {
+fun EventsScreen(
+    onOpenNotifications: () -> Unit = {},
+    viewModel: EventsViewModel = viewModel(factory = EventsViewModel.Factory),
+) {
     val context = LocalContext.current
-    val comingSoon = stringResource(R.string.toast_coming_soon)
-    val showComingSoon = { Toast.makeText(context, comingSoon, Toast.LENGTH_SHORT).show() }
-
     val balance by viewModel.balance.collectAsStateWithLifecycle()
     val weekSteps by viewModel.weekSteps.collectAsStateWithLifecycle()
+    val claimed by viewModel.claimedIds.collectAsStateWithLifecycle()
+    val claimResult by viewModel.claimResult.collectAsStateWithLifecycle()
+
+    val claimedFmt = stringResource(R.string.toast_claimed, "%s")
+    val notFinished = stringResource(R.string.toast_not_finished)
+    LaunchedEffect(claimResult) {
+        when (val r = claimResult) {
+            is ClaimResult.Success ->
+                Toast.makeText(context, claimedFmt.format("%,.0f".format(r.amount)), Toast.LENGTH_SHORT).show()
+            ClaimResult.NotFinished ->
+                Toast.makeText(context, notFinished, Toast.LENGTH_SHORT).show()
+            null -> {}
+        }
+        if (claimResult != null) viewModel.consumeClaimResult()
+    }
+
+    val inviteSubject = stringResource(R.string.invite_subject)
+    val inviteText = stringResource(R.string.invite_text)
+    val shareInvite = {
+        val send = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_SUBJECT, inviteSubject)
+            putExtra(Intent.EXTRA_TEXT, inviteText)
+        }
+        context.startActivity(Intent.createChooser(send, inviteSubject))
+    }
 
     var selectedChip by rememberSaveable { mutableIntStateOf(0) }
     val chips = listOf(
@@ -103,6 +127,8 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel(factory = EventsViewMode
     val showCampaigns = selectedChip == 0 || selectedChip == 2
     val showMissions = selectedChip == 0 || selectedChip == 3
 
+    val stepSurgeProgress = (weekSteps.toFloat() / Events.STEP_SURGE.target.toFloat()).coerceIn(0f, 1f)
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 10.dp, bottom = 22.dp),
@@ -120,7 +146,7 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel(factory = EventsViewMode
                 DarkIconButton(
                     icon = Icons.Filled.Notifications,
                     contentDescription = stringResource(R.string.cd_notifications),
-                    onClick = showComingSoon,
+                    onClick = onOpenNotifications,
                     badge = true,
                 )
             }
@@ -166,7 +192,13 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel(factory = EventsViewMode
         }
 
         if (showCampaigns) {
-            item { FeaturedCampaign(featuredTarget) }
+            item {
+                FeaturedCampaign(
+                    targetMillis = featuredTarget,
+                    claimed = claimed.contains(Events.NEON_HORIZON.id),
+                    onClaim = { viewModel.claim(Events.NEON_HORIZON, 1f) },
+                )
+            }
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -186,30 +218,20 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel(factory = EventsViewMode
             }
         }
 
-        item {
-            SectionHeader(
-                title = stringResource(R.string.events_active),
-                actionText = stringResource(R.string.common_view_all),
-                onAction = showComingSoon,
-            )
-        }
+        item { SectionHeader(title = stringResource(R.string.events_active)) }
 
         if (showChallenges) {
             item {
                 EventCard(
+                    def = Events.STEP_SURGE,
                     tag = stringResource(R.string.tag_weekly),
                     title = stringResource(R.string.event_step_surge),
                     desc = stringResource(R.string.event_step_surge_desc, "%,d".format(80_000)),
-                    progress = (weekSteps.toFloat() / 80_000f).coerceIn(0f, 1f),
+                    progress = stepSurgeProgress,
                     progressText = "%,d / %,d".format(weekSteps, 80_000),
                     rewardAmount = "+250",
-                    icon = Icons.Filled.Schedule,
-                    button = {
-                        GhostButton(
-                            text = stringResource(R.string.events_view_progress),
-                            onClick = showComingSoon,
-                        )
-                    },
+                    claimed = claimed.contains(Events.STEP_SURGE.id),
+                    onClaim = { viewModel.claim(Events.STEP_SURGE, stepSurgeProgress) },
                 )
             }
         }
@@ -217,17 +239,19 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel(factory = EventsViewMode
         if (showMissions) {
             item {
                 EventCard(
+                    def = Events.REFER,
                     tag = stringResource(R.string.tag_mission),
                     title = stringResource(R.string.event_refer),
                     desc = stringResource(R.string.event_refer_desc),
                     progress = 2f / 3f,
                     progressText = "2 / 3",
                     rewardAmount = "+500",
-                    icon = Icons.Filled.Notifications,
-                    button = {
+                    claimed = claimed.contains(Events.REFER.id),
+                    onClaim = { viewModel.claim(Events.REFER, 2f / 3f) },
+                    secondaryButton = {
                         GhostButton(
-                            text = stringResource(R.string.events_continue),
-                            onClick = showComingSoon,
+                            text = stringResource(R.string.events_invite),
+                            onClick = shareInvite,
                         )
                     },
                 )
@@ -237,20 +261,16 @@ fun EventsScreen(viewModel: EventsViewModel = viewModel(factory = EventsViewMode
         if (showChallenges) {
             item {
                 EventCard(
+                    def = Events.NIGHT_QUEST,
                     tag = stringResource(R.string.tag_limited),
                     title = stringResource(R.string.event_night_quest),
                     desc = stringResource(R.string.event_night_quest_desc),
                     progress = 12.4f / 20f,
                     progressText = "12.4 / 20 km",
                     rewardAmount = "+300",
-                    icon = Icons.Filled.Schedule,
+                    claimed = claimed.contains(Events.NIGHT_QUEST.id),
+                    onClaim = { viewModel.claim(Events.NIGHT_QUEST, 12.4f / 20f) },
                     countdownTarget = questTarget,
-                    button = {
-                        VoltButton(
-                            text = stringResource(R.string.events_claim),
-                            onClick = showComingSoon,
-                        )
-                    },
                 )
             }
         }
@@ -309,9 +329,13 @@ private fun TotalRewardsCard(balance: Double) {
     }
 }
 
-/** 추천 캠페인 — Neon Horizon */
+/** 추천 캠페인 — Neon Horizon. 시즌 참가 보상(온보딩)은 즉시 수령 가능. */
 @Composable
-private fun FeaturedCampaign(targetMillis: Long) {
+private fun FeaturedCampaign(
+    targetMillis: Long,
+    claimed: Boolean,
+    onClaim: () -> Unit,
+) {
     GlowCard(accent = true, contentPadding = PaddingValues(20.dp), spacing = 13.dp) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -379,17 +403,25 @@ private fun FeaturedCampaign(targetMillis: Long) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(9.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             RewardPill(
                 modifier = Modifier.weight(1f),
                 top = "+15,000",
                 bottom = "StrideTokens",
             )
-            RewardPill(
-                modifier = Modifier.weight(1f),
-                top = "Apex Runner",
-                bottom = "NFT",
-            )
+            if (claimed) {
+                GhostButton(
+                    text = stringResource(R.string.events_claimed),
+                    onClick = {},
+                    enabled = false,
+                )
+            } else {
+                VoltButton(
+                    text = stringResource(R.string.events_claim),
+                    onClick = onClaim,
+                )
+            }
         }
     }
 }
@@ -444,7 +476,6 @@ private fun HorizonArt(modifier: Modifier = Modifier) {
         drawPath(hex(r * 0.55f), color = Volt, style = Stroke(width = 1.6.dp.toPx()))
         drawCircle(Volt, radius = r * 0.14f, center = Offset(cx, cy))
 
-        // 지평선 아크
         val horizonY = size.height * 0.86f
         drawArc(
             color = Volt.copy(alpha = 0.35f),
@@ -455,7 +486,6 @@ private fun HorizonArt(modifier: Modifier = Modifier) {
             size = androidx.compose.ui.geometry.Size(size.width * 1.5f, size.height * 0.9f),
             style = Stroke(width = 2.dp.toPx()),
         )
-        // 별
         listOf(
             0.15f to 0.12f, 0.85f to 0.20f, 0.72f to 0.06f, 0.30f to 0.80f, 0.90f to 0.70f,
         ).forEach { (fx, fy) ->
@@ -468,18 +498,20 @@ private fun HorizonArt(modifier: Modifier = Modifier) {
     }
 }
 
-/** 진행형 이벤트 카드 */
+/** 진행형 이벤트 카드 — 목표를 채우면 Claim이 활성화되고 실제 SUP가 적립된다 */
 @Composable
 private fun EventCard(
+    def: EventDef,
     tag: String,
     title: String,
     desc: String,
     progress: Float,
     progressText: String,
     rewardAmount: String,
-    icon: ImageVector,
+    claimed: Boolean,
+    onClaim: () -> Unit,
     countdownTarget: Long? = null,
-    button: @Composable () -> Unit,
+    secondaryButton: (@Composable () -> Unit)? = null,
 ) {
     GlowCard(contentPadding = PaddingValues(18.dp), spacing = 12.dp) {
         Row(
@@ -525,7 +557,7 @@ private fun EventCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                Icon(icon, contentDescription = null, tint = Volt, modifier = Modifier.size(13.dp))
+                Icon(Icons.Filled.Schedule, contentDescription = null, tint = Volt, modifier = Modifier.size(13.dp))
                 Text(
                     text = stringResource(R.string.events_ends_in) + " " + countdown(countdownTarget),
                     fontSize = 12.sp,
@@ -538,7 +570,7 @@ private fun EventCard(
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(9.dp),
         ) {
             Column(
                 modifier = Modifier.weight(1f),
@@ -547,7 +579,23 @@ private fun EventCard(
                 BarMeter(fraction = progress, height = 7.dp)
                 Text(progressText, fontSize = 11.sp, color = Silver)
             }
-            button()
+            secondaryButton?.invoke()
+            when {
+                claimed -> GhostButton(
+                    text = stringResource(R.string.events_claimed),
+                    onClick = {},
+                    enabled = false,
+                )
+                progress >= 1f -> VoltButton(
+                    text = stringResource(R.string.events_claim),
+                    onClick = onClaim,
+                )
+                else -> GhostButton(
+                    text = stringResource(R.string.events_claim),
+                    onClick = onClaim,
+                    enabled = false,
+                )
+            }
         }
     }
 }

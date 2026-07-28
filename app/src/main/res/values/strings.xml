@@ -16,8 +16,17 @@
 
     <!-- Common -->
     <string name="common_view_all">View All</string>
-    <string name="toast_coming_soon">Coming soon!</string>
     <string name="common_ok">OK</string>
+    <string name="common_close">Close</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_confirm">Confirm</string>
+    <string name="common_none">None yet</string>
+
+    <!-- Splash -->
+    <string name="splash_tagline">Every Step. Every Stride. Every Day.</string>
+    <string name="splash_loading">LOADING</string>
+    <string name="splash_syncing">Syncing your run data</string>
+    <string name="splash_preparing">Preparing your stride…</string>
 
     <!-- Greeting -->
     <string name="greeting_dawn">Early bird,</string>
@@ -70,34 +79,86 @@
     <string name="community_popular">Popular Posts</string>
     <string name="community_post_body">Sunrise run hits different. Who\'s in for Saturday?</string>
     <string name="time_hours_ago">%1$dh ago</string>
+    <string name="time_just_now">Just now</string>
+    <string name="time_minutes_ago">%1$dm ago</string>
+    <string name="time_days_ago">%1$dd ago</string>
     <string name="community_looking">Looking for Runners</string>
     <string name="community_beginner">Beginner friendly</string>
     <string name="community_crew_all_levels">All levels welcome!</string>
     <string name="community_crew_night">Love the night? Let\'s run.</string>
     <string name="community_join_crew">JOIN CREW</string>
+    <string name="community_leave_crew">LEAVE</string>
     <string name="community_activity">Activity Feed</string>
     <string name="community_feed_joined">%1$s joined %2$s</string>
-    <string name="community_section_soon">This section is on the way. Stay tuned!</string>
+    <string name="community_no_results">No crews match \"%1$s\"</string>
+
+    <!-- Crew party run -->
+    <string name="crew_lobby">Party Run Lobby</string>
+    <string name="crew_open_lobby">OPEN LOBBY</string>
+    <string name="crew_ready">I\'M READY</string>
+    <string name="crew_ready_cancel">CANCEL READY</string>
+    <string name="crew_ready_count">%1$d / %2$d ready</string>
+    <string name="crew_waiting">Waiting for the crew…</string>
+    <string name="crew_all_ready">Everyone\'s ready!</string>
+    <string name="crew_you">You</string>
+    <string name="crew_state_ready">Ready</string>
+    <string name="crew_state_waiting">Waiting</string>
+    <string name="crew_go">GO!</string>
+    <string name="crew_boost">Party boost +%1$d%%</string>
+    <string name="crew_boost_hint" formatted="false">Every crewmate adds +10% earnings, up to +50%.</string>
+    <string name="crew_running_together">Running together with %1$d runners</string>
+    <string name="crew_result_title">Party run complete! 🎉</string>
+    <string name="crew_result_body">%1$s steps rewarded with a %2$d%% party boost</string>
+    <string name="crew_leave_lobby">Leave lobby</string>
+    <string name="crew_join_first">Join the crew to run together</string>
 
     <!-- Items -->
     <string name="items_sub">Gear up, earn more</string>
     <string name="items_my_gear">My Gear</string>
     <string name="items_next_level">To next level</string>
     <string name="items_upgrade_cost">Upgrade · %1$s SUP</string>
-    <string name="items_upgrade_hint">Each level adds +0.15 earning rate and +2 max energy.</string>
+    <string name="items_upgrade_hint">Each level adds +0.15 earning rate and boosts stats.</string>
+    <string name="items_max_level">Max level reached</string>
     <string name="items_vault">Sneaker Vault</string>
     <string name="items_owned">Owned</string>
-    <string name="items_unlock_at">Unlocks at Lv. %1$d</string>
+    <string name="items_equipped">EQUIPPED</string>
+    <string name="items_equip">EQUIP</string>
     <string name="items_boosts">Boost Shop</string>
+    <string name="items_active_boosts">Active Boosts</string>
+    <string name="items_collection">Collection</string>
+    <string name="items_collection_progress">%1$d / %2$d combinations</string>
+    <string name="items_mint_title">Mint a new pair</string>
+    <string name="items_mint_desc">Luck on your equipped sneaker raises the odds of a rare drop.</string>
+    <string name="items_mint_button">MINT · %1$s SUP</string>
+    <string name="mint_result_title">New sneaker minted!</string>
     <string name="boost_energy_title">Energy Cell</string>
     <string name="boost_energy_desc">Instantly restore 2 energy</string>
     <string name="boost_shield_title">Streak Shield</string>
-    <string name="boost_shield_desc">Protects your streak for one day</string>
+    <string name="boost_shield_desc">Protects your streak for 24 hours</string>
     <string name="boost_xp_title">XP Booster</string>
-    <string name="boost_xp_desc">Double session rewards for 24h</string>
+    <string name="boost_xp_desc">Double session rewards for 24 hours</string>
+    <string name="boost_time_left">%1$s left</string>
     <string name="price_sup">%1$s SUP</string>
     <string name="toast_upgraded">Sneaker upgraded! 🎉</string>
     <string name="toast_no_balance">Not enough SUP yet</string>
+    <string name="toast_boost_active">That boost is already running</string>
+    <string name="toast_boost_bought">Boost activated!</string>
+    <string name="toast_equipped">Equipped %1$s</string>
+    <string name="toast_max_level">Already at max level</string>
+
+    <!-- Sneaker detail -->
+    <string name="sneaker_stats">Stats</string>
+    <string name="sneaker_mint_no">Mint #%1$04d</string>
+    <string name="sneaker_earning">Earning rate</string>
+    <string name="sneaker_energy_saving">Energy saving</string>
+    <string name="sneaker_durability">Durability</string>
+    <string name="sneaker_about">About this NFT</string>
+    <string name="sneaker_about_body">Every pair is minted with its own model, colorway and rolled stats. Rarity sets the ceiling — Legendary pairs roll the strongest numbers and reach the highest level.</string>
+    <string name="rarity_common">COMMON</string>
+    <string name="rarity_uncommon">UNCOMMON</string>
+    <string name="rarity_rare">RARE</string>
+    <string name="rarity_epic">EPIC</string>
+    <string name="rarity_legendary">LEGENDARY</string>
 
     <!-- Events -->
     <string name="events_sub">Challenges. Rewards. Progress.</string>
@@ -121,9 +182,28 @@
     <string name="event_refer_desc">Invite 3 friends to join StrideUp</string>
     <string name="event_night_quest">Night Runner Quest</string>
     <string name="event_night_quest_desc">Run 20 km after 8 PM</string>
-    <string name="events_view_progress">View Progress</string>
-    <string name="events_continue">Continue</string>
+    <string name="events_view_progress">Progress</string>
+    <string name="events_invite">Invite</string>
     <string name="events_claim">Claim</string>
+    <string name="events_claimed">CLAIMED</string>
+    <string name="toast_claimed">+%1$s SUP claimed!</string>
+    <string name="toast_not_finished">Not finished yet — keep going!</string>
+    <string name="invite_subject">Join me on StrideUp</string>
+    <string name="invite_text">I\'m earning SUP just by walking on StrideUp. Come run with me!</string>
+
+    <!-- Notifications -->
+    <string name="notif_title">Notifications</string>
+    <string name="notif_mark_read">Mark all read</string>
+    <string name="notif_empty_title">Nothing here yet</string>
+    <string name="notif_empty_body">Rewards, crew invites and event updates will show up here.</string>
+    <string name="notif_reward_earned">Earned %2$s SUP from %1$s steps</string>
+    <string name="notif_goal_reached">Daily goal hit! %1$s day streak · +%2$s SUP</string>
+    <string name="notif_sneaker_minted">Minted %1$s</string>
+    <string name="notif_sneaker_upgraded">%1$s reached a new level</string>
+    <string name="notif_boost_activated">Boost activated</string>
+    <string name="notif_crew_joined">You joined %1$s</string>
+    <string name="notif_party_finished">Party run with %1$s runners · +%2$s SUP</string>
+    <string name="notif_event_claimed">Event reward claimed · +%2$s SUP</string>
 
     <!-- Profile -->
     <string name="profile_hello">Hey there,</string>
@@ -140,7 +220,18 @@
     <string name="ach_streak_master">Streak Master</string>
     <string name="ach_streak_master_desc">30 days</string>
     <string name="ach_ultra">Ultra Stride</string>
+    <string name="ach_ultra_desc">500 km</string>
+    <string name="ach_first_run">First Steps</string>
+    <string name="ach_first_run_desc">Finish 1 run</string>
+    <string name="ach_collector">Collector</string>
+    <string name="ach_collector_desc">Own 3 sneakers</string>
+    <string name="ach_party_animal">Party Animal</string>
+    <string name="ach_party_animal_desc">Join a crew</string>
+    <string name="ach_rich">SUP Whale</string>
+    <string name="ach_rich_desc">Hold 1,000 SUP</string>
     <string name="ach_locked">Locked</string>
+    <string name="ach_all_title">All Achievements</string>
+    <string name="ach_progress">%1$d of %2$d unlocked</string>
     <string name="profile_my_sneakers">My Sneakers</string>
     <string name="profile_owned_count">%1$d owned</string>
     <string name="profile_overview">Profile Overview</string>
@@ -150,6 +241,7 @@
     <string name="stat_distance">Distance</string>
     <string name="stat_calories">Calories</string>
     <string name="stat_time">Time</string>
+    <string name="stat_sessions">Runs</string>
     <string name="stat_tokens_earned">Tokens Earned</string>
     <string name="profile_account">Account &amp; Settings</string>
     <string name="settings_wallet">Wallet &amp; Tokens</string>
@@ -165,6 +257,60 @@
     <string name="about_network">Network</string>
     <string name="about_network_value">GIWA Chain (coming soon)</string>
 
+    <!-- Analytics -->
+    <string name="analytics_title">Analytics</string>
+    <string name="analytics_week">Week</string>
+    <string name="analytics_month">Month</string>
+    <string name="analytics_all">All time</string>
+    <string name="analytics_daily_avg">Daily average</string>
+    <string name="analytics_best_day">Best day</string>
+    <string name="analytics_goal_rate">Goal hit rate</string>
+    <string name="analytics_recent_runs">Recent runs</string>
+    <string name="analytics_no_runs">No runs recorded yet</string>
+
+    <!-- Notification settings -->
+    <string name="pref_push">Push notifications</string>
+    <string name="pref_push_desc">Session summaries and reward alerts</string>
+    <string name="pref_goal_reminder">Daily goal reminder</string>
+    <string name="pref_goal_reminder_desc">Nudge me if I\'m behind in the evening</string>
+    <string name="pref_party_invite">Crew &amp; party invites</string>
+    <string name="pref_party_invite_desc">Let crewmates ping me for a run</string>
+    <string name="pref_event_news">Event announcements</string>
+    <string name="pref_event_news_desc">New campaigns and limited quests</string>
+    <string name="pref_saved">Setting saved</string>
+
+    <!-- Privacy -->
+    <string name="privacy_data_title">What we store</string>
+    <string name="privacy_data_body">Everything — your steps, sessions, SUP ledger and sneakers — stays in local storage on this device. There is no account and no server upload.</string>
+    <string name="privacy_perm_title">Permissions in use</string>
+    <string name="privacy_perm_activity">Physical activity — counts your steps</string>
+    <string name="privacy_perm_notification">Notifications — shows the running session</string>
+    <string name="privacy_reset_title">Reset local data</string>
+    <string name="privacy_reset_body">Clears your notification history. Steps, SUP and sneakers are kept.</string>
+    <string name="privacy_reset_button">Clear notifications</string>
+    <string name="privacy_reset_done">Notification history cleared</string>
+
+    <!-- Support -->
+    <string name="support_faq">FAQ</string>
+    <string name="faq_q_earn">How do I earn SUP?</string>
+    <string name="faq_a_earn">Start a run from the home screen. Steps counted during an active session earn SUP, scaled by your sneaker and any boosts.</string>
+    <string name="faq_q_energy">Why did earning stop?</string>
+    <string name="faq_a_energy">Energy ran out. One energy covers 600 steps and it refills to full every midnight.</string>
+    <string name="faq_q_rarity">How does rarity work?</string>
+    <string name="faq_a_rarity">Rarity sets the stat ceiling and max level. Higher Luck on your equipped pair improves your odds when minting.</string>
+    <string name="faq_q_withdraw">When can I withdraw?</string>
+    <string name="faq_a_withdraw">On-chain transfer to GIWA Chain is still in development. Your balance is safe until then.</string>
+    <string name="support_contact">Contact</string>
+    <string name="support_contact_body">Questions or bug reports are welcome through the project repository.</string>
+
+    <!-- Connected accounts -->
+    <string name="connected_giwa">GIWA Wallet</string>
+    <string name="connected_health">Health Connect</string>
+    <string name="connected_social">Social account</string>
+    <string name="connected_status_soon">Coming soon</string>
+    <string name="connected_status_off">Not connected</string>
+    <string name="connected_body">Linking accounts will let you carry SUP on-chain and sync steps across devices.</string>
+
     <!-- Wallet -->
     <string name="wallet_balance">SUP Balance</string>
     <string name="wallet_tagline">Every step stacks up</string>
@@ -177,10 +323,19 @@
     <string name="wallet_giwa">GIWA Wallet</string>
     <string name="wallet_giwa_status">On-chain link in progress</string>
     <string name="wallet_giwa_body">Soon you\'ll be able to swap SUP into tokens on GIWA Chain.</string>
-    <string name="wallet_withdraw">Withdraw (coming soon)</string>
+    <string name="wallet_withdraw">Withdraw</string>
+    <string name="wallet_withdraw_title">Withdraw to GIWA Chain</string>
+    <string name="wallet_withdraw_body">On-chain settlement opens with the mainnet launch. Your balance carries over 1:1 when it does.</string>
+    <string name="wallet_withdraw_min">Minimum withdrawal · 1,000 SUP</string>
+    <string name="wallet_withdraw_eligible">You have enough to withdraw at launch 🎉</string>
+    <string name="wallet_withdraw_short">%1$s SUP more to reach the minimum</string>
     <string name="ledger_earn_walk">Run session reward</string>
     <string name="ledger_bonus_goal">Daily goal bonus</string>
     <string name="ledger_spend_upgrade">Sneaker upgrade</string>
+    <string name="ledger_spend_mint">Sneaker mint</string>
+    <string name="ledger_spend_boost">Boost purchase</string>
+    <string name="ledger_earn_event">Event reward</string>
+    <string name="ledger_earn_party">Party run reward</string>
     <string name="ledger_other">Reward</string>
 
     <!-- Run -->
@@ -192,6 +347,7 @@
     <string name="run_rewarded">%1$s of %2$s steps rewarded</string>
     <string name="run_locked_hint">Screen locked · tap the lock to release</string>
     <string name="run_simulate">+100 steps (debug)</string>
+    <string name="run_boost_active">XP Booster active · 2×</string>
 
     <!-- Content descriptions -->
     <string name="cd_lock">Screen lock</string>

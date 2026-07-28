@@ -82,6 +82,17 @@ class UserPrefs(private val context: Context) {
         }
     }
 
+    /** 에너지 셀 등으로 에너지를 회복한다. 최대치를 넘지 않는다. */
+    suspend fun restoreEnergy(today: Long, amount: Double) {
+        val remaining = currentEnergy(today)
+        val level = context.dataStore.data.first()[Keys.SNEAKER_LEVEL] ?: 1
+        val max = RewardEconomy.maxEnergy(level)
+        context.dataStore.edit {
+            it[Keys.ENERGY] = (remaining + amount).coerceIn(0.0, max)
+            it[Keys.ENERGY_DAY] = today
+        }
+    }
+
     suspend fun streakValue(): Int = context.dataStore.data.first()[Keys.STREAK] ?: 0
 
     suspend fun lastGoalMetDay(): Long = context.dataStore.data.first()[Keys.LAST_GOAL_MET_DAY] ?: -1L
