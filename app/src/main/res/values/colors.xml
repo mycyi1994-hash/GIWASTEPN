@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Obsidian & Champagne — Compose 테마(ui/theme/Color.kt)와 값을 맞춘다. -->
-    <color name="obsidian">#08090D</color>
-    <color name="obsidian_deep">#050609</color>
-    <color name="champagne">#E0C08A</color>
-    <color name="ic_launcher_background">#08090D</color>
+    <!-- Cream & Sunset — Compose 테마(ui/theme/Color.kt)와 값을 맞춘다. -->
+    <color name="cream">#F9F5EE</color>
+    <color name="coral">#FF6B4A</color>
+    <color name="ic_launcher_background">#F9F5EE</color>
 </resources>

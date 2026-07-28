@@ -20,11 +20,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.NearMe
 import androidx.compose.material.icons.filled.Straighten
-import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
@@ -54,36 +53,44 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.giwa.strideup.data.local.DailyStepsEntity
 import com.giwa.strideup.domain.RewardEconomy
 import com.giwa.strideup.ui.StepPermissions
+import com.giwa.strideup.ui.components.ChipButton
 import com.giwa.strideup.ui.components.Eyebrow
-import com.giwa.strideup.ui.components.GhostButton
-import com.giwa.strideup.ui.components.GoldButton
+import com.giwa.strideup.ui.components.GradientText
 import com.giwa.strideup.ui.components.HairlineDivider
-import com.giwa.strideup.ui.components.LineMeter
-import com.giwa.strideup.ui.components.LuxeCard
 import com.giwa.strideup.ui.components.MemberBadge
-import com.giwa.strideup.ui.components.MetalRing
-import com.giwa.strideup.ui.components.MetalText
+import com.giwa.strideup.ui.components.SoftCard
 import com.giwa.strideup.ui.components.StatColumn
-import com.giwa.strideup.ui.components.TokenEmblem
+import com.giwa.strideup.ui.components.SunsetButton
+import com.giwa.strideup.ui.components.SunsetRing
+import com.giwa.strideup.ui.components.TokenCoin
 import com.giwa.strideup.ui.components.VerticalHairline
-import com.giwa.strideup.ui.components.Wordmark
 import com.giwa.strideup.ui.components.animatedInt
-import com.giwa.strideup.ui.theme.Ash
-import com.giwa.strideup.ui.theme.AshDim
-import com.giwa.strideup.ui.theme.Champagne
-import com.giwa.strideup.ui.theme.ChampagneLight
-import com.giwa.strideup.ui.theme.Copper
-import com.giwa.strideup.ui.theme.Ivory
-import com.giwa.strideup.ui.theme.MetalInk
-import com.giwa.strideup.ui.theme.ObsidianDeep
-import com.giwa.strideup.ui.theme.Platinum
+import com.giwa.strideup.ui.theme.Coral
+import com.giwa.strideup.ui.theme.Honey
+import com.giwa.strideup.ui.theme.HoneyInk
+import com.giwa.strideup.ui.theme.Ink
+import com.giwa.strideup.ui.theme.Sage
+import com.giwa.strideup.ui.theme.Sand
+import com.giwa.strideup.ui.theme.SunsetVertical
+import com.giwa.strideup.ui.theme.Taupe
+import com.giwa.strideup.ui.theme.TaupeLight
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
 private val headerDateFormatter: DateTimeFormatter =
     DateTimeFormatter.ofPattern("M월 d일 EEEE", Locale.KOREAN)
+
+/** 시간대에 맞춘 캐주얼한 인사 */
+private fun greeting(): String = when (LocalTime.now().hour) {
+    in 0..4 -> "고요한 새벽이에요"
+    in 5..10 -> "좋은 아침이에요"
+    in 11..16 -> "오후도 가볍게 걸어요"
+    in 17..20 -> "노을 산책, 어때요?"
+    else -> "오늘 하루도 수고했어요"
+}
 
 @Composable
 fun HomeScreen(
@@ -103,7 +110,7 @@ fun HomeScreen(
         if (hasPermission) viewModel.onPermissionGranted()
     }
 
-    // 루트/시스템 설정에서 권한이 허용된 경우에도 카드가 남지 않도록 재개 시 재확인.
+    // 시스템 설정에서 권한이 허용된 경우에도 카드가 남지 않도록 재개 시 재확인.
     LifecycleResumeEffect(Unit) {
         val granted = StepPermissions.hasActivityRecognition(context)
         if (granted != hasPermission) {
@@ -115,26 +122,25 @@ fun HomeScreen(
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 28.dp),
-        verticalArrangement = Arrangement.spacedBy(18.dp),
+        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 14.dp, bottom = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item { HomeHeader(level = state.sneakerLevel) }
 
         if (!hasPermission) {
             item {
-                LuxeCard(accent = true, spacing = 12.dp) {
-                    Eyebrow("PERMISSION", color = Champagne)
+                SoftCard(accent = true, spacing = 12.dp) {
                     Text(
-                        "걸음 측정 권한이 필요합니다",
+                        "걸음을 세려면 권한이 필요해요",
                         style = MaterialTheme.typography.titleMedium,
-                        color = Ivory,
+                        color = Ink,
                     )
                     Text(
-                        "오늘의 걸음을 집계하고 SUP를 적립하려면 신체 활동 권한을 허용해 주세요.",
+                        "오늘의 걸음을 집계하고 SUP를 쌓으려면 신체 활동 권한을 허용해 주세요.",
                         style = MaterialTheme.typography.bodySmall,
-                        color = Ash,
+                        color = Taupe,
                     )
-                    GhostButton(
+                    ChipButton(
                         text = "권한 허용하기",
                         onClick = { permissionLauncher.launch(StepPermissions.missing(context)) },
                     )
@@ -144,24 +150,24 @@ fun HomeScreen(
 
         item { TodayCard(state) }
 
-        item { GoldButton(text = "Start Walk", onClick = onStartWalk) }
+        item { SunsetButton(text = "산책 시작하기", onClick = onStartWalk) }
 
         item { AssetRow(state) }
 
         item { RouteCard() }
 
         item {
-            LuxeCard(spacing = 18.dp) {
+            SoftCard(spacing = 16.dp) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Eyebrow("Last 7 days")
+                    Text("이번 주 걸음", style = MaterialTheme.typography.titleMedium, color = Ink)
                     Text(
                         "목표 %,d".format(state.goal),
                         style = MaterialTheme.typography.bodySmall,
-                        color = AshDim,
+                        color = TaupeLight,
                     )
                 }
                 WeeklyChart(week = state.week, goal = state.goal)
@@ -170,18 +176,17 @@ fun HomeScreen(
 
         if (!state.sensorAvailable) {
             item {
-                LuxeCard(spacing = 8.dp) {
-                    Eyebrow("Sensor", color = AshDim)
+                SoftCard(spacing = 8.dp) {
                     Text(
-                        "걸음 센서를 찾을 수 없습니다",
+                        "걸음 센서를 찾을 수 없어요",
                         style = MaterialTheme.typography.titleSmall,
-                        color = Ivory,
+                        color = Ink,
                     )
                     Text(
-                        "이 기기(또는 에뮬레이터)에는 걸음 센서가 없습니다. " +
+                        "이 기기(또는 에뮬레이터)에는 걸음 센서가 없어요. " +
                             "워킹 탭의 시뮬레이션 버튼으로 적립 흐름을 체험해 보세요.",
                         style = MaterialTheme.typography.bodySmall,
-                        color = Ash,
+                        color = Taupe,
                     )
                 }
             }
@@ -198,19 +203,23 @@ private fun HomeHeader(level: Int) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-            Wordmark(fontSize = 19.sp)
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(
                 text = headerDateFormatter.format(LocalDate.now()),
                 style = MaterialTheme.typography.bodySmall,
-                color = AshDim,
+                color = TaupeLight,
+            )
+            Text(
+                text = greeting(),
+                style = MaterialTheme.typography.headlineSmall,
+                color = Ink,
             )
         }
         MemberBadge(level = level)
     }
 }
 
-/** 오늘의 성과 — 화면의 주인공. 가는 획의 큰 숫자 + 금속 링. */
+/** 오늘의 성과 — 화면의 주인공. 큼직한 선셋 링 하나로 말한다. */
 @Composable
 private fun TodayCard(state: HomeViewModel.UiState) {
     val fraction = if (state.goal > 0) state.todaySteps.toFloat() / state.goal else 0f
@@ -218,63 +227,71 @@ private fun TodayCard(state: HomeViewModel.UiState) {
     val distanceKm = RewardEconomy.distanceMeters(state.todaySteps) / 1000
     val calories = RewardEconomy.calories(state.todaySteps)
 
-    LuxeCard(accent = true, contentPadding = PaddingValues(22.dp), spacing = 20.dp) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
+    SoftCard(accent = true, contentPadding = PaddingValues(24.dp), spacing = 20.dp) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            SunsetRing(
+                progress = fraction,
+                modifier = Modifier.size(200.dp),
+                ringWidth = 15.dp,
             ) {
-                Eyebrow("Today")
-                Row(verticalAlignment = Alignment.Bottom) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
                     Text(
                         text = "%,d".format(steps),
-                        fontSize = 54.sp,
+                        fontSize = 42.sp,
                         fontWeight = FontWeight.Light,
-                        letterSpacing = (-2.5).sp,
-                        color = Ivory,
+                        letterSpacing = (-1.5).sp,
+                        color = Ink,
                     )
-                    Spacer(Modifier.width(6.dp))
                     Text(
-                        text = "steps",
+                        text = "걸음",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = AshDim,
-                        modifier = Modifier.padding(bottom = 10.dp),
+                        color = Taupe,
                     )
                 }
             }
-            MetalRing(
-                progress = fraction,
-                modifier = Modifier.size(92.dp),
-                ringWidth = 7.dp,
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .background(Sand)
+                    .padding(horizontal = 14.dp, vertical = 7.dp),
             ) {
-                MetalText(
-                    text = "${state.goalPercent.coerceAtMost(999)}%",
-                    fontSize = 19.sp,
-                    fontWeight = FontWeight.Light,
+                Text(
+                    text = "오늘 목표 %,d · %d%% 달성".format(
+                        state.goal,
+                        state.goalPercent.coerceAtMost(999),
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Taupe,
+                    fontWeight = FontWeight.SemiBold,
                 )
             }
         }
-
-        LineMeter(fraction = fraction)
 
         HairlineDivider()
 
         Row(modifier = Modifier.fillMaxWidth()) {
             StatColumn(
                 icon = Icons.Filled.Straighten,
-                tint = Platinum,
+                tint = Sage,
                 label = "거리",
                 value = "%.2f km".format(distanceKm),
             )
             StatColumn(
                 icon = Icons.Filled.LocalFireDepartment,
-                tint = Copper,
+                tint = Coral,
                 label = "칼로리",
-                value = "%,.0f kcal".format(calories),
+                value = "%,.0f".format(calories),
             )
             StatColumn(
-                icon = Icons.Filled.Whatshot,
-                tint = Champagne,
+                icon = Icons.Filled.AutoAwesome,
+                tint = Honey,
                 label = "스트릭",
                 value = "${state.streak}일",
             )
@@ -282,10 +299,10 @@ private fun TodayCard(state: HomeViewModel.UiState) {
     }
 }
 
-/** 보유 자산 — SUP 잔액과 에너지를 한 줄에 나란히. */
+/** 보유 자산 — SUP 잔액과 에너지를 한 줄에. */
 @Composable
 private fun AssetRow(state: HomeViewModel.UiState) {
-    LuxeCard(contentPadding = PaddingValues(vertical = 18.dp, horizontal = 12.dp)) {
+    SoftCard(contentPadding = PaddingValues(vertical = 18.dp, horizontal = 12.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -295,15 +312,16 @@ private fun AssetRow(state: HomeViewModel.UiState) {
                     .weight(1f)
                     .padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(13.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                TokenEmblem(size = 40.dp)
-                Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                    Eyebrow("SUP 잔액", color = AshDim)
-                    MetalText(
+                TokenCoin(size = 40.dp)
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Eyebrow("SUP", color = TaupeLight)
+                    GradientText(
                         text = "%,.1f".format(state.balance),
                         fontSize = 21.sp,
-                        fontWeight = FontWeight.Normal,
+                        fontWeight = FontWeight.SemiBold,
+                        brush = HoneyInk,
                     )
                 }
             }
@@ -315,9 +333,9 @@ private fun AssetRow(state: HomeViewModel.UiState) {
                     .weight(1f)
                     .padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(13.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                MetalRing(
+                SunsetRing(
                     progress = state.energyPercent / 100f,
                     modifier = Modifier.size(40.dp),
                     ringWidth = 4.dp,
@@ -326,17 +344,17 @@ private fun AssetRow(state: HomeViewModel.UiState) {
                     Icon(
                         Icons.Filled.Bolt,
                         contentDescription = null,
-                        tint = Champagne,
+                        tint = Coral,
                         modifier = Modifier.size(15.dp),
                     )
                 }
-                Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                    Eyebrow("에너지", color = AshDim)
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Eyebrow("에너지", color = TaupeLight)
                     Text(
                         text = "${state.energyPercent}%",
                         fontSize = 21.sp,
-                        fontWeight = FontWeight.Light,
-                        color = Ivory,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Ink,
                     )
                 }
             }
@@ -344,36 +362,36 @@ private fun AssetRow(state: HomeViewModel.UiState) {
     }
 }
 
-/** YOUR ROUTE — 금빛 궤적이 그려진 장식용 지도 카드 */
+/** 오늘의 루트 — 코럴 궤적이 그려진 장식용 지도 카드 */
 @Composable
 private fun RouteCard() {
-    LuxeCard(spacing = 14.dp) {
+    SoftCard(spacing = 14.dp) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Eyebrow("Your route")
+            Text("오늘의 루트", style = MaterialTheme.typography.titleMedium, color = Ink)
             Icon(
                 Icons.Filled.NearMe,
                 contentDescription = null,
-                tint = Champagne.copy(alpha = 0.8f),
-                modifier = Modifier.size(15.dp),
+                tint = Coral,
+                modifier = Modifier.size(16.dp),
             )
         }
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(118.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(ObsidianDeep),
+                .clip(RoundedCornerShape(18.dp))
+                .background(Sand),
         ) {
             Canvas(Modifier.fillMaxSize()) {
                 val w = size.width
                 val h = size.height
 
-                // 지적도 격자
-                val gridColor = Color.White.copy(alpha = 0.035f)
+                // 은은한 격자
+                val gridColor = Ink.copy(alpha = 0.04f)
                 for (c in 1 until 7) {
                     val x = w * c / 7
                     drawLine(gridColor, Offset(x, 0f), Offset(x, h), strokeWidth = 1f)
@@ -383,7 +401,7 @@ private fun RouteCard() {
                     drawLine(gridColor, Offset(0f, y), Offset(w, y), strokeWidth = 1f)
                 }
 
-                // 궤적
+                // 산책 궤적
                 val points = listOf(
                     0.08f to 0.74f, 0.21f to 0.58f, 0.33f to 0.66f, 0.47f to 0.40f,
                     0.61f to 0.53f, 0.77f to 0.33f, 0.92f to 0.25f,
@@ -392,18 +410,15 @@ private fun RouteCard() {
                     moveTo(points.first().x, points.first().y)
                     for (i in 1 until points.size) lineTo(points[i].x, points[i].y)
                 }
-                drawPath(path, Champagne.copy(alpha = 0.16f), style = Stroke(width = 11f, cap = StrokeCap.Round))
-                drawPath(
-                    path,
-                    brush = Brush.horizontalGradient(listOf(Champagne, ChampagneLight)),
-                    style = Stroke(width = 2.5f, cap = StrokeCap.Round),
-                )
+                drawPath(path, Coral.copy(alpha = 0.18f), style = Stroke(width = 12f, cap = StrokeCap.Round))
+                drawPath(path, brush = SunsetVertical, style = Stroke(width = 4f, cap = StrokeCap.Round))
 
-                // 출발 · 도착
-                drawCircle(Champagne.copy(alpha = 0.22f), radius = 11f, center = points.first())
-                drawCircle(Champagne, radius = 3.5f, center = points.first())
-                drawCircle(ChampagneLight.copy(alpha = 0.25f), radius = 13f, center = points.last())
-                drawCircle(ChampagneLight, radius = 4.5f, center = points.last())
+                // 출발 · 도착 핀
+                drawCircle(Coral.copy(alpha = 0.25f), radius = 11f, center = points.first())
+                drawCircle(Coral, radius = 4f, center = points.first())
+                drawCircle(Coral.copy(alpha = 0.30f), radius = 13f, center = points.last())
+                drawCircle(Color.White, radius = 6.5f, center = points.last())
+                drawCircle(Coral, radius = 4f, center = points.last())
             }
         }
     }
@@ -415,25 +430,22 @@ private fun WeeklyChart(week: List<DailyStepsEntity>, goal: Int) {
     val days = (0..6).map { offset -> today - 6 + offset }
     val byDay = week.associateBy { it.epochDay }
     val maxSteps = maxOf(goal, week.maxOfOrNull { it.steps } ?: 0, 1)
-    val dimBar = Brush.verticalGradient(
-        listOf(Champagne.copy(alpha = 0.34f), Champagne.copy(alpha = 0.10f)),
-    )
 
     Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(126.dp),
+                .height(120.dp),
         ) {
             // 목표선
             Canvas(Modifier.fillMaxSize()) {
                 val y = size.height * (1f - goal.toFloat() / maxSteps)
                 drawLine(
-                    color = Champagne.copy(alpha = 0.30f),
+                    color = TaupeLight,
                     start = Offset(0f, y),
                     end = Offset(size.width, y),
-                    strokeWidth = 1f,
-                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(5f, 7f)),
+                    strokeWidth = 1.5f,
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(6f, 8f)),
                 )
             }
             Row(
@@ -443,14 +455,25 @@ private fun WeeklyChart(week: List<DailyStepsEntity>, goal: Int) {
             ) {
                 days.forEach { day ->
                     val steps = byDay[day]?.steps ?: 0
-                    val fraction = (steps.toFloat() / maxSteps).coerceIn(0.02f, 1f)
+                    val fraction = (steps.toFloat() / maxSteps).coerceIn(0.04f, 1f)
                     Box(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight(fraction)
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(if (day == today) MetalInk else dimBar),
-                    )
+                            .clip(RoundedCornerShape(7.dp)),
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .then(
+                                    if (day == today) {
+                                        Modifier.background(SunsetVertical)
+                                    } else {
+                                        Modifier.background(Sand)
+                                    },
+                                ),
+                        )
+                    }
                 }
             }
         }
@@ -464,7 +487,7 @@ private fun WeeklyChart(week: List<DailyStepsEntity>, goal: Int) {
                         .getDisplayName(TextStyle.NARROW, Locale.KOREAN),
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (day == today) Champagne else AshDim,
+                    color = if (day == today) Coral else TaupeLight,
                     textAlign = TextAlign.Center,
                 )
             }

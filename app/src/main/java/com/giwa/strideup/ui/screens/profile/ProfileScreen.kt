@@ -12,9 +12,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.TrendingUp
-import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
@@ -38,21 +38,22 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.giwa.strideup.data.prefs.UserPrefs
 import com.giwa.strideup.domain.RewardEconomy
 import com.giwa.strideup.ui.components.DetailRow
-import com.giwa.strideup.ui.components.Eyebrow
-import com.giwa.strideup.ui.components.GoldButton
+import com.giwa.strideup.ui.components.GradientText
 import com.giwa.strideup.ui.components.HairlineDivider
 import com.giwa.strideup.ui.components.LineMeter
-import com.giwa.strideup.ui.components.LuxeCard
 import com.giwa.strideup.ui.components.MemberBadge
-import com.giwa.strideup.ui.components.MetalText
 import com.giwa.strideup.ui.components.ScreenTitle
+import com.giwa.strideup.ui.components.SoftCard
 import com.giwa.strideup.ui.components.StatColumn
-import com.giwa.strideup.ui.theme.Ash
-import com.giwa.strideup.ui.theme.AshDim
-import com.giwa.strideup.ui.theme.Champagne
-import com.giwa.strideup.ui.theme.Copper
-import com.giwa.strideup.ui.theme.Ivory
-import com.giwa.strideup.ui.theme.Platinum
+import com.giwa.strideup.ui.components.SunsetButton
+import com.giwa.strideup.ui.theme.Coral
+import com.giwa.strideup.ui.theme.Honey
+import com.giwa.strideup.ui.theme.HoneyInk
+import com.giwa.strideup.ui.theme.Ink
+import com.giwa.strideup.ui.theme.Sage
+import com.giwa.strideup.ui.theme.Sand
+import com.giwa.strideup.ui.theme.Taupe
+import com.giwa.strideup.ui.theme.TaupeLight
 
 @Composable
 fun ProfileScreen(viewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory)) {
@@ -69,7 +70,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = viewModel(factory = ProfileViewM
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 28.dp),
+        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 14.dp, bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item { ScreenTitle(eyebrow = "Profile", title = "프로필") }
@@ -81,42 +82,46 @@ fun ProfileScreen(viewModel: ProfileViewModel = viewModel(factory = ProfileViewM
         item { GoalCard(goal = state.goal, onGoalChange = viewModel::setGoal) }
 
         item {
-            LuxeCard(spacing = 12.dp) {
-                Eyebrow("About")
-                DetailRow(label = "버전", value = "StrideUp 1.0.0")
+            SoftCard(spacing = 12.dp) {
+                Text("앱 정보", style = MaterialTheme.typography.titleMedium, color = Ink)
+                DetailRow(label = "버전", value = "StrideUp 1.1.0")
                 HairlineDivider()
                 DetailRow(label = "네트워크", value = "GIWA Chain (예정)")
                 HairlineDivider()
                 Text(
-                    text = "걷기 → SUP 포인트 적립 → GIWA 체인 온체인 전환. " +
-                        "적립은 워킹 세션 중 걸음에 대해서만 이루어집니다.",
+                    text = "걷기 → SUP 적립 → GIWA 체인 온체인 전환. " +
+                        "적립은 워킹 세션 중의 걸음에 대해서만 이루어져요.",
                     style = MaterialTheme.typography.bodySmall,
-                    color = AshDim,
+                    color = TaupeLight,
                 )
             }
         }
     }
 }
 
-/** 회원 헤더 — 아바타 + 등급 + 보유 SUP */
+/** 회원 카드 — 아바타 + 한 줄 소개 + 보유 SUP */
 @Composable
 private fun MemberCard(level: Int, balance: Double) {
-    LuxeCard(accent = true, contentPadding = PaddingValues(22.dp), spacing = 18.dp) {
+    SoftCard(accent = true, contentPadding = PaddingValues(22.dp), spacing = 16.dp) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(18.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            MemberBadge(level = level, size = 58.dp)
+            MemberBadge(level = level, size = 56.dp)
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(5.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(
                     text = "StrideUp 러너",
                     style = MaterialTheme.typography.titleMedium,
-                    color = Ivory,
+                    color = Ink,
                 )
-                Eyebrow("GIWA STEPN · M2E MEMBER", color = Champagne.copy(alpha = 0.75f))
+                Text(
+                    text = "가볍게 걷고, 확실하게 쌓아요",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Taupe,
+                )
             }
         }
         HairlineDivider()
@@ -125,11 +130,16 @@ private fun MemberCard(level: Int, balance: Double) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Eyebrow("보유 SUP", color = AshDim)
-            MetalText(
+            Text(
+                text = "보유 SUP",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Taupe,
+            )
+            GradientText(
                 text = "%,.2f".format(balance),
                 fontSize = 20.sp,
-                fontWeight = FontWeight.Normal,
+                fontWeight = FontWeight.SemiBold,
+                brush = HoneyInk,
             )
         }
     }
@@ -145,37 +155,37 @@ private fun SneakerCard(state: ProfileViewModel.UiState, onUpgrade: () -> Unit) 
         0f
     }
 
-    LuxeCard(spacing = 18.dp) {
+    SoftCard(spacing = 16.dp) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Eyebrow("My sneakers")
-            MetalText(
-                text = "LEVEL ${state.sneakerLevel}",
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = 1.6.sp,
+            Text("내 스니커즈", style = MaterialTheme.typography.titleMedium, color = Ink)
+            GradientText(
+                text = "LV ${state.sneakerLevel}",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.0.sp,
             )
         }
 
         Row(modifier = Modifier.fillMaxWidth()) {
             StatColumn(
                 icon = Icons.Filled.TrendingUp,
-                tint = Champagne,
+                tint = Coral,
                 label = "적립 배율",
                 value = "×%.2f".format(state.multiplier),
             )
             StatColumn(
                 icon = Icons.Filled.Bolt,
-                tint = Platinum,
+                tint = Honey,
                 label = "최대 에너지",
                 value = "%.0f".format(state.maxEnergy),
             )
             StatColumn(
-                icon = Icons.Filled.Whatshot,
-                tint = Copper,
+                icon = Icons.Filled.AutoAwesome,
+                tint = Sage,
                 label = "스트릭",
                 value = "${state.streak}일",
             )
@@ -191,7 +201,7 @@ private fun SneakerCard(state: ProfileViewModel.UiState, onUpgrade: () -> Unit) 
                 Text(
                     text = "다음 레벨까지",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Ash,
+                    color = Taupe,
                 )
                 Text(
                     text = "%,.0f / %,.0f SUP".format(
@@ -199,34 +209,35 @@ private fun SneakerCard(state: ProfileViewModel.UiState, onUpgrade: () -> Unit) 
                         state.upgradeCost,
                     ),
                     style = MaterialTheme.typography.bodySmall,
-                    color = if (affordable) Champagne else AshDim,
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (affordable) Coral else TaupeLight,
                 )
             }
-            LineMeter(fraction = progress, height = 5.dp)
+            LineMeter(fraction = progress, height = 6.dp)
         }
 
-        GoldButton(
-            text = "Upgrade · %,.0f SUP".format(state.upgradeCost),
+        SunsetButton(
+            text = "업그레이드 · %,.0f SUP".format(state.upgradeCost),
             onClick = onUpgrade,
             enabled = affordable,
         )
 
         Text(
-            text = "레벨업 시 적립 배율 +0.15, 최대 에너지 +2가 적용됩니다.",
+            text = "레벨이 오르면 적립 배율 +0.15, 최대 에너지 +2가 붙어요.",
             style = MaterialTheme.typography.bodySmall,
-            color = AshDim,
+            color = TaupeLight,
         )
     }
 }
 
-/** 일일 목표 설정 */
+/** 하루 목표 설정 */
 @Composable
 private fun GoalCard(goal: Int, onGoalChange: (Int) -> Unit) {
     var sliderValue by remember(goal) { mutableFloatStateOf(goal.toFloat()) }
     val steps = sliderValue.toInt()
     val distanceKm = RewardEconomy.distanceMeters(steps) / 1000
 
-    LuxeCard(spacing = 16.dp) {
+    SoftCard(spacing = 14.dp) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -239,31 +250,31 @@ private fun GoalCard(goal: Int, onGoalChange: (Int) -> Unit) {
                 Icon(
                     Icons.AutoMirrored.Filled.DirectionsWalk,
                     contentDescription = null,
-                    tint = Champagne,
-                    modifier = Modifier.size(16.dp),
+                    tint = Coral,
+                    modifier = Modifier.size(17.dp),
                 )
-                Eyebrow("Daily goal")
+                Text("하루 목표", style = MaterialTheme.typography.titleMedium, color = Ink)
             }
             Text(
                 text = "약 %.1f km".format(distanceKm),
                 style = MaterialTheme.typography.bodySmall,
-                color = AshDim,
+                color = TaupeLight,
             )
         }
 
         Row(verticalAlignment = Alignment.Bottom) {
             Text(
                 text = "%,d".format(steps),
-                fontSize = 38.sp,
+                fontSize = 36.sp,
                 fontWeight = FontWeight.Light,
-                letterSpacing = (-1.5).sp,
-                color = Ivory,
+                letterSpacing = (-1.2).sp,
+                color = Ink,
             )
             Text(
-                text = " steps",
+                text = " 걸음",
                 style = MaterialTheme.typography.bodyMedium,
-                color = AshDim,
-                modifier = Modifier.padding(bottom = 7.dp),
+                color = Taupe,
+                modifier = Modifier.padding(bottom = 6.dp),
             )
         }
 
@@ -274,18 +285,18 @@ private fun GoalCard(goal: Int, onGoalChange: (Int) -> Unit) {
             valueRange = UserPrefs.MIN_GOAL.toFloat()..UserPrefs.MAX_GOAL.toFloat(),
             steps = (UserPrefs.MAX_GOAL - UserPrefs.MIN_GOAL) / 500 - 1,
             colors = SliderDefaults.colors(
-                thumbColor = Champagne,
-                activeTrackColor = Champagne,
-                inactiveTrackColor = Color.White.copy(alpha = 0.08f),
+                thumbColor = Coral,
+                activeTrackColor = Coral,
+                inactiveTrackColor = Sand,
                 activeTickColor = Color.Transparent,
                 inactiveTickColor = Color.Transparent,
             ),
         )
 
         Text(
-            text = "목표를 달성하면 보너스 SUP가 지급되고, 연속 달성일이 쌓일수록 보너스가 커집니다.",
+            text = "목표를 채우면 보너스 SUP가 지급되고, 연속으로 달성할수록 보너스가 커져요.",
             style = MaterialTheme.typography.bodySmall,
-            color = AshDim,
+            color = TaupeLight,
         )
     }
 }

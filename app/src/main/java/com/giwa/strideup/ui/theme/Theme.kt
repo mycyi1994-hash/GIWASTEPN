@@ -1,41 +1,42 @@
 package com.giwa.strideup.ui.theme
 
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 
-private val StrideUpDarkColors = darkColorScheme(
-    primary = Champagne,
-    onPrimary = ObsidianDeep,
-    primaryContainer = CharcoalHigh,
-    onPrimaryContainer = ChampagneLight,
-    secondary = Platinum,
-    onSecondary = ObsidianDeep,
-    secondaryContainer = CharcoalHigh,
-    onSecondaryContainer = Platinum,
-    tertiary = Jade,
-    onTertiary = ObsidianDeep,
-    background = Obsidian,
-    onBackground = Ivory,
-    surface = Charcoal,
-    onSurface = Ivory,
-    surfaceVariant = CharcoalHigh,
-    onSurfaceVariant = Ash,
-    surfaceContainer = Charcoal,
-    surfaceContainerHigh = CharcoalHigh,
-    surfaceContainerHighest = CharcoalHigh,
-    error = Crimson,
-    onError = Ivory,
-    outline = Hairline,
-    outlineVariant = Hairline,
-    scrim = ObsidianDeep,
+private val StrideUpLightColors = lightColorScheme(
+    primary = Coral,
+    onPrimary = Color.White,
+    primaryContainer = Sand,
+    onPrimaryContainer = CoralDeep,
+    secondary = Sage,
+    onSecondary = Color.White,
+    secondaryContainer = Sand,
+    onSecondaryContainer = Ink,
+    tertiary = Honey,
+    onTertiary = Color.White,
+    background = Cream,
+    onBackground = Ink,
+    surface = CardWhite,
+    onSurface = Ink,
+    surfaceVariant = Sand,
+    onSurfaceVariant = Taupe,
+    surfaceContainer = CardWhite,
+    surfaceContainerHigh = Cream,
+    surfaceContainerHighest = Sand,
+    error = Rose,
+    onError = Color.White,
+    outline = Border,
+    outlineVariant = Border,
+    scrim = Ink,
 )
 
-/** StrideUp은 금속 광택이 살아나는 다크 테마만 사용한다. */
+/** StrideUp은 따뜻한 크림 라이트 테마만 사용한다. */
 @Composable
 fun StrideUpTheme(content: @Composable () -> Unit) {
     MaterialTheme(
-        colorScheme = StrideUpDarkColors,
+        colorScheme = StrideUpLightColors,
         typography = StrideUpTypography,
         shapes = StrideUpShapes,
         content = content,

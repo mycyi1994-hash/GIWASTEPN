@@ -4,66 +4,54 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 /**
- * 고급감을 만드는 핵심은 "단색"이 아니라 "면의 반사"다.
- * 금속·유리 표현에 쓰는 브러시를 한곳에 모아 화면 전체의 광택 방향을 통일한다.
+ * 화면 전체의 "빛의 방향"을 한곳에서 통일한다.
+ * 면은 종이(크림·화이트), 강조는 선셋(코럴→살구)과 허니 그라데이션.
  */
 
-/** 브러시드 메탈 스윕 — 링/원형 요소용. 한 바퀴에 광택이 두 번 스친다. */
-val MetalSweep: Brush = Brush.sweepGradient(
-    0.00f to ChampagneDeep,
-    0.14f to Champagne,
-    0.26f to ChampagneLight,
-    0.42f to Champagne,
-    0.58f to ChampagneDeep,
-    0.72f to Champagne,
-    0.86f to ChampagneLight,
-    1.00f to ChampagneDeep,
+/** 선셋 스윕 — 진행 링용. 한 바퀴 돌며 코럴에서 살구로 물든다. */
+val SunsetSweep: Brush = Brush.sweepGradient(
+    0.00f to CoralDeep,
+    0.30f to Coral,
+    0.65f to Peach,
+    1.00f to CoralDeep,
 )
 
-/** 금속 판 — pill 버튼·멤버십 카드 등 가로로 긴 면 */
-val MetalPlate: Brush = Brush.linearGradient(
-    listOf(ChampagneDeep, Champagne, ChampagneLight, Champagne, ChampagneDeep),
+/** 선셋 판 — 주 CTA·히어로 카드 등 가로로 긴 면 */
+val SunsetPlate: Brush = Brush.linearGradient(
+    listOf(CoralDeep, Coral, Peach),
 )
 
-/** 금속 텍스트 채움 — 위에서 빛을 받는 각인 느낌 */
-val MetalInk: Brush = Brush.verticalGradient(
-    listOf(ChampagneLight, Champagne, ChampagneDeep),
+/** 선셋 텍스트 채움 */
+val SunsetInk: Brush = Brush.linearGradient(
+    listOf(CoralDeep, Peach),
 )
 
-/** 유리 표면 — 위가 밝고 아래로 사라지는 아주 옅은 오버레이 */
-val GlassFill: Brush = Brush.verticalGradient(
-    listOf(Color.White.copy(alpha = 0.055f), Color.White.copy(alpha = 0.010f)),
+/** 세로 선셋 — 차트 바 등 세로 면 */
+val SunsetVertical: Brush = Brush.verticalGradient(
+    listOf(Peach, Coral),
 )
 
-/** 유리 모서리 — 좌상단이 밝은 1px 엣지 라이팅 */
-val GlassEdge: Brush = Brush.linearGradient(
-    listOf(
-        Color.White.copy(alpha = 0.16f),
-        Color.White.copy(alpha = 0.04f),
-        Color.White.copy(alpha = 0.10f),
-    ),
+/** 허니 판 — SUP 코인·게이지 */
+val HoneyPlate: Brush = Brush.linearGradient(
+    listOf(HoneyDeep, Honey, Peach),
 )
 
-/** 금색 모서리 — 강조 카드용 */
-val GoldEdge: Brush = Brush.linearGradient(
-    listOf(
-        Champagne.copy(alpha = 0.55f),
-        Champagne.copy(alpha = 0.10f),
-        ChampagneLight.copy(alpha = 0.38f),
-    ),
+/** 허니 텍스트 채움 — SUP 수치 */
+val HoneyInk: Brush = Brush.verticalGradient(
+    listOf(Honey, HoneyDeep),
 )
 
-/** 헤어라인 — 가운데가 진하고 양끝이 사라지는 구분선 */
+/** 카드 표면 — 위가 미세하게 따뜻한 종이 질감 */
+val CardSheen: Brush = Brush.verticalGradient(
+    listOf(CardWarm, CardWhite),
+)
+
+/** 앱 배경 — 아래로 갈수록 가라앉는 크림 */
+val CreamBackdrop: Brush = Brush.verticalGradient(
+    listOf(Cream, CreamDeep),
+)
+
+/** 양끝이 사라지는 헤어라인 */
 val HairlineFade: Brush = Brush.horizontalGradient(
-    listOf(Color.Transparent, Color.White.copy(alpha = 0.12f), Color.Transparent),
-)
-
-/** 앱 배경 — 위에서 아래로 가라앉는 흑요석 */
-val ObsidianBackdrop: Brush = Brush.verticalGradient(
-    listOf(ObsidianTop, Obsidian, ObsidianDeep),
-)
-
-/** 하단 네비게이션 유리판 */
-val NavGlass: Brush = Brush.verticalGradient(
-    listOf(Charcoal.copy(alpha = 0.94f), ObsidianDeep),
+    listOf(Color.Transparent, Ink.copy(alpha = 0.10f), Color.Transparent),
 )
