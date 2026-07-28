@@ -466,4 +466,66 @@
     <string name="seed_crew2_body">다리 공사 때문에 3구간 우회로 넣었어요. 다음 정모 때 참고하세요.</string>
     <string name="seed_crew3_title">오늘 밤 크루 정기런</string>
     <string name="seed_crew3_body">8시 정각 출발. 늦으면 따라잡기 힘듭니다!</string>
+
+    <!-- Party host -->
+    <string name="party_host_badge">파티장</string>
+    <string name="party_start">파티 러닝 시작</string>
+    <string name="party_invite_button">크루원 초대하기</string>
+    <string name="party_invite_title">파티에 초대</string>
+    <string name="party_invite_action">초대</string>
+    <string name="party_invite_empty">이미 모든 크루원이 파티에 있어요.</string>
+    <string name="party_kick">강퇴</string>
+    <string name="party_gps_rule">파티장에게서 %1$dm 이상 떨어지면 자동으로 파티에서 빠져요.</string>
+
+    <!-- Notification actions -->
+    <string name="notif_accept">수락</string>
+    <string name="notif_decline">거절</string>
+    <string name="notif_claim">받기</string>
+    <string name="notif_done">처리 완료</string>
+    <string name="notif_crew_invite">%1$s 크루에서 초대장이 왔어요</string>
+    <string name="notif_party_invite">%1$s에서 파티런에 초대했어요</string>
+    <string name="notif_event_reward">이벤트 보상 도착: %1$s · %2$s SUP</string>
+    <string name="notif_party_member_left">%1$s님이 거리가 벌어져 파티에서 빠졌어요</string>
+
+    <!-- Achievement grades -->
+    <string name="ach_total_progress">전체 진행도</string>
+    <string name="ach_grade_bronze">브론즈</string>
+    <string name="ach_grade_silver">실버</string>
+    <string name="ach_grade_gold">골드</string>
+    <string name="ach_grade_platinum">플래티넘</string>
+    <string name="ach_grade_diamond">다이아</string>
+
+    <!-- Achievement categories -->
+    <string name="ach_cat_steps">걸음</string>
+    <string name="ach_cat_distance">거리</string>
+    <string name="ach_cat_sessions">러닝</string>
+    <string name="ach_cat_streak">스트릭</string>
+    <string name="ach_cat_sup">적립</string>
+    <string name="ach_cat_mint">민팅</string>
+    <string name="ach_cat_collection">컬렉터</string>
+    <string name="ach_cat_upgrade">강화</string>
+    <string name="ach_cat_party">파티런</string>
+    <string name="ach_cat_event">이벤트</string>
+    <string name="ach_cat_crew">크루</string>
+    <string name="ach_cat_post">글쓰기</string>
+    <string name="ach_cat_level">레벨</string>
+
+    <!-- Achievement goals -->
+    <string name="ach_goal_steps">누적 %1$s 걸음 걷기</string>
+    <string name="ach_goal_distance">누적 %1$s km 달리기</string>
+    <string name="ach_goal_sessions">러닝 세션 %1$s회 완료</string>
+    <string name="ach_goal_streak">목표 %1$s일 연속 달성</string>
+    <string name="ach_goal_sup">누적 %1$s SUP 적립</string>
+    <string name="ach_goal_mint">스니커즈 %1$s회 민팅</string>
+    <string name="ach_goal_collection">도감 %1$s칸 수집</string>
+    <string name="ach_goal_upgrade">강화 %1$s회 성공</string>
+    <string name="ach_goal_party">파티런 %1$s회 완주</string>
+    <string name="ach_goal_event">이벤트 보상 %1$s회 수령</string>
+    <string name="ach_goal_crew">크루 %1$s개 가입</string>
+    <string name="ach_goal_post">커뮤니티 글 %1$s개 작성</string>
+    <string name="ach_goal_level">스니커즈를 Lv.%1$s까지 강화</string>
+
+    <!-- Profile identity -->
+    <string name="profile_edit_avatar">아바타 변경</string>
+    <string name="profile_uid">ID %1$s</string>
 </resources>

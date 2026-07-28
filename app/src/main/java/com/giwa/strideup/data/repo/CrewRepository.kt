@@ -38,9 +38,13 @@ data class Crew(
 data class PartyMember(
     val id: String,
     val name: String,
+    /** 러너 고유 ID — "SU-XXXXXX" */
+    val uid: String,
     val level: Int,
     val ready: Boolean,
     val isMe: Boolean,
+    /** 파티장(나)로부터의 거리 (m, 시뮬레이션) */
+    val distanceM: Int,
 )
 
 enum class PartyPhase {
@@ -205,9 +209,40 @@ class CrewRepository(
     }
 
     // ── 파티런 로비 ──────────────────────────────────────────
+    //
+    // 로비를 연 사람(나)이 파티장이다. 파티장은 크루원을 초대·강퇴할 수 있고,
+    // 전원 준비되면 "시작"을 눌러 러닝을 개시한다.
+    // 러닝 중 파티장에게서 MAX_PARTY_DISTANCE_M 이상 떨어진 크루원은
+    // 자동으로 파티에서 빠진다(백엔드가 없으므로 거리는 시뮬레이션).
 
     private val _party = MutableStateFlow(PartyState())
     val party: StateFlow<PartyState> = _party
+
+    private var driftJob: Job? = null
+
+    /** 시뮬레이션 러너의 고유 ID — 이름에서 결정적으로 만든다 */
+    private fun uidOf(name: String): String {
+        val alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+        var h = name.hashCode()
+        val body = buildString {
+            repeat(6) {
+                append(alphabet[((h % alphabet.length) + alphabet.length) % alphabet.length])
+                h = h shr 3
+            }
+        }
+        return "SU-$body"
+    }
+
+    private fun member(index: Int, name: String, random: Random, ready: Boolean = false) =
+        PartyMember(
+            id = "m$index",
+            name = name,
+            uid = uidOf(name),
+            level = 8 + random.nextInt(14),
+            ready = ready,
+            isMe = false,
+            distanceM = 4 + random.nextInt(38),
+        )
 
     /** 로비 입장. 크루원 일부는 이미 준비를 마친 상태로 시작한다. */
     fun openLobby(crewId: String) {
@@ -218,21 +253,13 @@ class CrewRepository(
             return // 이미 이 크루 로비에 있음
         }
         simulationJob?.cancel()
+        driftJob?.cancel()
         val random = Random(System.nanoTime())
         val squad = crew.roster.take(3 + random.nextInt(2))
         val members = buildList {
-            add(PartyMember("me", "", 0, ready = false, isMe = true))
+            add(PartyMember("me", "", "", 0, ready = false, isMe = true, distanceM = 0))
             squad.forEachIndexed { index, name ->
-                add(
-                    PartyMember(
-                        id = "m$index",
-                        name = name,
-                        level = 8 + random.nextInt(14),
-                        // 한두 명은 이미 준비 완료
-                        ready = index == 0 && random.nextBoolean(),
-                        isMe = false,
-                    )
-                )
+                add(member(index, name, random, ready = index == 0 && random.nextBoolean()))
             }
         }
         _party.value = PartyState(
@@ -245,7 +272,44 @@ class CrewRepository(
 
     fun leaveLobby() {
         simulationJob?.cancel()
+        driftJob?.cancel()
         _party.value = PartyState()
+    }
+
+    /** 파티에 없는 크루원 — 초대 후보 */
+    fun inviteCandidates(): List<String> {
+        val state = _party.value
+        val crew = state.crewId?.let { crewOf(it) } ?: return emptyList()
+        val inParty = state.members.map { it.name }.toSet()
+        return (crew.roster + EXTRA_RUNNERS).distinct().filterNot { it in inParty }
+    }
+
+    /** 파티장 권한 — 크루원 초대. 초대된 크루원은 잠시 후 준비를 누른다. */
+    fun invite(name: String) {
+        val state = _party.value
+        if (state.phase != PartyPhase.LOBBY) return
+        if (state.members.any { it.name == name }) return
+        val random = Random(System.nanoTime())
+        val newMember = member(state.members.size + 100, name, random)
+        _party.value = state.copy(members = state.members + newMember)
+        scope.launch {
+            delay(900L + random.nextLong(1800))
+            val snapshot = _party.value
+            if (snapshot.phase != PartyPhase.LOBBY) return@launch
+            _party.value = snapshot.copy(
+                members = snapshot.members.map {
+                    if (it.id == newMember.id) it.copy(ready = true) else it
+                },
+            )
+        }
+    }
+
+    /** 파티장 권한 — 크루원 강퇴 */
+    fun kick(memberId: String) {
+        val state = _party.value
+        if (state.phase != PartyPhase.LOBBY) return
+        if (memberId == "me") return
+        _party.value = state.copy(members = state.members.filterNot { it.id == memberId })
     }
 
     /** 내 준비 상태 토글. 준비를 누르면 남은 크루원들이 차례로 따라온다. */
@@ -256,7 +320,6 @@ class CrewRepository(
             members = state.members.map { if (it.isMe) it.copy(ready = ready) else it },
         )
         if (ready) startSimulation() else simulationJob?.cancel()
-        maybeStartCountdown()
     }
 
     private fun startSimulation() {
@@ -267,22 +330,22 @@ class CrewRepository(
                 val current = _party.value
                 if (current.phase != PartyPhase.LOBBY) return@launch
                 val pending = current.members.filter { !it.ready && !it.isMe }
-                if (pending.isEmpty()) break
+                if (pending.isEmpty()) return@launch
                 delay(700L + random.nextLong(1600))
                 val snapshot = _party.value
                 if (snapshot.phase != PartyPhase.LOBBY || !snapshot.myReady) return@launch
-                val next = snapshot.members.firstOrNull { !it.ready && !it.isMe } ?: break
+                val next = snapshot.members.firstOrNull { !it.ready && !it.isMe } ?: return@launch
                 _party.value = snapshot.copy(
                     members = snapshot.members.map {
                         if (it.id == next.id) it.copy(ready = true) else it
                     },
                 )
             }
-            maybeStartCountdown()
         }
     }
 
-    private fun maybeStartCountdown() {
+    /** 파티장 권한 — 전원 준비 후 시작. 카운트다운을 거쳐 동시 측정에 들어간다. */
+    fun startParty() {
         val state = _party.value
         if (state.phase != PartyPhase.LOBBY || !state.allReady) return
         simulationJob?.cancel()
@@ -296,6 +359,38 @@ class CrewRepository(
             val snapshot = _party.value
             if (snapshot.phase != PartyPhase.COUNTDOWN) return@launch
             _party.value = snapshot.copy(phase = PartyPhase.RUNNING, countdown = 0)
+            startDistanceDrift()
+        }
+    }
+
+    /**
+     * 러닝 중 거리 시뮬레이션. 크루원 거리가 조금씩 출렁이다
+     * [MAX_PARTY_DISTANCE_M]을 넘으면 자동으로 파티에서 빠지고 알림을 남긴다.
+     */
+    private fun startDistanceDrift() {
+        driftJob?.cancel()
+        driftJob = scope.launch {
+            val random = Random(System.nanoTime())
+            while (true) {
+                delay(2500)
+                val state = _party.value
+                if (state.phase != PartyPhase.RUNNING) return@launch
+                var dropped: PartyMember? = null
+                val updated = state.members.map { m ->
+                    if (m.isMe) return@map m
+                    val next = (m.distanceM + random.nextInt(-9, 15)).coerceAtLeast(2)
+                    m.copy(distanceM = next)
+                }
+                val survivors = updated.filter { m ->
+                    val ok = m.isMe || m.distanceM <= MAX_PARTY_DISTANCE_M
+                    if (!ok && dropped == null) dropped = m
+                    ok
+                }
+                _party.value = state.copy(members = survivors)
+                dropped?.let {
+                    rewardRepository.notify(NotificationType.PARTY_MEMBER_LEFT, it.name)
+                }
+            }
         }
     }
 
@@ -304,6 +399,7 @@ class CrewRepository(
         val state = _party.value
         if (state.phase != PartyPhase.RUNNING) return
         simulationJob?.cancel()
+        driftJob?.cancel()
         _party.value = state.copy(
             phase = PartyPhase.FINISHED,
             resultPoints = points,
@@ -318,6 +414,14 @@ class CrewRepository(
     /** 현재 파티 인원 (파티런이 아니면 1) */
     fun currentPartySize(): Int =
         if (_party.value.isActive) _party.value.partySize.coerceAtLeast(1) else 1
+
+    companion object {
+        /** 파티장에게서 이만큼 떨어지면 자동으로 파티에서 빠진다 */
+        const val MAX_PARTY_DISTANCE_M = 100
+
+        /** 초대 후보를 채우는 여분 러너들 */
+        private val EXTRA_RUNNERS = listOf("Riley P.", "Sena K.", "Théo M.", "Ines V.", "Milo J.")
+    }
 }
 
 /** Room 엔티티 → 도메인 모델 */

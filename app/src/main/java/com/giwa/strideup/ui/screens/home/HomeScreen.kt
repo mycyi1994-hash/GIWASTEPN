@@ -55,7 +55,7 @@ import com.giwa.strideup.ui.components.GlowCard
 import com.giwa.strideup.ui.components.LevelAvatar
 import com.giwa.strideup.ui.components.NeonRing
 import com.giwa.strideup.ui.components.RouteMap
-import com.giwa.strideup.ui.components.SneakerArt
+import com.giwa.strideup.ui.components.SneakerVisual
 import com.giwa.strideup.ui.components.StartRunButton
 import com.giwa.strideup.ui.components.TokenCard
 import com.giwa.strideup.ui.components.Wordmark
@@ -133,6 +133,7 @@ fun HomeScreen(
 
         GreetingRow(
             level = state.level,
+            avatarId = state.avatarId,
             balance = state.balance,
             onOpenWallet = onOpenWallet,
             onOpenProfile = onOpenProfile,
@@ -218,6 +219,7 @@ private fun TopBar(unread: Int, onOpenNotifications: () -> Unit, onOpenWallet: (
 @Composable
 private fun GreetingRow(
     level: Int,
+    avatarId: Int,
     balance: Double,
     onOpenWallet: () -> Unit,
     onOpenProfile: () -> Unit,
@@ -234,6 +236,7 @@ private fun GreetingRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         LevelAvatar(
+            avatarId = avatarId,
             level = level,
             size = 46.dp,
             modifier = Modifier.quietClickable(onOpenProfile),
@@ -555,11 +558,12 @@ private fun SneakerStrip(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             if (sneaker != null) {
-                SneakerArt(
+                SneakerVisual(
                     sneaker = sneaker,
                     modifier = Modifier
                         .weight(0.62f)
-                        .fillMaxHeight(),
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(12.dp)),
                 )
             } else {
                 Spacer(Modifier.weight(0.62f))

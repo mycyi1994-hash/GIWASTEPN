@@ -136,7 +136,13 @@ class WalkSessionService : Service() {
         stepJob?.cancel()
         timerJob?.cancel()
         scope.launch {
-            val reward = ServiceLocator.rewardRepository.settleSession(session.steps, session.partySize)
+            // 파티런이면 정산 시점의 실제 인원을 쓴다 — 러닝 중 거리 이탈로 빠진 인원 반영.
+            val settleSize = if (session.partySize > 1) {
+                ServiceLocator.crewRepository.currentPartySize()
+            } else {
+                session.partySize
+            }
+            val reward = ServiceLocator.rewardRepository.settleSession(session.steps, settleSize)
             ServiceLocator.database.walkSessionDao().insert(
                 WalkSessionEntity(
                     startedAt = session.startedAt,
@@ -152,7 +158,7 @@ class WalkSessionService : Service() {
                 lastRewardPoints = reward.points,
                 lastRewardedSteps = reward.rewardedSteps,
                 lastSessionSteps = session.steps,
-                lastPartySize = session.partySize,
+                lastPartySize = settleSize,
             )
             // 파티런이었다면 크루 로비를 결과 화면으로 전환한다.
             if (session.partySize > 1) {

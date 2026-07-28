@@ -466,4 +466,66 @@
     <string name="seed_crew2_body">He añadido un desvío en el tramo 3 por las obras del puente. Míralo antes de la próxima quedada.</string>
     <string name="seed_crew3_title">Salida del crew esta noche</string>
     <string name="seed_crew3_body">Salimos a las 8:00 en punto. ¡Alcanzarnos después cuesta!</string>
+
+    <!-- Party host -->
+    <string name="party_host_badge">LÍDER</string>
+    <string name="party_start">Empezar carrera en grupo</string>
+    <string name="party_invite_button">Invitar a miembros</string>
+    <string name="party_invite_title">Invitar al grupo</string>
+    <string name="party_invite_action">Invitar</string>
+    <string name="party_invite_empty">Ya están todos en el grupo.</string>
+    <string name="party_kick">Expulsar</string>
+    <string name="party_gps_rule">Quien se aleje más de %1$d m del líder sale del grupo automáticamente.</string>
+
+    <!-- Notification actions -->
+    <string name="notif_accept">Aceptar</string>
+    <string name="notif_decline">Rechazar</string>
+    <string name="notif_claim">Reclamar</string>
+    <string name="notif_done">Hecho</string>
+    <string name="notif_crew_invite">%1$s te ha invitado a su crew</string>
+    <string name="notif_party_invite">%1$s te ha invitado a una carrera en grupo</string>
+    <string name="notif_event_reward">Recompensa de evento: %1$s · %2$s SUP</string>
+    <string name="notif_party_member_left">%1$s se quedó atrás y salió del grupo</string>
+
+    <!-- Achievement grades -->
+    <string name="ach_total_progress">Progreso total</string>
+    <string name="ach_grade_bronze">BRONCE</string>
+    <string name="ach_grade_silver">PLATA</string>
+    <string name="ach_grade_gold">ORO</string>
+    <string name="ach_grade_platinum">PLATINO</string>
+    <string name="ach_grade_diamond">DIAMANTE</string>
+
+    <!-- Achievement categories -->
+    <string name="ach_cat_steps">Pasos</string>
+    <string name="ach_cat_distance">Distancia</string>
+    <string name="ach_cat_sessions">Carreras</string>
+    <string name="ach_cat_streak">Racha</string>
+    <string name="ach_cat_sup">Ganancias</string>
+    <string name="ach_cat_mint">Minteo</string>
+    <string name="ach_cat_collection">Colección</string>
+    <string name="ach_cat_upgrade">Mejoras</string>
+    <string name="ach_cat_party">Grupo</string>
+    <string name="ach_cat_event">Eventos</string>
+    <string name="ach_cat_crew">Crew</string>
+    <string name="ach_cat_post">Publicaciones</string>
+    <string name="ach_cat_level">Nivel</string>
+
+    <!-- Achievement goals -->
+    <string name="ach_goal_steps">Camina %1$s pasos en total</string>
+    <string name="ach_goal_distance">Recorre %1$s km en total</string>
+    <string name="ach_goal_sessions">Completa %1$s sesiones</string>
+    <string name="ach_goal_streak">Cumple tu objetivo %1$s días seguidos</string>
+    <string name="ach_goal_sup">Gana %1$s SUP en total</string>
+    <string name="ach_goal_mint">Mintea %1$s zapatillas</string>
+    <string name="ach_goal_collection">Consigue %1$s huecos del álbum</string>
+    <string name="ach_goal_upgrade">Mejora tus zapatillas %1$s veces</string>
+    <string name="ach_goal_party">Termina %1$s carreras en grupo</string>
+    <string name="ach_goal_event">Reclama %1$s recompensas de evento</string>
+    <string name="ach_goal_crew">Únete a %1$s crews</string>
+    <string name="ach_goal_post">Escribe %1$s publicaciones</string>
+    <string name="ach_goal_level">Sube una zapatilla al Nv.%1$s</string>
+
+    <!-- Profile identity -->
+    <string name="profile_edit_avatar">Cambiar avatar</string>
+    <string name="profile_uid">ID %1$s</string>
 </resources>

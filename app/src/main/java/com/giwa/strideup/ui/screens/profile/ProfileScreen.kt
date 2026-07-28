@@ -1,6 +1,7 @@
 package com.giwa.strideup.ui.screens.profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,13 +12,16 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.LocationOn
@@ -27,18 +31,23 @@ import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.SupportAgent
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.filled.Whatshot
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -51,6 +60,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.giwa.strideup.R
 import com.giwa.strideup.data.prefs.UserPrefs
 import com.giwa.strideup.domain.RewardEconomy
+import com.giwa.strideup.ui.components.AvatarEmojis
 import com.giwa.strideup.ui.components.BarMeter
 import com.giwa.strideup.ui.components.GlowCard
 import com.giwa.strideup.ui.components.HexEmblem
@@ -62,6 +72,9 @@ import com.giwa.strideup.ui.components.VerticalHairline
 import com.giwa.strideup.ui.components.Wordmark
 import com.giwa.strideup.ui.components.quietClickable
 import com.giwa.strideup.ui.screens.home.runnerTier
+import com.giwa.strideup.ui.theme.Carbon
+import com.giwa.strideup.ui.theme.CarbonHigh
+import com.giwa.strideup.ui.theme.Edge
 import com.giwa.strideup.ui.theme.Silver
 import com.giwa.strideup.ui.theme.Slate
 import com.giwa.strideup.ui.theme.Snow
@@ -80,6 +93,18 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    var showAvatarPicker by rememberSaveable { mutableStateOf(false) }
+
+    if (showAvatarPicker) {
+        AvatarPickerDialog(
+            selected = state.avatarId,
+            onPick = { id ->
+                viewModel.setAvatar(id)
+                showAvatarPicker = false
+            },
+            onDismiss = { showAvatarPicker = false },
+        )
+    }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -99,13 +124,20 @@ fun ProfileScreen(
             }
         }
 
-        item { ProfileHeader(state) }
+        item { ProfileHeader(state, onEditAvatar = { showAvatarPicker = true }) }
 
         item { StatsRow(state) }
 
         item { AchievementsCard(state, onOpenAchievements) }
 
-        item { SneakersCard(state.sneakerLevel, state.ownedSneakers, onOpenItems) }
+        item {
+            SneakersCard(
+                level = state.sneakerLevel,
+                owned = state.ownedSneakers,
+                equippedName = state.equippedName,
+                onOpenItems = onOpenItems,
+            )
+        }
 
         item { OverviewCard(state, onOpenAnalytics) }
 
@@ -144,7 +176,7 @@ fun ProfileScreen(
 
         item {
             GlowCard(contentPadding = PaddingValues(16.dp), spacing = 9.dp) {
-                AboutRow(label = stringResource(R.string.about_version), value = "StrideUp 1.3.0")
+                AboutRow(label = stringResource(R.string.about_version), value = "StrideUp 1.5.0")
                 AboutRow(
                     label = stringResource(R.string.about_network),
                     value = stringResource(R.string.about_network_value),
@@ -166,17 +198,40 @@ private fun AboutRow(label: String, value: String) {
 }
 
 @Composable
-private fun ProfileHeader(state: ProfileViewModel.UiState) {
+private fun ProfileHeader(
+    state: ProfileViewModel.UiState,
+    onEditAvatar: () -> Unit,
+) {
     GlowCard(accent = true, contentPadding = PaddingValues(20.dp), spacing = 14.dp) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(15.dp),
         ) {
-            LevelAvatar(
-                level = state.sneakerLevel,
-                size = 72.dp,
-                contentDescription = stringResource(R.string.cd_profile),
-            )
+            Box {
+                LevelAvatar(
+                    level = state.sneakerLevel,
+                    size = 72.dp,
+                    contentDescription = stringResource(R.string.cd_profile),
+                    avatarId = state.avatarId,
+                )
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .size(24.dp)
+                        .clip(CircleShape)
+                        .background(CarbonHigh)
+                        .border(1.dp, Volt.copy(alpha = 0.6f), CircleShape)
+                        .quietClickable(onEditAvatar),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        Icons.Filled.Edit,
+                        contentDescription = stringResource(R.string.profile_edit_avatar),
+                        tint = Volt,
+                        modifier = Modifier.size(12.dp),
+                    )
+                }
+            }
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -202,6 +257,22 @@ private fun ProfileHeader(state: ProfileViewModel.UiState) {
                         fontWeight = FontWeight.SemiBold,
                         color = Volt,
                     )
+                }
+                if (state.runnerUid.isNotBlank()) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(50))
+                            .background(CarbonHigh)
+                            .padding(horizontal = 8.dp, vertical = 3.dp),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.profile_uid, state.runnerUid),
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            letterSpacing = 0.8.sp,
+                            color = Slate,
+                        )
+                    }
                 }
             }
         }
@@ -382,7 +453,12 @@ private fun AchPreview(
 }
 
 @Composable
-private fun SneakersCard(level: Int, owned: Int, onOpenItems: () -> Unit) {
+private fun SneakersCard(
+    level: Int,
+    owned: Int,
+    equippedName: String,
+    onOpenItems: () -> Unit,
+) {
     GlowCard(
         modifier = Modifier.quietClickable(onOpenItems),
         contentPadding = PaddingValues(18.dp),
@@ -407,7 +483,11 @@ private fun SneakersCard(level: Int, owned: Int, onOpenItems: () -> Unit) {
                 )
             }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text("Apex Runner", style = MaterialTheme.typography.titleSmall, color = Snow)
+                Text(
+                    text = equippedName.ifBlank { stringResource(R.string.common_none) },
+                    style = MaterialTheme.typography.titleSmall,
+                    color = Snow,
+                )
                 Text(
                     text = stringResource(R.string.level_chip, level) + " · " + runnerTier(level),
                     fontSize = 11.sp,
@@ -422,6 +502,63 @@ private fun SneakersCard(level: Int, owned: Int, onOpenItems: () -> Unit) {
             )
         }
     }
+}
+
+/** 아바타 선택 — 이모지 4×4 그리드 */
+@Composable
+private fun AvatarPickerDialog(
+    selected: Int,
+    onPick: (Int) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Carbon,
+        titleContentColor = Snow,
+        textContentColor = Silver,
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(
+                    text = stringResource(R.string.common_close),
+                    color = Volt,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        },
+        title = {
+            Text(
+                text = stringResource(R.string.profile_edit_avatar),
+                fontWeight = FontWeight.Black,
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                AvatarEmojis.chunked(4).forEachIndexed { rowIndex, row ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        row.forEachIndexed { colIndex, emoji ->
+                            val id = rowIndex * 4 + colIndex
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .aspectRatio(1f)
+                                    .clip(CircleShape)
+                                    .background(CarbonHigh)
+                                    .border(
+                                        width = if (selected == id) 2.dp else 1.dp,
+                                        color = if (selected == id) Volt else Edge,
+                                        shape = CircleShape,
+                                    )
+                                    .quietClickable { onPick(id) },
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Text(text = emoji, fontSize = 24.sp)
+                            }
+                        }
+                    }
+                }
+            }
+        },
+    )
 }
 
 @Composable

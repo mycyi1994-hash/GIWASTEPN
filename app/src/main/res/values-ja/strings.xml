@@ -467,4 +467,66 @@
     <string name="seed_crew2_body">橋の工事のため3区間に迂回路を追加しました。次の定例前に確認してください。</string>
     <string name="seed_crew3_title">今夜のクルー定例ラン</string>
     <string name="seed_crew3_body">8時ちょうどに出発。遅れると追いつくのが大変です！</string>
+
+    <!-- Party host -->
+    <string name="party_host_badge">ホスト</string>
+    <string name="party_start">パーティランを開始</string>
+    <string name="party_invite_button">クルーを招待する</string>
+    <string name="party_invite_title">パーティに招待</string>
+    <string name="party_invite_action">招待</string>
+    <string name="party_invite_empty">すでに全員がパーティにいます。</string>
+    <string name="party_kick">外す</string>
+    <string name="party_gps_rule">ホストから %1$dm 以上離れると自動的にパーティから外れます。</string>
+
+    <!-- Notification actions -->
+    <string name="notif_accept">承認</string>
+    <string name="notif_decline">辞退</string>
+    <string name="notif_claim">受け取る</string>
+    <string name="notif_done">処理済み</string>
+    <string name="notif_crew_invite">%1$s からクルーへの招待が届きました</string>
+    <string name="notif_party_invite">%1$s からパーティランに招待されました</string>
+    <string name="notif_event_reward">イベント報酬が届きました: %1$s · %2$s SUP</string>
+    <string name="notif_party_member_left">%1$s さんが離れすぎたためパーティから外れました</string>
+
+    <!-- Achievement grades -->
+    <string name="ach_total_progress">全体の進行度</string>
+    <string name="ach_grade_bronze">ブロンズ</string>
+    <string name="ach_grade_silver">シルバー</string>
+    <string name="ach_grade_gold">ゴールド</string>
+    <string name="ach_grade_platinum">プラチナ</string>
+    <string name="ach_grade_diamond">ダイヤ</string>
+
+    <!-- Achievement categories -->
+    <string name="ach_cat_steps">歩数</string>
+    <string name="ach_cat_distance">距離</string>
+    <string name="ach_cat_sessions">ラン</string>
+    <string name="ach_cat_streak">ストリーク</string>
+    <string name="ach_cat_sup">獲得</string>
+    <string name="ach_cat_mint">ミント</string>
+    <string name="ach_cat_collection">コレクター</string>
+    <string name="ach_cat_upgrade">強化</string>
+    <string name="ach_cat_party">パーティ</string>
+    <string name="ach_cat_event">イベント</string>
+    <string name="ach_cat_crew">クルー</string>
+    <string name="ach_cat_post">投稿</string>
+    <string name="ach_cat_level">レベル</string>
+
+    <!-- Achievement goals -->
+    <string name="ach_goal_steps">累計 %1$s 歩あるく</string>
+    <string name="ach_goal_distance">累計 %1$s km 走る</string>
+    <string name="ach_goal_sessions">ランを %1$s 回完了</string>
+    <string name="ach_goal_streak">目標を %1$s 日連続で達成</string>
+    <string name="ach_goal_sup">累計 %1$s SUP を獲得</string>
+    <string name="ach_goal_mint">スニーカーを %1$s 回ミント</string>
+    <string name="ach_goal_collection">図鑑を %1$s 枠あつめる</string>
+    <string name="ach_goal_upgrade">強化を %1$s 回おこなう</string>
+    <string name="ach_goal_party">パーティランを %1$s 回完走</string>
+    <string name="ach_goal_event">イベント報酬を %1$s 回受け取る</string>
+    <string name="ach_goal_crew">クルーに %1$s 件参加</string>
+    <string name="ach_goal_post">コミュニティに %1$s 件投稿</string>
+    <string name="ach_goal_level">スニーカーを Lv.%1$s まで育てる</string>
+
+    <!-- Profile identity -->
+    <string name="profile_edit_avatar">アバターを変更</string>
+    <string name="profile_uid">ID %1$s</string>
 </resources>

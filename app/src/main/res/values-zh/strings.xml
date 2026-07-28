@@ -466,4 +466,66 @@
     <string name="seed_crew2_body">因为桥梁施工，第 3 段加了绕行路线。下次聚跑前看一下。</string>
     <string name="seed_crew3_title">今晚跑团例跑</string>
     <string name="seed_crew3_body">8 点整出发，迟到很难追上！</string>
+
+    <!-- Party host -->
+    <string name="party_host_badge">队长</string>
+    <string name="party_start">开始组队跑</string>
+    <string name="party_invite_button">邀请跑团成员</string>
+    <string name="party_invite_title">邀请加入队伍</string>
+    <string name="party_invite_action">邀请</string>
+    <string name="party_invite_empty">所有成员都已经在队伍里了。</string>
+    <string name="party_kick">移出</string>
+    <string name="party_gps_rule">离队长超过 %1$d 米会被自动移出队伍。</string>
+
+    <!-- Notification actions -->
+    <string name="notif_accept">接受</string>
+    <string name="notif_decline">拒绝</string>
+    <string name="notif_claim">领取</string>
+    <string name="notif_done">已处理</string>
+    <string name="notif_crew_invite">%1$s 邀请你加入跑团</string>
+    <string name="notif_party_invite">%1$s 邀请你参加组队跑</string>
+    <string name="notif_event_reward">活动奖励已到账：%1$s · %2$s SUP</string>
+    <string name="notif_party_member_left">%1$s 掉队太远，已离开队伍</string>
+
+    <!-- Achievement grades -->
+    <string name="ach_total_progress">总进度</string>
+    <string name="ach_grade_bronze">青铜</string>
+    <string name="ach_grade_silver">白银</string>
+    <string name="ach_grade_gold">黄金</string>
+    <string name="ach_grade_platinum">铂金</string>
+    <string name="ach_grade_diamond">钻石</string>
+
+    <!-- Achievement categories -->
+    <string name="ach_cat_steps">步数</string>
+    <string name="ach_cat_distance">距离</string>
+    <string name="ach_cat_sessions">跑步</string>
+    <string name="ach_cat_streak">连续达成</string>
+    <string name="ach_cat_sup">赚取</string>
+    <string name="ach_cat_mint">铸造</string>
+    <string name="ach_cat_collection">收藏</string>
+    <string name="ach_cat_upgrade">强化</string>
+    <string name="ach_cat_party">组队跑</string>
+    <string name="ach_cat_event">活动</string>
+    <string name="ach_cat_crew">跑团</string>
+    <string name="ach_cat_post">发帖</string>
+    <string name="ach_cat_level">等级</string>
+
+    <!-- Achievement goals -->
+    <string name="ach_goal_steps">累计走 %1$s 步</string>
+    <string name="ach_goal_distance">累计跑 %1$s 公里</string>
+    <string name="ach_goal_sessions">完成 %1$s 次跑步</string>
+    <string name="ach_goal_streak">连续 %1$s 天达成目标</string>
+    <string name="ach_goal_sup">累计赚取 %1$s SUP</string>
+    <string name="ach_goal_mint">铸造 %1$s 双球鞋</string>
+    <string name="ach_goal_collection">收集图鉴 %1$s 格</string>
+    <string name="ach_goal_upgrade">强化 %1$s 次</string>
+    <string name="ach_goal_party">完成 %1$s 次组队跑</string>
+    <string name="ach_goal_event">领取 %1$s 次活动奖励</string>
+    <string name="ach_goal_crew">加入 %1$s 个跑团</string>
+    <string name="ach_goal_post">发布 %1$s 条帖子</string>
+    <string name="ach_goal_level">把球鞋升到 Lv.%1$s</string>
+
+    <!-- Profile identity -->
+    <string name="profile_edit_avatar">更换头像</string>
+    <string name="profile_uid">ID %1$s</string>
 </resources>

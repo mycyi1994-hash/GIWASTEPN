@@ -76,6 +76,6 @@ object ServiceLocator {
         )
         communityRepository = CommunityRepository(database.postDao(), app)
         eventRepository = EventRepository(database.claimedEventDao(), rewardRepository)
-        notificationRepository = NotificationRepository(database.notificationDao())
+        notificationRepository = NotificationRepository(database.notificationDao(), rewardRepository)
     }
 }

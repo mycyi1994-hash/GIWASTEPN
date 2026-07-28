@@ -65,14 +65,21 @@ class RewardRepository(
         return true
     }
 
-    suspend fun notify(type: String, argText: String = "", argAmount: Double = 0.0) {
+    suspend fun notify(
+        type: String,
+        argText: String = "",
+        argAmount: Double = 0.0,
+        argExtra: String = "",
+    ) {
         notificationDao.insert(
             NotificationEntity(
                 timestamp = System.currentTimeMillis(),
                 type = type,
                 argText = argText,
                 argAmount = argAmount,
+                argExtra = argExtra,
                 read = false,
+                actioned = false,
             )
         )
     }

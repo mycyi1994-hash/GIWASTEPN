@@ -19,7 +19,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.GroupAdd
+import androidx.compose.material.icons.filled.PersonOff
+import androidx.compose.material.icons.filled.Redeem
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.MilitaryTech
 import androidx.compose.material.icons.filled.Notifications
@@ -50,11 +54,13 @@ import com.giwa.strideup.R
 import com.giwa.strideup.core.ServiceLocator
 import com.giwa.strideup.data.local.NotificationEntity
 import com.giwa.strideup.data.local.NotificationType
+import com.giwa.strideup.data.repo.CrewRepository
 import com.giwa.strideup.data.repo.NotificationRepository
 import com.giwa.strideup.ui.components.DarkIconButton
 import com.giwa.strideup.ui.components.GhostButton
 import com.giwa.strideup.ui.components.GlowCard
 import com.giwa.strideup.ui.components.IconSquare
+import com.giwa.strideup.ui.components.VoltButton
 import com.giwa.strideup.ui.theme.Silver
 import com.giwa.strideup.ui.theme.Slate
 import com.giwa.strideup.ui.theme.Snow
@@ -65,7 +71,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /** 알림함 — 본문은 저장된 type + 인자를 표시 시점에 현지화한다. */
-class NotificationsViewModel(private val repo: NotificationRepository) : ViewModel() {
+class NotificationsViewModel(
+    private val repo: NotificationRepository,
+    private val crewRepository: CrewRepository,
+) : ViewModel() {
 
     val items: StateFlow<List<NotificationEntity>> = repo.notifications()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
@@ -74,10 +83,37 @@ class NotificationsViewModel(private val repo: NotificationRepository) : ViewMod
         viewModelScope.launch { repo.markAllRead() }
     }
 
+    /** "모두 읽음" — 알림함 전체 비우기 */
+    fun clearAll() {
+        viewModelScope.launch { repo.clearAll() }
+    }
+
+    fun acceptCrewInvite(entity: NotificationEntity) {
+        viewModelScope.launch { repo.acceptCrewInvite(entity, crewRepository) }
+    }
+
+    fun decline(entity: NotificationEntity) {
+        viewModelScope.launch { repo.decline(entity) }
+    }
+
+    fun acceptPartyInvite(entity: NotificationEntity, onOpenLobby: (String) -> Unit) {
+        viewModelScope.launch {
+            repo.acceptPartyInvite(entity)
+            if (entity.argExtra.isNotBlank()) onOpenLobby(entity.argExtra)
+        }
+    }
+
+    fun claimEventReward(entity: NotificationEntity) {
+        viewModelScope.launch { repo.claimEventReward(entity) }
+    }
+
     companion object {
         val Factory = viewModelFactory {
             initializer {
-                NotificationsViewModel(ServiceLocator.notificationRepository)
+                NotificationsViewModel(
+                    ServiceLocator.notificationRepository,
+                    ServiceLocator.crewRepository,
+                )
             }
         }
     }
@@ -86,6 +122,7 @@ class NotificationsViewModel(private val repo: NotificationRepository) : ViewMod
 @Composable
 fun NotificationsScreen(
     onBack: () -> Unit = {},
+    onOpenLobby: (String) -> Unit = {},
     viewModel: NotificationsViewModel = viewModel(factory = NotificationsViewModel.Factory),
 ) {
     val notifications by viewModel.items.collectAsStateWithLifecycle()
@@ -123,7 +160,7 @@ fun NotificationsScreen(
                 if (notifications.isNotEmpty()) {
                     GhostButton(
                         text = stringResource(R.string.notif_mark_read),
-                        onClick = viewModel::markAllRead,
+                        onClick = viewModel::clearAll,
                     )
                 }
             }
@@ -156,17 +193,37 @@ fun NotificationsScreen(
             }
         } else {
             items(notifications, key = { it.id }) { entity ->
-                NotificationRow(entity = entity, now = now)
+                NotificationRow(
+                    entity = entity,
+                    now = now,
+                    onAcceptCrew = { viewModel.acceptCrewInvite(entity) },
+                    onDecline = { viewModel.decline(entity) },
+                    onAcceptParty = { viewModel.acceptPartyInvite(entity, onOpenLobby) },
+                    onClaim = { viewModel.claimEventReward(entity) },
+                )
             }
         }
     }
 }
 
 @Composable
-private fun NotificationRow(entity: NotificationEntity, now: Long) {
+private fun NotificationRow(
+    entity: NotificationEntity,
+    now: Long,
+    onAcceptCrew: () -> Unit,
+    onDecline: () -> Unit,
+    onAcceptParty: () -> Unit,
+    onClaim: () -> Unit,
+) {
+    val actionable = entity.type in listOf(
+        NotificationType.CREW_INVITE,
+        NotificationType.PARTY_INVITE,
+        NotificationType.EVENT_REWARD,
+    )
     GlowCard(
         contentPadding = PaddingValues(horizontal = 15.dp, vertical = 13.dp),
         shape = RoundedCornerShape(18.dp),
+        accent = actionable && !entity.actioned,
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -197,6 +254,60 @@ private fun NotificationRow(entity: NotificationEntity, now: Long) {
                 )
             }
         }
+
+        if (actionable) {
+            if (entity.actioned) {
+                Text(
+                    text = stringResource(R.string.notif_done),
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Slate,
+                )
+            } else {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(9.dp),
+                ) {
+                    when (entity.type) {
+                        NotificationType.CREW_INVITE -> {
+                            VoltButton(
+                                text = stringResource(R.string.notif_accept),
+                                onClick = onAcceptCrew,
+                                modifier = Modifier.weight(1f),
+                            )
+                            GhostButton(
+                                text = stringResource(R.string.notif_decline),
+                                onClick = onDecline,
+                                accent = Silver,
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
+
+                        NotificationType.PARTY_INVITE -> {
+                            VoltButton(
+                                text = stringResource(R.string.notif_accept),
+                                onClick = onAcceptParty,
+                                modifier = Modifier.weight(1f),
+                            )
+                            GhostButton(
+                                text = stringResource(R.string.notif_decline),
+                                onClick = onDecline,
+                                accent = Silver,
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
+
+                        else -> {
+                            VoltButton(
+                                text = stringResource(R.string.notif_claim),
+                                onClick = onClaim,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -209,6 +320,10 @@ private fun iconFor(type: String): ImageVector = when (type) {
     NotificationType.CREW_JOINED -> Icons.Filled.Shield
     NotificationType.PARTY_FINISHED -> Icons.Filled.MilitaryTech
     NotificationType.EVENT_CLAIMED -> Icons.Filled.CheckCircle
+    NotificationType.PARTY_MEMBER_LEFT -> Icons.Filled.PersonOff
+    NotificationType.CREW_INVITE -> Icons.Filled.GroupAdd
+    NotificationType.PARTY_INVITE -> Icons.Filled.Bolt
+    NotificationType.EVENT_REWARD -> Icons.Filled.Redeem
     else -> Icons.Filled.Notifications
 }
 
@@ -240,6 +355,18 @@ private fun messageFor(entity: NotificationEntity): String {
 
         NotificationType.EVENT_CLAIMED ->
             stringResource(R.string.notif_event_claimed, entity.argText, amount)
+
+        NotificationType.PARTY_MEMBER_LEFT ->
+            stringResource(R.string.notif_party_member_left, entity.argText)
+
+        NotificationType.CREW_INVITE ->
+            stringResource(R.string.notif_crew_invite, entity.argText)
+
+        NotificationType.PARTY_INVITE ->
+            stringResource(R.string.notif_party_invite, entity.argText)
+
+        NotificationType.EVENT_REWARD ->
+            stringResource(R.string.notif_event_reward, entity.argText, amount)
 
         else -> stringResource(R.string.notif_title)
     }

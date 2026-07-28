@@ -20,6 +20,7 @@ class ProfileViewModel(
     private val stepRepository: StepRepository,
     rewardRepository: RewardRepository,
     sneakerRepository: SneakerRepository,
+    private val prefs: UserPrefs,
 ) : ViewModel() {
 
     data class UiState(
@@ -30,6 +31,9 @@ class ProfileViewModel(
         val lifetimeSteps: Long = 0,
         val monthSteps: Long = 0,
         val ownedSneakers: Int = 0,
+        val runnerUid: String = "",
+        val avatarId: Int = 0,
+        val equippedName: String = "",
     ) {
         val multiplier: Double get() = RewardEconomy.sneakerMultiplier(sneakerLevel)
         val upgradeCost: Double get() = RewardEconomy.upgradeCost(sneakerLevel)
@@ -50,20 +54,32 @@ class ProfileViewModel(
             stepRepository.observeMonthSteps(),
         ) { streak, lifetime, month -> Triple(streak, lifetime, month) },
         sneakerRepository.ownedCount,
-    ) { (goal, level, balance), (streak, lifetime, month), owned ->
+        combine(
+            prefs.runnerUid,
+            prefs.avatarId,
+            sneakerRepository.equipped,
+        ) { uid, avatar, equipped -> Triple(uid, avatar, equipped) },
+    ) { (goal, level, balance), (streak, lifetime, month), owned, (uid, avatar, equipped) ->
         UiState(
             goal = goal,
-            sneakerLevel = level,
+            sneakerLevel = equipped?.level ?: level,
             balance = balance,
             streak = streak,
             lifetimeSteps = lifetime,
             monthSteps = month,
             ownedSneakers = owned,
+            runnerUid = uid,
+            avatarId = avatar,
+            equippedName = equipped?.let { "${it.faction.displayName} ${it.variantName}" }.orEmpty(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState())
 
     fun setGoal(goal: Int) {
         viewModelScope.launch { stepRepository.setDailyGoal(goal) }
+    }
+
+    fun setAvatar(id: Int) {
+        viewModelScope.launch { prefs.setAvatarId(id) }
     }
 
     companion object {
@@ -73,6 +89,7 @@ class ProfileViewModel(
                     ServiceLocator.stepRepository,
                     ServiceLocator.rewardRepository,
                     ServiceLocator.sneakerRepository,
+                    ServiceLocator.userPrefs,
                 )
             }
         }

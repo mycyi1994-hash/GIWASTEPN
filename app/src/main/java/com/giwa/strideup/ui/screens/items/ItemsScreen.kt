@@ -14,10 +14,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -27,6 +29,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,6 +47,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.giwa.strideup.R
 import com.giwa.strideup.domain.BoostType
 import com.giwa.strideup.domain.Faction
+import com.giwa.strideup.domain.Rarity
 import com.giwa.strideup.domain.RewardEconomy
 import com.giwa.strideup.domain.VARIANTS_PER_FACTION
 import com.giwa.strideup.ui.components.BarMeter
@@ -51,14 +57,16 @@ import com.giwa.strideup.ui.components.GhostButton
 import com.giwa.strideup.ui.components.GlowCard
 import com.giwa.strideup.ui.components.HexEmblem
 import com.giwa.strideup.ui.components.IconSquare
+import com.giwa.strideup.ui.components.PillChip
 import com.giwa.strideup.ui.components.RarityChip
 import com.giwa.strideup.ui.components.SectionHeader
 import com.giwa.strideup.ui.components.SneakerCollectionCard
-import com.giwa.strideup.ui.components.SneakerHero
+import com.giwa.strideup.ui.components.SneakerVisual
 import com.giwa.strideup.ui.components.TokenCard
 import com.giwa.strideup.ui.components.VoltButton
 import com.giwa.strideup.ui.components.Wordmark
 import com.giwa.strideup.ui.components.label
+import com.giwa.strideup.ui.components.quietClickable
 import com.giwa.strideup.ui.components.tint
 import com.giwa.strideup.ui.theme.Carbon
 import com.giwa.strideup.ui.theme.CarbonHigh
@@ -74,6 +82,10 @@ fun ItemsScreen(
 ) {
     val context = LocalContext.current
     val inventory by viewModel.inventory.collectAsStateWithLifecycle()
+    val groups by viewModel.groups.collectAsStateWithLifecycle()
+    var rarityFilter by rememberSaveable { mutableStateOf<String?>(null) }
+    var factionFilter by rememberSaveable { mutableStateOf<String?>(null) }
+    var copiesFor by rememberSaveable { mutableStateOf<String?>(null) }
     val equipped by viewModel.equipped.collectAsStateWithLifecycle()
     val balance by viewModel.balance.collectAsStateWithLifecycle()
     val boosts by viewModel.activeBoosts.collectAsStateWithLifecycle()
@@ -266,20 +278,75 @@ fun ItemsScreen(
             }
         }
 
-        items(inventory.chunked(2).size) { rowIndex ->
-            val row = inventory.chunked(2)[rowIndex]
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                row.forEach { sneaker ->
-                    SneakerCollectionCard(
-                        sneaker = sneaker,
-                        modifier = Modifier.weight(1f),
-                        onClick = { onOpenSneaker(sneaker.id) },
+        // ── 필터: 등급 · 속성 ───────────────────────────────
+        item {
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                item {
+                    PillChip(
+                        text = stringResource(R.string.post_cat_all),
+                        selected = rarityFilter == null && factionFilter == null,
+                        onClick = {
+                            rarityFilter = null
+                            factionFilter = null
+                        },
                     )
                 }
-                if (row.size == 1) Spacer(Modifier.weight(1f))
+                items(Rarity.entries.size) { i ->
+                    val r = Rarity.entries[i]
+                    PillChip(
+                        text = r.label(),
+                        selected = rarityFilter == r.id,
+                        onClick = { rarityFilter = if (rarityFilter == r.id) null else r.id },
+                    )
+                }
+                items(Faction.entries.size) { i ->
+                    val f = Faction.entries[i]
+                    PillChip(
+                        text = f.label(),
+                        selected = factionFilter == f.id,
+                        onClick = { factionFilter = if (factionFilter == f.id) null else f.id },
+                    )
+                }
+            }
+        }
+
+        item {
+            val filtered = groups.filter { g ->
+                (rarityFilter == null || g.representative.rarity.id == rarityFilter) &&
+                    (factionFilter == null || g.representative.faction.id == factionFilter)
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                if (filtered.isEmpty()) {
+                    GlowCard(contentPadding = PaddingValues(24.dp)) {
+                        Text(
+                            text = stringResource(R.string.common_none),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Silver,
+                        )
+                    }
+                }
+                filtered.chunked(2).forEach { row ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        row.forEach { group ->
+                            SneakerCollectionCard(
+                                sneaker = group.representative,
+                                count = group.count,
+                                modifier = Modifier.weight(1f),
+                                onClick = {
+                                    if (group.count == 1) {
+                                        onOpenSneaker(group.representative.id)
+                                    } else {
+                                        copiesFor = group.representative.slotKey
+                                    }
+                                },
+                            )
+                        }
+                        if (row.size == 1) Spacer(Modifier.weight(1f))
+                    }
+                }
             }
         }
 
@@ -335,6 +402,28 @@ fun ItemsScreen(
         }
     }
 
+    // ── 사본 목록 ───────────────────────────────────────────
+    copiesFor?.let { slot ->
+        val copies = inventory.filter { it.slotKey == slot }
+            .sortedWith(
+                compareByDescending<com.giwa.strideup.domain.Sneaker> { it.equipped }
+                    .thenByDescending { it.level }
+                    .thenBy { it.mintNumber },
+            )
+        if (copies.isEmpty()) {
+            copiesFor = null
+        } else {
+            CopiesDialog(
+                copies = copies,
+                onOpen = { id ->
+                    copiesFor = null
+                    onOpenSneaker(id)
+                },
+                onDismiss = { copiesFor = null },
+            )
+        }
+    }
+
     // ── 민팅 결과 ───────────────────────────────────────────
     minted?.let { sneaker ->
         AlertDialog(
@@ -363,11 +452,13 @@ fun ItemsScreen(
                         FactionChip(sneaker.faction)
                         RarityChip(sneaker.rarity)
                     }
-                    SneakerHero(
+                    SneakerVisual(
                         sneaker = sneaker,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(120.dp),
+                            .height(150.dp)
+                            .clip(RoundedCornerShape(16.dp)),
+                        animate = true,
                     )
                     Text(
                         text = "${sneaker.faction.label()} ${sneaker.variantName}",
@@ -422,6 +513,93 @@ private fun FactionProgressCell(
             color = c,
         )
     }
+}
+
+/** 같은 도감 슬롯의 사본 목록 — 민팅 번호·레벨·부스트로 구분한다 */
+@Composable
+private fun CopiesDialog(
+    copies: List<com.giwa.strideup.domain.Sneaker>,
+    onOpen: (Long) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val first = copies.firstOrNull() ?: return
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Carbon,
+        titleContentColor = Snow,
+        textContentColor = Silver,
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(
+                    text = stringResource(R.string.common_close),
+                    color = Volt,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        },
+        title = {
+            Text(
+                text = "${first.faction.label()} ${first.variantName} ×${copies.size}",
+                fontWeight = FontWeight.Black,
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                copies.forEach { copy ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(CarbonHigh)
+                            .quietClickable { onOpen(copy.id) }
+                            .padding(horizontal = 12.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(11.dp),
+                    ) {
+                        SneakerVisual(
+                            sneaker = copy,
+                            modifier = Modifier
+                                .size(52.dp)
+                                .clip(RoundedCornerShape(10.dp)),
+                        )
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.level_chip, copy.level),
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Volt,
+                                )
+                                if (copy.equipped) {
+                                    Text(
+                                        text = stringResource(R.string.items_equipped),
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.Black,
+                                        color = Volt,
+                                    )
+                                }
+                            }
+                            Text(
+                                text = stringResource(R.string.sneaker_mint_no, copy.mintNumber) +
+                                    "  ·  +%.1f%%".format(copy.boostPercent),
+                                fontSize = 11.sp,
+                                color = Silver,
+                            )
+                        }
+                        Icon(
+                            Icons.Filled.ChevronRight,
+                            contentDescription = null,
+                            tint = Slate,
+                            modifier = Modifier.size(16.dp),
+                        )
+                    }
+                }
+            }
+        },
+    )
 }
 
 @Composable

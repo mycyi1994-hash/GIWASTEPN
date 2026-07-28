@@ -23,6 +23,7 @@ class HomeViewModel(
     rewardRepository: RewardRepository,
     sneakerRepository: SneakerRepository,
     notificationRepository: NotificationRepository,
+    prefs: UserPrefs,
 ) : ViewModel() {
 
     data class UiState(
@@ -36,6 +37,7 @@ class HomeViewModel(
         val week: List<DailyStepsEntity> = emptyList(),
         val sensorAvailable: Boolean = true,
         val equipped: Sneaker? = null,
+        val avatarId: Int = 0,
     ) {
         val energyPercent: Int
             get() = if (maxEnergy > 0) ((energy / maxEnergy) * 100).toInt().coerceIn(0, 100) else 0
@@ -61,7 +63,8 @@ class HomeViewModel(
         ) { balance, streak, level -> Triple(balance, streak, level) },
         stepRepository.observeWeek(),
         sneakerRepository.equipped,
-    ) { (steps, goal, energy), (balance, streak, level), week, equipped ->
+        prefs.avatarId,
+    ) { (steps, goal, energy), (balance, streak, level), week, equipped, avatarId ->
         UiState(
             todaySteps = steps,
             goal = goal,
@@ -73,6 +76,7 @@ class HomeViewModel(
             week = week,
             sensorAvailable = stepRepository.stepSensorAvailable,
             equipped = equipped,
+            avatarId = avatarId,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState())
 
@@ -87,6 +91,7 @@ class HomeViewModel(
                     ServiceLocator.rewardRepository,
                     ServiceLocator.sneakerRepository,
                     ServiceLocator.notificationRepository,
+                    ServiceLocator.userPrefs,
                 )
             }
         }

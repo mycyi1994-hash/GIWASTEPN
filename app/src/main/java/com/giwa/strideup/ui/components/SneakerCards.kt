@@ -118,6 +118,7 @@ fun RarityChip(rarity: Rarity, modifier: Modifier = Modifier, small: Boolean = f
 fun SneakerCollectionCard(
     sneaker: Sneaker,
     modifier: Modifier = Modifier,
+    count: Int = 1,
     onClick: () -> Unit = {},
 ) {
     val rc = sneaker.rarity.tint()
@@ -159,12 +160,33 @@ fun SneakerCollectionCard(
             }
         }
 
-        SneakerArt(
-            sneaker = sneaker,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(72.dp),
-        )
+        Box(modifier = Modifier.fillMaxWidth()) {
+            SneakerVisual(
+                sneaker = sneaker,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(96.dp)
+                    .clip(RoundedCornerShape(14.dp)),
+            )
+            if (count > 1) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(5.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(Night.copy(alpha = 0.82f))
+                        .border(1.dp, Volt.copy(alpha = 0.6f), RoundedCornerShape(50))
+                        .padding(horizontal = 8.dp, vertical = 2.dp),
+                ) {
+                    Text(
+                        text = "×$count",
+                        color = Volt,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Black,
+                    )
+                }
+            }
+        }
 
         Text(
             text = sneaker.variantName,
@@ -313,11 +335,13 @@ fun EquippedSneakerCard(
             }
         }
 
-        SneakerHero(
+        SneakerVisual(
             sneaker = sneaker,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(132.dp),
+                .height(150.dp)
+                .clip(RoundedCornerShape(16.dp)),
+            animate = true,
         )
 
         Row(

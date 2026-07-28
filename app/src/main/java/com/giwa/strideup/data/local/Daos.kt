@@ -57,6 +57,12 @@ interface RewardDao {
 
     @Query("SELECT * FROM rewards ORDER BY timestamp DESC, id DESC LIMIT :limit")
     fun observeLedger(limit: Int): Flow<List<RewardEntity>>
+
+    @Query("SELECT COUNT(*) FROM rewards WHERE type = :type")
+    fun observeCountByType(type: String): Flow<Int>
+
+    @Query("SELECT COALESCE(SUM(amount), 0.0) FROM rewards WHERE amount > 0")
+    fun observeEarnedTotal(): Flow<Double>
 }
 
 @Dao
@@ -196,6 +202,9 @@ interface PostDao {
 
     @Query("SELECT COUNT(*) FROM posts")
     suspend fun count(): Int
+
+    @Query("SELECT COUNT(*) FROM posts WHERE mine = 1")
+    fun observeMineCount(): Flow<Int>
 }
 
 @Dao
@@ -212,6 +221,15 @@ interface NotificationDao {
 
     @Query("UPDATE notifications SET read = 1")
     suspend fun markAllRead()
+
+    @Query("UPDATE notifications SET actioned = 1, read = 1 WHERE id = :id")
+    suspend fun markActioned(id: Long)
+
+    @Query("DELETE FROM notifications WHERE id = :id")
+    suspend fun delete(id: Long)
+
+    @Query("SELECT COUNT(*) FROM notifications")
+    suspend fun count(): Int
 
     @Query("DELETE FROM notifications")
     suspend fun clear()

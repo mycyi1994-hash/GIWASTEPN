@@ -130,7 +130,11 @@ data class PostEntity(
     val joined: Boolean,
 )
 
-/** 앱 내 알림. 본문은 type + 인자로 표시 시점에 현지화한다. */
+/**
+ * 앱 내 알림. 본문은 type + 인자로 표시 시점에 현지화한다.
+ * 액션형 알림(초대 수락, 보상 받기)은 argExtra에 대상 ID를 담고
+ * actioned로 처리 여부를 기록한다.
+ */
 @Entity(tableName = "notifications")
 data class NotificationEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
@@ -138,7 +142,11 @@ data class NotificationEntity(
     val type: String,
     val argText: String,
     val argAmount: Double,
+    /** 액션 대상 — 크루 ID, 이벤트 ID 등 */
+    val argExtra: String,
     val read: Boolean,
+    /** 액션형 알림을 처리(수락/수령)했는지 */
+    val actioned: Boolean,
 )
 
 object NotificationType {
@@ -150,4 +158,15 @@ object NotificationType {
     const val CREW_JOINED = "CREW_JOINED"
     const val PARTY_FINISHED = "PARTY_FINISHED"
     const val EVENT_CLAIMED = "EVENT_CLAIMED"
+    const val PARTY_MEMBER_LEFT = "PARTY_MEMBER_LEFT"
+
+    // ── 액션형 ──
+    /** 크루 초대 — 수락하면 해당 크루에 가입 (argExtra = crewId) */
+    const val CREW_INVITE = "CREW_INVITE"
+
+    /** 파티런 초대 — 수락하면 로비로 이동 (argExtra = crewId) */
+    const val PARTY_INVITE = "PARTY_INVITE"
+
+    /** 이벤트 보상 — 받기를 누르면 SUP 적립 (argAmount = 금액) */
+    const val EVENT_REWARD = "EVENT_REWARD"
 }

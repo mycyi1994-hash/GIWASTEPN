@@ -20,6 +20,16 @@ class PartyLobbyViewModel(private val crewRepository: CrewRepository) : ViewMode
 
     fun dismissResult() = crewRepository.dismissResult()
 
+    // ── 파티장 권한 ──
+
+    fun startParty() = crewRepository.startParty()
+
+    fun kick(memberId: String) = crewRepository.kick(memberId)
+
+    fun invite(name: String) = crewRepository.invite(name)
+
+    fun inviteCandidates(): List<String> = crewRepository.inviteCandidates()
+
     companion object {
         val Factory = viewModelFactory {
             initializer { PartyLobbyViewModel(ServiceLocator.crewRepository) }

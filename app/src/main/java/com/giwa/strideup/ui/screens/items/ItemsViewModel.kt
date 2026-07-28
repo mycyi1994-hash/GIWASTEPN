@@ -16,6 +16,7 @@ import com.giwa.strideup.domain.Sneaker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -29,6 +30,14 @@ sealed interface ItemsMessage {
     data class Equipped(val name: String) : ItemsMessage
 }
 
+/** 같은 (속성 × 등급 × 변형) 사본 묶음 — 그리드에 ×N 으로 표시한다 */
+data class SneakerGroup(
+    val representative: Sneaker,
+    val copies: List<Sneaker>,
+) {
+    val count: Int get() = copies.size
+}
+
 class ItemsViewModel(
     private val sneakerRepository: SneakerRepository,
     private val boostRepository: BoostRepository,
@@ -36,6 +45,33 @@ class ItemsViewModel(
 ) : ViewModel() {
 
     val inventory: StateFlow<List<Sneaker>> = sneakerRepository.inventory
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    /**
+     * 도감 슬롯별 그룹. 대표는 착용 중인 사본, 없으면 최고 레벨 사본.
+     * 착용 중인 그룹이 맨 위, 그다음 등급 → 획득 순.
+     */
+    val groups: StateFlow<List<SneakerGroup>> = sneakerRepository.inventory
+        .map { list ->
+            list.groupBy { it.slotKey }
+                .map { (_, copies) ->
+                    val rep = copies.firstOrNull { it.equipped }
+                        ?: copies.maxByOrNull { it.level * 1000L + it.mintNumber }!!
+                    SneakerGroup(
+                        representative = rep,
+                        copies = copies.sortedWith(
+                            compareByDescending<Sneaker> { it.equipped }
+                                .thenByDescending { it.level }
+                                .thenBy { it.mintNumber },
+                        ),
+                    )
+                }
+                .sortedWith(
+                    compareByDescending<SneakerGroup> { it.representative.equipped }
+                        .thenByDescending { it.representative.rarity.ordinal }
+                        .thenByDescending { it.representative.acquiredAt },
+                )
+        }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     val equipped: StateFlow<Sneaker?> = sneakerRepository.equipped

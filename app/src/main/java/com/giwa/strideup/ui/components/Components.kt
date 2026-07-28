@@ -307,11 +307,20 @@ fun HexBadge(text: String, modifier: Modifier = Modifier, size: Dp = 26.dp) {
 
 /** 프로필 아바타 — 볼트 링 + 우하단 육각 레벨 배지 */
 @Composable
+/** 선택 가능한 프로필 아바타 이모지 */
+val AvatarEmojis = listOf(
+    "🏃", "🏃‍♀️", "⚡", "🔥", "💧", "🌪", "🐺", "🦅",
+    "🐯", "🐉", "🦊", "🐢", "🚀", "🌙", "☀️", "💎",
+)
+
+fun avatarEmoji(id: Int): String = AvatarEmojis[id.coerceIn(0, AvatarEmojis.size - 1)]
+
 fun LevelAvatar(
     level: Int,
     modifier: Modifier = Modifier,
     size: Dp = 52.dp,
     contentDescription: String? = null,
+    avatarId: Int = -1,
 ) {
     Box(modifier = modifier.size(size + 6.dp)) {
         Box(
@@ -322,12 +331,19 @@ fun LevelAvatar(
                 .background(CarbonHigh, CircleShape),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(
-                imageVector = Icons.Outlined.Person,
-                contentDescription = contentDescription,
-                tint = Silver,
-                modifier = Modifier.size(size * 0.44f),
-            )
+            if (avatarId >= 0) {
+                Text(
+                    text = avatarEmoji(avatarId),
+                    fontSize = (size.value * 0.42f).sp,
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Outlined.Person,
+                    contentDescription = contentDescription,
+                    tint = Silver,
+                    modifier = Modifier.size(size * 0.44f),
+                )
+            }
         }
         HexBadge(
             text = "$level",
@@ -392,8 +408,13 @@ fun NeonRing(
         Canvas(Modifier.fillMaxSize()) {
             val stroke = ringWidth.toPx()
             val inset = stroke / 2f + 6.dp.toPx()
-            val arcSize = Size(size.width - inset * 2, size.height - inset * 2)
-            val topLeft = Offset(inset, inset)
+            // 컨테이너가 정사각형이 아니어도 항상 정원을 그린다
+            val d = min(size.width, size.height)
+            val arcSize = Size(d - inset * 2, d - inset * 2)
+            val topLeft = Offset(
+                (size.width - d) / 2f + inset,
+                (size.height - d) / 2f + inset,
+            )
 
             drawArc(
                 color = Color.White.copy(alpha = 0.06f),
@@ -843,40 +864,122 @@ fun ListRow(
     }
 }
 
-/** 루트 맵 — 다크 지도 위 볼트 글로우 궤적 */
+/**
+ * 루트 맵 — 원근이 들어간 3D 도시 위 볼트 글로우 궤적.
+ *
+ * 바닥 그리드가 지평선으로 수렴하고, 빌딩 블록이 낮게 솟아 있으며
+ * 루트는 지면을 따라 흐르다 출발·도착 핀으로 끝난다.
+ */
 @Composable
 fun RouteMap(modifier: Modifier = Modifier) {
     Canvas(modifier) {
         val w = size.width
         val h = size.height
 
-        val gridColor = Color.White.copy(alpha = 0.045f)
-        for (c in 1 until 6) {
-            val x = w * c / 6
-            drawLine(gridColor, Offset(x, 0f), Offset(x, h), strokeWidth = 1f)
-        }
-        for (r in 1 until 4) {
-            val y = h * r / 4
-            drawLine(gridColor, Offset(0f, y), Offset(w, y), strokeWidth = 1f)
+        // 지면 좌표 (u: 0..1 가로, v: 0..1 깊이) → 화면 투영
+        fun ground(u: Float, v: Float): Offset {
+            val spread = 1f - v * 0.46f
+            return Offset(
+                x = w / 2f + (u - 0.5f) * w * spread,
+                y = h * (0.94f - v * 0.74f),
+            )
         }
 
-        val points = listOf(
-            0.06f to 0.82f, 0.22f to 0.62f, 0.36f to 0.70f, 0.50f to 0.44f,
-            0.63f to 0.52f, 0.78f to 0.28f, 0.92f to 0.18f,
-        ).map { Offset(w * it.first, h * it.second) }
+        // 지평선 글로우
+        drawRect(
+            brush = Brush.verticalGradient(
+                colors = listOf(Color.Transparent, Volt.copy(alpha = 0.07f), Color.Transparent),
+                startY = h * 0.10f,
+                endY = h * 0.42f,
+            ),
+        )
+
+        // 깊이 방향 그리드 (지평선으로 수렴)
+        val gridColor = Color.White.copy(alpha = 0.05f)
+        for (c in 0..8) {
+            val u = c / 8f
+            drawLine(gridColor, ground(u, 0f), ground(u, 1f), strokeWidth = 1f)
+        }
+        // 가로 그리드 — 멀수록 촘촘하게
+        for (r in 0..5) {
+            val v = 1f - (1f - r / 5f) * (1f - r / 5f)
+            drawLine(gridColor, ground(0f, v), ground(1f, v), strokeWidth = 1f)
+        }
+
+        // 빌딩 블록 (u, v, 폭, 깊이감 높이) — 먼 것부터 그린다
+        data class Block(val u: Float, val v: Float, val bw: Float, val bh: Float)
+        val blocks = listOf(
+            Block(0.14f, 0.86f, 0.10f, 0.16f),
+            Block(0.80f, 0.82f, 0.12f, 0.22f),
+            Block(0.46f, 0.74f, 0.09f, 0.13f),
+            Block(0.68f, 0.58f, 0.10f, 0.18f),
+            Block(0.18f, 0.50f, 0.11f, 0.14f),
+            Block(0.86f, 0.36f, 0.09f, 0.12f),
+            Block(0.32f, 0.24f, 0.08f, 0.10f),
+        )
+        for (b in blocks) {
+            val bl = ground(b.u - b.bw / 2, b.v)
+            val br = ground(b.u + b.bw / 2, b.v)
+            val rise = h * b.bh * (1f - b.v * 0.45f)
+            val tl = Offset(bl.x, bl.y - rise)
+            val tr = Offset(br.x, br.y - rise)
+            // 앞면
+            drawPath(
+                Path().apply {
+                    moveTo(bl.x, bl.y); lineTo(br.x, br.y); lineTo(tr.x, tr.y); lineTo(tl.x, tl.y); close()
+                },
+                Color.White.copy(alpha = 0.045f),
+            )
+            // 지붕 (살짝 뒤로 기울여 입체감)
+            val depth = rise * 0.30f
+            drawPath(
+                Path().apply {
+                    moveTo(tl.x, tl.y); lineTo(tr.x, tr.y)
+                    lineTo(tr.x + depth * 0.35f, tr.y - depth)
+                    lineTo(tl.x + depth * 0.35f, tl.y - depth)
+                    close()
+                },
+                Color.White.copy(alpha = 0.085f),
+            )
+            // 모서리 하이라이트
+            drawLine(Volt.copy(alpha = 0.14f), tl, tr, strokeWidth = 1.4f)
+            // 창문 불빛
+            drawCircle(Volt.copy(alpha = 0.35f), radius = 1.6f, center = Offset((tl.x + tr.x) / 2f, (tl.y + bl.y) / 2f))
+        }
+
+        // 루트 (지면 좌표) — 가까운 곳에서 출발해 멀리 사라진다
+        val route = listOf(
+            0.10f to 0.10f, 0.30f to 0.22f, 0.24f to 0.42f, 0.52f to 0.52f,
+            0.48f to 0.68f, 0.74f to 0.76f, 0.66f to 0.90f,
+        ).map { ground(it.first, it.second) }
         val path = Path().apply {
-            moveTo(points.first().x, points.first().y)
-            for (i in 1 until points.size) lineTo(points[i].x, points[i].y)
+            moveTo(route.first().x, route.first().y)
+            for (i in 1 until route.size) {
+                val p = route[i]
+                val prev = route[i - 1]
+                quadraticBezierTo((prev.x + p.x) / 2f, (prev.y + p.y) / 2f, p.x, p.y)
+            }
         }
-        drawPath(path, Volt.copy(alpha = 0.22f), style = Stroke(width = 13f, cap = StrokeCap.Round))
-        drawPath(path, Volt, style = Stroke(width = 4f, cap = StrokeCap.Round))
+        drawPath(path, Volt.copy(alpha = 0.20f), style = Stroke(width = 12f, cap = StrokeCap.Round))
+        drawPath(path, Volt, style = Stroke(width = 3.6f, cap = StrokeCap.Round))
 
-        drawCircle(Volt.copy(alpha = 0.30f), radius = 12f, center = points.first())
-        drawCircle(Night, radius = 6f, center = points.first())
-        drawCircle(Volt, radius = 6f, center = points.first(), style = Stroke(width = 2.5f))
+        // 출발 핀
+        val start = route.first()
+        drawCircle(Volt.copy(alpha = 0.28f), radius = 11f, center = start)
+        drawCircle(Night, radius = 5.5f, center = start)
+        drawCircle(Volt, radius = 5.5f, center = start, style = Stroke(width = 2.4f))
 
-        drawCircle(Volt.copy(alpha = 0.35f), radius = 15f, center = points.last())
-        drawCircle(Volt, radius = 6.5f, center = points.last())
+        // 도착 핀 — 지면 그림자 + 살짝 떠 있는 헤드
+        val end = route.last()
+        drawOval(
+            color = Volt.copy(alpha = 0.20f),
+            topLeft = Offset(end.x - 9f, end.y - 3.5f),
+            size = Size(18f, 7f),
+        )
+        val head = Offset(end.x, end.y - 14f)
+        drawLine(Volt.copy(alpha = 0.7f), end, head, strokeWidth = 2.2f)
+        drawCircle(Volt.copy(alpha = 0.35f), radius = 10f, center = head)
+        drawCircle(Volt, radius = 5.2f, center = head)
     }
 }
 

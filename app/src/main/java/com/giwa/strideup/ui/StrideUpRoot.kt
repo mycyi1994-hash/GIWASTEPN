@@ -219,7 +219,10 @@ private fun MainScaffold() {
             composable(Routes.RUN) { RunScreen(onBack = { navController.popBackStack() }) }
             composable(Routes.WALLET) { WalletScreen(onBack = { navController.popBackStack() }) }
             composable(Routes.NOTIFICATIONS) {
-                NotificationsScreen(onBack = { navController.popBackStack() })
+                NotificationsScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenLobby = { crewId -> navController.navigate(Routes.lobby(crewId)) },
+                )
             }
             composable(Routes.ACHIEVEMENTS) {
                 AchievementsScreen(onBack = { navController.popBackStack() })

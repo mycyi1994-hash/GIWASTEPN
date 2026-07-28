@@ -8,6 +8,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,17 +36,16 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.giwa.strideup.R
 import com.giwa.strideup.core.ServiceLocator
-import com.giwa.strideup.domain.SneakerMint
 import com.giwa.strideup.ui.components.HexEmblem
-import com.giwa.strideup.ui.components.SneakerHero
 import com.giwa.strideup.ui.theme.Night
 import com.giwa.strideup.ui.theme.Silver
 import com.giwa.strideup.ui.theme.Slate
@@ -73,15 +73,13 @@ fun SplashScreen(onReady: () -> Unit) {
         animationSpec = tween(420, easing = LinearEasing),
         label = "splashProgress",
     )
-    // 스플래시에 세워둘 대표 스니커즈 (실제 착용 중인 것이 있으면 그것)
-    val heroSneaker = remember { SneakerMint.starter() }
-
     LaunchedEffect(Unit) {
         val startedAt = System.currentTimeMillis()
 
         // 실제 준비 작업 — 각 단계가 끝날 때마다 진행률을 올린다.
         progress = 0.15f
         withTimeoutOrNull(4_000) {
+            ServiceLocator.userPrefs.ensureRunnerUid()
             ServiceLocator.sneakerRepository.ensureStarter()
         }
 
@@ -94,6 +92,7 @@ fun SplashScreen(onReady: () -> Unit) {
         withTimeoutOrNull(3_000) {
             ServiceLocator.crewRepository.ensureSeeded()
             ServiceLocator.communityRepository.ensureSeeded()
+            ServiceLocator.notificationRepository.seedWelcome()
         }
 
         progress = 0.68f
@@ -124,57 +123,32 @@ fun SplashScreen(onReady: () -> Unit) {
         SpeedBackdrop(Modifier.fillMaxSize())
 
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 28.dp, vertical = 40.dp),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(Modifier.height(28.dp))
-
-            HexEmblem(size = 62.dp)
-
-            Spacer(Modifier.height(14.dp))
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "Stride",
-                    fontSize = 44.sp,
-                    fontWeight = FontWeight.Black,
-                    fontStyle = FontStyle.Italic,
-                    letterSpacing = (-1.5).sp,
-                    color = Snow,
-                )
-                Text(
-                    text = "Up",
-                    fontSize = 44.sp,
-                    fontWeight = FontWeight.Black,
-                    fontStyle = FontStyle.Italic,
-                    letterSpacing = (-1.5).sp,
-                    color = Volt,
-                )
-            }
-
-            Spacer(Modifier.height(8.dp))
-
-            Text(
-                text = stringResource(R.string.splash_tagline),
-                fontSize = 13.sp,
-                color = Silver,
-                textAlign = TextAlign.Center,
-            )
-
-            // 스니커즈 히어로
+            // 원본 목업 이미지 그대로 — 로고 · 슬로건 · 스니커즈 · 도시 배경
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                contentAlignment = Alignment.Center,
+                contentAlignment = Alignment.TopCenter,
             ) {
-                SneakerHero(
-                    sneaker = heroSneaker,
+                Image(
+                    painter = painterResource(R.drawable.splash_hero),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.TopCenter,
+                )
+                // 이미지 하단을 배경으로 자연스럽게 페이드
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp),
+                        .height(90.dp)
+                        .align(Alignment.BottomCenter)
+                        .background(
+                            Brush.verticalGradient(listOf(Color.Transparent, Night)),
+                        ),
                 )
             }
 
@@ -257,7 +231,9 @@ fun SplashScreen(onReady: () -> Unit) {
 
             // 하단 헥사곤 + 좌우 라인
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 28.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
             ) {
@@ -285,6 +261,8 @@ fun SplashScreen(onReady: () -> Unit) {
                         ),
                 )
             }
+
+            Spacer(Modifier.height(30.dp))
         }
     }
 }

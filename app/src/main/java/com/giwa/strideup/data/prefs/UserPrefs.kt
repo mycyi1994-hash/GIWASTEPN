@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.giwa.strideup.domain.RewardEconomy
 import java.time.LocalDate
@@ -30,9 +31,40 @@ class UserPrefs(private val context: Context) {
         val LAST_GOAL_MET_DAY = longPreferencesKey("last_goal_met_day")
         val BASELINE_DAY = longPreferencesKey("baseline_day")
         val BASELINE_STEPS = longPreferencesKey("baseline_steps")
+        val RUNNER_UID = stringPreferencesKey("runner_uid")
+        val AVATAR_ID = intPreferencesKey("avatar_id")
     }
 
     val dailyGoal: Flow<Int> = context.dataStore.data.map { it[Keys.DAILY_GOAL] ?: DEFAULT_GOAL }
+
+    // ── 러너 식별 · 프로필 ───────────────────────────────────
+
+    /** 러너 고유 ID — "SU-XXXXXX". 발급 전이면 빈 문자열. */
+    val runnerUid: Flow<String> = context.dataStore.data.map { it[Keys.RUNNER_UID] ?: "" }
+
+    /** 선택한 아바타 인덱스 (기본 0) */
+    val avatarId: Flow<Int> = context.dataStore.data.map { it[Keys.AVATAR_ID] ?: 0 }
+
+    suspend fun setAvatarId(id: Int) {
+        context.dataStore.edit { it[Keys.AVATAR_ID] = id }
+    }
+
+    /**
+     * 첫 실행 시 러너 UID를 발급한다. 이미 있으면 그 값을 반환한다.
+     * 헷갈리는 문자(0/O, 1/I)를 뺀 32문자 알파벳을 쓴다.
+     */
+    suspend fun ensureRunnerUid(): String {
+        val existing = context.dataStore.data.first()[Keys.RUNNER_UID]
+        if (!existing.isNullOrBlank()) return existing
+        val alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+        val random = java.security.SecureRandom()
+        val body = buildString {
+            repeat(6) { append(alphabet[random.nextInt(alphabet.length)]) }
+        }
+        val uid = "SU-$body"
+        context.dataStore.edit { it[Keys.RUNNER_UID] = uid }
+        return uid
+    }
 
     val sneakerLevel: Flow<Int> = context.dataStore.data.map { it[Keys.SNEAKER_LEVEL] ?: 1 }
 

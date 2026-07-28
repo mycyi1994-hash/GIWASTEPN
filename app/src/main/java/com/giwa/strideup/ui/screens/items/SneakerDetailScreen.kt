@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.MaterialTheme
@@ -34,7 +35,7 @@ import com.giwa.strideup.ui.components.FactionChip
 import com.giwa.strideup.ui.components.GhostButton
 import com.giwa.strideup.ui.components.GlowCard
 import com.giwa.strideup.ui.components.RarityChip
-import com.giwa.strideup.ui.components.SneakerHero
+import com.giwa.strideup.ui.components.SneakerVisual
 import com.giwa.strideup.ui.components.StatBar
 import com.giwa.strideup.ui.components.VoltButton
 import com.giwa.strideup.ui.components.label
@@ -134,11 +135,13 @@ fun SneakerDetailScreen(
                         color = Slate,
                     )
                 }
-                SneakerHero(
+                SneakerVisual(
                     sneaker = sneaker,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(190.dp),
+                        .height(210.dp)
+                        .clip(RoundedCornerShape(18.dp)),
+                    animate = true,
                 )
                 Column(
                     modifier = Modifier.fillMaxWidth(),
