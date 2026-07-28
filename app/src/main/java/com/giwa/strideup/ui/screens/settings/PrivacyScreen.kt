@@ -136,7 +136,7 @@ fun PrivacyScreen(onBack: () -> Unit = {}) {
                     text = stringResource(R.string.privacy_reset_button),
                     onClick = {
                         scope.launch {
-                            ServiceLocator.notificationRepository.clear()
+                            ServiceLocator.notificationRepository.clearAll()
                             Toast.makeText(context, resetDoneMessage, Toast.LENGTH_SHORT).show()
                         }
                     },

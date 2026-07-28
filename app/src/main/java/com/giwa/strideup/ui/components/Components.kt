@@ -305,8 +305,6 @@ fun HexBadge(text: String, modifier: Modifier = Modifier, size: Dp = 26.dp) {
     }
 }
 
-/** 프로필 아바타 — 볼트 링 + 우하단 육각 레벨 배지 */
-@Composable
 /** 선택 가능한 프로필 아바타 이모지 */
 val AvatarEmojis = listOf(
     "🏃", "🏃‍♀️", "⚡", "🔥", "💧", "🌪", "🐺", "🦅",
@@ -315,6 +313,8 @@ val AvatarEmojis = listOf(
 
 fun avatarEmoji(id: Int): String = AvatarEmojis[id.coerceIn(0, AvatarEmojis.size - 1)]
 
+/** 프로필 아바타 — 볼트 링 + 우하단 육각 레벨 배지 */
+@Composable
 fun LevelAvatar(
     level: Int,
     modifier: Modifier = Modifier,
