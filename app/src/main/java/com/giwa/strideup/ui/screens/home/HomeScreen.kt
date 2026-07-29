@@ -38,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -54,7 +55,6 @@ import com.giwa.strideup.ui.components.DarkIconButton
 import com.giwa.strideup.ui.components.GlowCard
 import com.giwa.strideup.ui.components.LevelAvatar
 import com.giwa.strideup.ui.components.NeonRing
-import com.giwa.strideup.ui.components.RouteMap
 import com.giwa.strideup.ui.components.SneakerVisual
 import com.giwa.strideup.ui.components.StartRunButton
 import com.giwa.strideup.ui.components.TokenCard
@@ -301,6 +301,47 @@ private fun PermissionStrip(onClick: () -> Unit) {
 }
 
 /** 오늘 걸음 히어로 — 좌측 큰 숫자 + 우측 루트 맵 + 목표 진행 바 */
+/**
+ * 오늘 걸음을 재미있는 비교 문구로 풀어준다.
+ * 1km 단위 100개 문구(랜드마크 비교)가 리소스에 있고, 오늘 거리(km)에 맞는 문구를 고른다.
+ */
+@Composable
+private fun DistanceFactPanel(todaySteps: Int, modifier: Modifier = Modifier) {
+    val facts = stringArrayResource(R.array.distance_facts)
+    val km = todaySteps * RewardEconomy.STRIDE_METERS / 1000.0
+    val index = km.toInt().coerceAtMost(facts.size)
+    val text = if (index >= 1) facts[index - 1] else stringResource(R.string.distance_fact_none)
+
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(Volt.copy(alpha = 0.07f))
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(5.dp),
+        ) {
+            Text(
+                text = "%.2f km".format(km),
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Black,
+                letterSpacing = (-0.4).sp,
+                color = Volt,
+            )
+            Text(
+                text = text,
+                fontSize = 10.5.sp,
+                lineHeight = 14.sp,
+                color = Silver,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                maxLines = 4,
+            )
+        }
+    }
+}
+
 @Composable
 private fun StepsHeroCard(
     state: HomeViewModel.UiState,
@@ -344,7 +385,8 @@ private fun StepsHeroCard(
                     color = Slate,
                 )
             }
-            RouteMap(
+            DistanceFactPanel(
+                todaySteps = state.todaySteps,
                 modifier = Modifier
                     .weight(0.82f)
                     .fillMaxHeight()
@@ -424,13 +466,14 @@ private fun EnergyCard(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = "$percent%",
-                        fontSize = 20.sp,
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.ExtraBold,
+                        letterSpacing = (-0.5).sp,
                         color = Snow,
                     )
                     Text(
                         text = "%.0f / %.0f".format(energy, maxEnergy),
-                        fontSize = 9.sp,
+                        fontSize = 8.sp,
                         color = Slate,
                     )
                 }
@@ -512,8 +555,11 @@ private fun DistanceCard(
             }
         }
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(18.dp),
             horizontalArrangement = Arrangement.spacedBy(5.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             days.forEach { day ->
                 val label = LocalDate.ofEpochDay(day).dayOfWeek
@@ -522,11 +568,11 @@ private fun DistanceCard(
                     if (day == today) {
                         Box(
                             modifier = Modifier
-                                .size(14.dp)
+                                .size(16.dp)
                                 .background(Volt, CircleShape),
                             contentAlignment = Alignment.Center,
                         ) {
-                            Text(label, color = Night, fontSize = 7.sp, fontWeight = FontWeight.Bold)
+                            Text(label, color = Night, fontSize = 8.sp, fontWeight = FontWeight.Bold)
                         }
                     } else {
                         Text(label, color = Slate, fontSize = 8.sp)

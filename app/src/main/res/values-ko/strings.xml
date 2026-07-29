@@ -528,4 +528,145 @@
     <!-- Profile identity -->
     <string name="profile_edit_avatar">아바타 변경</string>
     <string name="profile_uid">ID %1$s</string>
+
+    <!-- 걸음 거리 비교 문구 (1km 단위, 100종) -->
+    <string-array name="distance_facts">
+        <item>오늘은 올림픽 수영장 20개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 63빌딩 높이 8채만큼의 거리를 걸었어요!</item>
+        <item>오늘은 N서울타워 높이 13개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 에펠탑 높이 12개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 부르즈 할리파 높이 6채만큼의 거리를 걸었어요!</item>
+        <item>오늘은 한강대교 7개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 한라산 높이 4개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 경복궁 3바퀴만큼의 거리를 걸었어요!</item>
+        <item>오늘은 골든게이트브리지 3개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 백두산 높이 4개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 광안대교 1개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 여의도 1바퀴만큼의 거리를 걸었어요!</item>
+        <item>오늘은 에베레스트 높이 1개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 인천대교 1개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 63빌딩 높이 60채만큼의 거리를 걸었어요!</item>
+        <item>오늘은 N서울타워 높이 68개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 에펠탑 높이 52개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 롯데월드타워 높이 32채만큼의 거리를 걸었어요!</item>
+        <item>오늘은 부르즈 할리파 높이 23채만큼의 거리를 걸었어요!</item>
+        <item>오늘은 한강대교 24개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 한라산 높이 11개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 한라산 높이 11개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 경복궁 10바퀴만큼의 거리를 걸었어요!</item>
+        <item>오늘은 후지산 높이 6개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 에베레스트 높이 3개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 인천대교 1개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 마라톤 풀코스를 1번 완주한 거리예요!</item>
+        <item>오늘은 에펠탑 높이 85개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 롯데월드타워 높이 52채만큼의 거리를 걸었어요!</item>
+        <item>오늘은 부르즈 할리파 높이 36채만큼의 거리를 걸었어요!</item>
+        <item>오늘은 한강대교 37개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 한라산 높이 16개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 후지산 높이 9개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 광안대교 5개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 여의도 4바퀴만큼의 거리를 걸었어요!</item>
+        <item>오늘은 에베레스트 높이 4개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 인천대교 2개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 마라톤 풀코스를 1번 완주한 거리예요!</item>
+        <item>오늘은 롯데월드타워 높이 70채만큼의 거리를 걸었어요!</item>
+        <item>오늘은 부르즈 할리파 높이 48채만큼의 거리를 걸었어요!</item>
+        <item>오늘은 한강대교 49개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 한라산 높이 22개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 경복궁 18바퀴만큼의 거리를 걸었어요!</item>
+        <item>오늘은 골든게이트브리지 16개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 백두산 높이 16개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 후지산 높이 12개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 광안대교 6개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 여의도 6바퀴만큼의 거리를 걸었어요!</item>
+        <item>오늘은 에베레스트 높이 6개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 인천대교 2개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 마라톤 풀코스를 1번 완주한 거리예요!</item>
+        <item>오늘은 롯데월드타워 높이 94채만큼의 거리를 걸었어요!</item>
+        <item>오늘은 부르즈 할리파 높이 64채만큼의 거리를 걸었어요!</item>
+        <item>오늘은 한강대교 64개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 한라산 높이 28개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 여의도 7바퀴만큼의 거리를 걸었어요!</item>
+        <item>오늘은 에베레스트 높이 6개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 인천대교 3개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 마라톤 풀코스를 1번 완주한 거리예요!</item>
+        <item>오늘은 부르즈 할리파 높이 72채만큼의 거리를 걸었어요!</item>
+        <item>오늘은 한강대교 73개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 한라산 높이 32개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 경복궁 26바퀴만큼의 거리를 걸었어요!</item>
+        <item>오늘은 골든게이트브리지 23개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 백두산 높이 24개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 후지산 높이 17개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 광안대교 9개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 여의도 8바퀴만큼의 거리를 걸었어요!</item>
+        <item>오늘은 에베레스트 높이 8개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 인천대교 3개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 마라톤 풀코스를 2번 완주한 거리예요!</item>
+        <item>오늘은 부르즈 할리파 높이 87채만큼의 거리를 걸었어요!</item>
+        <item>오늘은 한강대교 87개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 한라산 높이 38개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 경복궁 31바퀴만큼의 거리를 걸었어요!</item>
+        <item>오늘은 골든게이트브리지 28개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 백두산 높이 28개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 후지산 높이 21개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 광안대교 11개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 여의도 10바퀴만큼의 거리를 걸었어요!</item>
+        <item>오늘은 에베레스트 높이 9개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 인천대교 4개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 광안대교 11개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 후지산 높이 22개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 광안대교 11개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 여의도 10바퀴만큼의 거리를 걸었어요!</item>
+        <item>오늘은 에베레스트 높이 10개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 인천대교 4개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 마라톤 풀코스를 2번 완주한 거리예요!</item>
+        <item>오늘은 한라산 높이 46개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 경복궁 38바퀴만큼의 거리를 걸었어요!</item>
+        <item>오늘은 골든게이트브리지 34개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 백두산 높이 34개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 후지산 높이 25개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 광안대교 13개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 여의도 11바퀴만큼의 거리를 걸었어요!</item>
+        <item>오늘은 에베레스트 높이 11개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 인천대교 5개만큼의 거리를 걸었어요!</item>
+        <item>오늘은 마라톤 풀코스를 2번 완주한 거리예요!</item>
+        <item>오늘은 한라산 높이 51개만큼의 거리를 걸었어요!</item>
+    </string-array>
+    <string name="distance_fact_none">오늘의 첫 1km를 향해 걷는 중이에요 👟</string>
+
+    <!-- Login -->
+    <string name="login_headline">걸음이 보상이 되는 곳,
+StepUp과 함께 달려보세요.</string>
+    <string name="login_google">Google로 계속하기</string>
+    <string name="login_google_progress">로그인 중…</string>
+    <string name="login_guest">게스트 모드로 둘러보기</string>
+    <string name="login_terms">계속하면 데모 약관에 동의하게 됩니다. 실제 계정 정보는 수집하지 않아요.</string>
+
+    <!-- Guide -->
+    <string name="settings_guide">앱 가이드</string>
+    <string name="guide_heading">StepUp 사용법</string>
+    <string name="guide_skip">건너뛰기</string>
+    <string name="guide_next">다음</string>
+    <string name="guide_start">StepUp 시작하기</string>
+    <string name="guide1_title">홈 한눈에 보기</string>
+    <string name="guide1_body">오늘 걸음 · 에너지 · 착용 스니커즈가 한 화면에 모여 있어요. 걸은 거리는 랜드마크 비교 문구로 재미있게 보여줘요.</string>
+    <string name="guide1_tip">팁: START RUN을 누르면 적립이 시작돼요.</string>
+    <string name="guide2_title">달리고 SUP 적립</string>
+    <string name="guide2_body">러닝 세션 중에는 에너지가 남아 있는 동안 걸음마다 SUP가 쌓여요. 에너지는 자정에 리필되니 하루에 나눠 쓰는 게 유리해요.</string>
+    <string name="guide2_tip">팁: 착용 스니커즈의 부스트만큼 더 적립돼요.</string>
+    <string name="guide3_title">스니커즈 NFT 수집</string>
+    <string name="guide3_body">불 · 물 · 번개 · 바람 4속성, 도감 44칸. SUP로 민팅하고 강화해서 마음에 드는 신발을 착용하세요.</string>
+    <string name="guide3_tip" formatted="false">팁: 부스트 차이는 등급당 1%뿐 — 수집이 핵심!</string>
+    <string name="guide4_title">커뮤니티 게시판</string>
+    <string name="guide4_body">가까운 순으로 정렬된 번개러닝에 참가하고, 꿀팁과 자유 글을 나눠보세요. 랭킹 카드에서 이번 주 내 순위도 확인할 수 있어요.</string>
+    <string name="guide4_tip">팁: + 글쓰기 버튼으로 새 글을 올려요.</string>
+    <string name="guide5_title">크루와 파티런</string>
+    <string name="guide5_body" formatted="false">크루에 가입하거나 직접 만들고 파티 로비를 열어보세요. 전원 준비되면 파티장이 시작하고, 1명당 적립 +10% 부스트가 붙어요.</string>
+    <string name="guide5_tip">팁: 파티장에게서 100m 넘게 떨어지면 자동 이탈!</string>
+    <string name="guide6_title">이벤트와 보상</string>
+    <string name="guide6_body">주간 걸음 캠페인과 친구 초대 보상으로 실제 SUP를 받아요. 알림함에서 바로 보상을 수령할 수도 있어요.</string>
+    <string name="guide6_tip">팁: 이벤트 탭에서 진행 중인 캠페인을 확인하세요.</string>
+    <string name="guide7_title">프로필과 업적</string>
+    <string name="guide7_body">아바타를 고르고 러너 ID를 확인하세요. 브론즈부터 다이아까지 업적 100종 — 1년 꾸준히 달리면 전부 달성할 수 있어요.</string>
+    <string name="guide7_tip">팁: 이 가이드는 프로필에서 언제든 다시 볼 수 있어요.</string>
 </resources>

@@ -528,4 +528,145 @@
     <!-- Profile identity -->
     <string name="profile_edit_avatar">Cambiar avatar</string>
     <string name="profile_uid">ID %1$s</string>
+
+    <!-- 걸음 거리 비교 문구 (1km 단위, 100종) -->
+    <string-array name="distance_facts">
+        <item>¡Hoy has cubierto unas 20 veces una piscina olímpica!</item>
+        <item>¡Hoy has cubierto unas 8 veces el edificio 63!</item>
+        <item>¡Hoy has cubierto unas 13 veces la Torre de Seúl!</item>
+        <item>¡Hoy has cubierto unas 12 veces la Torre Eiffel!</item>
+        <item>¡Hoy has cubierto unas 6 veces el Burj Khalifa!</item>
+        <item>¡Hoy has cubierto unas 7 veces el puente Hangang!</item>
+        <item>¡Hoy has cubierto unas 4 veces el monte Hallasan!</item>
+        <item>¡Hoy has dado 3 vueltas a el palacio Gyeongbokgung!</item>
+        <item>¡Hoy has cubierto unas 3 veces el puente Golden Gate!</item>
+        <item>¡Hoy has cubierto unas 4 veces el monte Baekdu!</item>
+        <item>¡Hoy has cubierto una vez el puente Gwangan!</item>
+        <item>¡Hoy has dado 1 vuelta a la isla de Yeouido!</item>
+        <item>¡Hoy has cubierto una vez el Everest!</item>
+        <item>¡Hoy has cubierto una vez el puente de Incheon!</item>
+        <item>¡Hoy has cubierto unas 60 veces el edificio 63!</item>
+        <item>¡Hoy has cubierto unas 68 veces la Torre de Seúl!</item>
+        <item>¡Hoy has cubierto unas 52 veces la Torre Eiffel!</item>
+        <item>¡Hoy has cubierto unas 32 veces la Lotte World Tower!</item>
+        <item>¡Hoy has cubierto unas 23 veces el Burj Khalifa!</item>
+        <item>¡Hoy has cubierto unas 24 veces el puente Hangang!</item>
+        <item>¡Hoy has cubierto unas 11 veces el monte Hallasan!</item>
+        <item>¡Hoy has cubierto unas 11 veces el monte Hallasan!</item>
+        <item>¡Hoy has dado 10 vueltas a el palacio Gyeongbokgung!</item>
+        <item>¡Hoy has cubierto unas 6 veces el monte Fuji!</item>
+        <item>¡Hoy has cubierto unas 3 veces el Everest!</item>
+        <item>¡Hoy has cubierto una vez el puente de Incheon!</item>
+        <item>¡Hoy equivale a 1 vez un maratón completo!</item>
+        <item>¡Hoy has cubierto unas 85 veces la Torre Eiffel!</item>
+        <item>¡Hoy has cubierto unas 52 veces la Lotte World Tower!</item>
+        <item>¡Hoy has cubierto unas 36 veces el Burj Khalifa!</item>
+        <item>¡Hoy has cubierto unas 37 veces el puente Hangang!</item>
+        <item>¡Hoy has cubierto unas 16 veces el monte Hallasan!</item>
+        <item>¡Hoy has cubierto unas 9 veces el monte Fuji!</item>
+        <item>¡Hoy has cubierto unas 5 veces el puente Gwangan!</item>
+        <item>¡Hoy has dado 4 vueltas a la isla de Yeouido!</item>
+        <item>¡Hoy has cubierto unas 4 veces el Everest!</item>
+        <item>¡Hoy has cubierto unas 2 veces el puente de Incheon!</item>
+        <item>¡Hoy equivale a 1 vez un maratón completo!</item>
+        <item>¡Hoy has cubierto unas 70 veces la Lotte World Tower!</item>
+        <item>¡Hoy has cubierto unas 48 veces el Burj Khalifa!</item>
+        <item>¡Hoy has cubierto unas 49 veces el puente Hangang!</item>
+        <item>¡Hoy has cubierto unas 22 veces el monte Hallasan!</item>
+        <item>¡Hoy has dado 18 vueltas a el palacio Gyeongbokgung!</item>
+        <item>¡Hoy has cubierto unas 16 veces el puente Golden Gate!</item>
+        <item>¡Hoy has cubierto unas 16 veces el monte Baekdu!</item>
+        <item>¡Hoy has cubierto unas 12 veces el monte Fuji!</item>
+        <item>¡Hoy has cubierto unas 6 veces el puente Gwangan!</item>
+        <item>¡Hoy has dado 6 vueltas a la isla de Yeouido!</item>
+        <item>¡Hoy has cubierto unas 6 veces el Everest!</item>
+        <item>¡Hoy has cubierto unas 2 veces el puente de Incheon!</item>
+        <item>¡Hoy equivale a 1 vez un maratón completo!</item>
+        <item>¡Hoy has cubierto unas 94 veces la Lotte World Tower!</item>
+        <item>¡Hoy has cubierto unas 64 veces el Burj Khalifa!</item>
+        <item>¡Hoy has cubierto unas 64 veces el puente Hangang!</item>
+        <item>¡Hoy has cubierto unas 28 veces el monte Hallasan!</item>
+        <item>¡Hoy has dado 7 vueltas a la isla de Yeouido!</item>
+        <item>¡Hoy has cubierto unas 6 veces el Everest!</item>
+        <item>¡Hoy has cubierto unas 3 veces el puente de Incheon!</item>
+        <item>¡Hoy equivale a 1 vez un maratón completo!</item>
+        <item>¡Hoy has cubierto unas 72 veces el Burj Khalifa!</item>
+        <item>¡Hoy has cubierto unas 73 veces el puente Hangang!</item>
+        <item>¡Hoy has cubierto unas 32 veces el monte Hallasan!</item>
+        <item>¡Hoy has dado 26 vueltas a el palacio Gyeongbokgung!</item>
+        <item>¡Hoy has cubierto unas 23 veces el puente Golden Gate!</item>
+        <item>¡Hoy has cubierto unas 24 veces el monte Baekdu!</item>
+        <item>¡Hoy has cubierto unas 17 veces el monte Fuji!</item>
+        <item>¡Hoy has cubierto unas 9 veces el puente Gwangan!</item>
+        <item>¡Hoy has dado 8 vueltas a la isla de Yeouido!</item>
+        <item>¡Hoy has cubierto unas 8 veces el Everest!</item>
+        <item>¡Hoy has cubierto unas 3 veces el puente de Incheon!</item>
+        <item>¡Hoy equivale a 2 veces un maratón completo!</item>
+        <item>¡Hoy has cubierto unas 87 veces el Burj Khalifa!</item>
+        <item>¡Hoy has cubierto unas 87 veces el puente Hangang!</item>
+        <item>¡Hoy has cubierto unas 38 veces el monte Hallasan!</item>
+        <item>¡Hoy has dado 31 vueltas a el palacio Gyeongbokgung!</item>
+        <item>¡Hoy has cubierto unas 28 veces el puente Golden Gate!</item>
+        <item>¡Hoy has cubierto unas 28 veces el monte Baekdu!</item>
+        <item>¡Hoy has cubierto unas 21 veces el monte Fuji!</item>
+        <item>¡Hoy has cubierto unas 11 veces el puente Gwangan!</item>
+        <item>¡Hoy has dado 10 vueltas a la isla de Yeouido!</item>
+        <item>¡Hoy has cubierto unas 9 veces el Everest!</item>
+        <item>¡Hoy has cubierto unas 4 veces el puente de Incheon!</item>
+        <item>¡Hoy has cubierto unas 11 veces el puente Gwangan!</item>
+        <item>¡Hoy has cubierto unas 22 veces el monte Fuji!</item>
+        <item>¡Hoy has cubierto unas 11 veces el puente Gwangan!</item>
+        <item>¡Hoy has dado 10 vueltas a la isla de Yeouido!</item>
+        <item>¡Hoy has cubierto unas 10 veces el Everest!</item>
+        <item>¡Hoy has cubierto unas 4 veces el puente de Incheon!</item>
+        <item>¡Hoy equivale a 2 veces un maratón completo!</item>
+        <item>¡Hoy has cubierto unas 46 veces el monte Hallasan!</item>
+        <item>¡Hoy has dado 38 vueltas a el palacio Gyeongbokgung!</item>
+        <item>¡Hoy has cubierto unas 34 veces el puente Golden Gate!</item>
+        <item>¡Hoy has cubierto unas 34 veces el monte Baekdu!</item>
+        <item>¡Hoy has cubierto unas 25 veces el monte Fuji!</item>
+        <item>¡Hoy has cubierto unas 13 veces el puente Gwangan!</item>
+        <item>¡Hoy has dado 11 vueltas a la isla de Yeouido!</item>
+        <item>¡Hoy has cubierto unas 11 veces el Everest!</item>
+        <item>¡Hoy has cubierto unas 5 veces el puente de Incheon!</item>
+        <item>¡Hoy equivale a 2 veces un maratón completo!</item>
+        <item>¡Hoy has cubierto unas 51 veces el monte Hallasan!</item>
+    </string-array>
+    <string name="distance_fact_none">Camino al primer km de hoy 👟</string>
+
+    <!-- Login -->
+    <string name="login_headline">Cada paso se convierte en recompensa.
+Empieza a correr con StepUp.</string>
+    <string name="login_google">Continuar con Google</string>
+    <string name="login_google_progress">Iniciando sesión…</string>
+    <string name="login_guest">Continuar como invitado</string>
+    <string name="login_terms">Al continuar aceptas los términos de la demo. No se recogen datos reales.</string>
+
+    <!-- Guide -->
+    <string name="settings_guide">Guía de la app</string>
+    <string name="guide_heading">Cómo funciona StepUp</string>
+    <string name="guide_skip">Saltar</string>
+    <string name="guide_next">Siguiente</string>
+    <string name="guide_start">Empezar con StepUp</string>
+    <string name="guide1_title">Inicio de un vistazo</string>
+    <string name="guide1_body">Tus pasos, energía y zapatilla equipada en una sola pantalla. El panel convierte tu distancia en monumentos famosos.</string>
+    <string name="guide1_tip">Consejo: pulsa START RUN para empezar a ganar.</string>
+    <string name="guide2_title">Corre y gana SUP</string>
+    <string name="guide2_body">Durante una carrera, cada paso gana SUP mientras quede energía. La energía se recarga a medianoche.</string>
+    <string name="guide2_tip">Consejo: el impulso de tu zapatilla multiplica lo ganado.</string>
+    <string name="guide3_title">Colecciona zapatillas NFT</string>
+    <string name="guide3_body">Cuatro facciones y 44 huecos de álbum. Mintea con SUP, mejora niveles y equipa tu par favorito.</string>
+    <string name="guide3_tip" formatted="false">Consejo: los impulsos son pequeños, ¡colecciona por el diseño!</string>
+    <string name="guide4_title">Foro de la comunidad</string>
+    <string name="guide4_body">Únete a quedadas ordenadas por cercanía y comparte consejos. La tarjeta de ranking muestra tu posición semanal.</string>
+    <string name="guide4_tip">Consejo: el botón + crea una publicación.</string>
+    <string name="guide5_title">Crews y carreras en grupo</string>
+    <string name="guide5_body" formatted="false">Únete o crea un crew y abre el lobby. Cuando todos estén listos, el líder inicia: cada miembro suma +10%.</string>
+    <string name="guide5_tip">Consejo: ¡no te alejes más de 100 m del líder!</string>
+    <string name="guide6_title">Eventos y recompensas</string>
+    <string name="guide6_body">Las campañas semanales y las invitaciones pagan SUP real. Reclama recompensas desde las notificaciones.</string>
+    <string name="guide6_tip">Consejo: mira la pestaña de eventos.</string>
+    <string name="guide7_title">Perfil y logros</string>
+    <string name="guide7_body">Elige avatar, guarda tu ID de corredor y persigue 100 logros de Bronce a Diamante: un año constante los desbloquea todos.</string>
+    <string name="guide7_tip">Consejo: reabre esta guía desde tu perfil.</string>
 </resources>

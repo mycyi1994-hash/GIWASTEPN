@@ -33,6 +33,8 @@ class UserPrefs(private val context: Context) {
         val BASELINE_STEPS = longPreferencesKey("baseline_steps")
         val RUNNER_UID = stringPreferencesKey("runner_uid")
         val AVATAR_ID = intPreferencesKey("avatar_id")
+        val LOGIN_METHOD = stringPreferencesKey("login_method")
+        val GUIDE_SEEN = intPreferencesKey("guide_seen")
     }
 
     val dailyGoal: Flow<Int> = context.dataStore.data.map { it[Keys.DAILY_GOAL] ?: DEFAULT_GOAL }
@@ -47,6 +49,20 @@ class UserPrefs(private val context: Context) {
 
     suspend fun setAvatarId(id: Int) {
         context.dataStore.edit { it[Keys.AVATAR_ID] = id }
+    }
+
+    /** 로그인 방식 — "google" / "guest" / ""(미선택) */
+    val loginMethod: Flow<String> = context.dataStore.data.map { it[Keys.LOGIN_METHOD] ?: "" }
+
+    suspend fun setLoginMethod(method: String) {
+        context.dataStore.edit { it[Keys.LOGIN_METHOD] = method }
+    }
+
+    /** 온보딩 가이드를 끝까지 봤는지 */
+    val guideSeen: Flow<Boolean> = context.dataStore.data.map { (it[Keys.GUIDE_SEEN] ?: 0) == 1 }
+
+    suspend fun setGuideSeen() {
+        context.dataStore.edit { it[Keys.GUIDE_SEEN] = 1 }
     }
 
     /**

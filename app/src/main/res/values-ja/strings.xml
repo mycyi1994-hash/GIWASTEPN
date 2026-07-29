@@ -529,4 +529,145 @@
     <!-- Profile identity -->
     <string name="profile_edit_avatar">アバターを変更</string>
     <string name="profile_uid">ID %1$s</string>
+
+    <!-- 걸음 거리 비교 문구 (1km 단위, 100종) -->
+    <string-array name="distance_facts">
+        <item>今日は五輪プールおよそ20個ぶん歩きました！</item>
+        <item>今日は63ビルの高さおよそ8個ぶん歩きました！</item>
+        <item>今日はNソウルタワーの高さおよそ13個ぶん歩きました！</item>
+        <item>今日はエッフェル塔の高さおよそ12個ぶん歩きました！</item>
+        <item>今日はブルジュ・ハリファの高さおよそ6個ぶん歩きました！</item>
+        <item>今日は漢江大橋およそ7個ぶん歩きました！</item>
+        <item>今日は漢拏山の高さおよそ4個ぶん歩きました！</item>
+        <item>今日は景福宮を約3周ぶん歩きました！</item>
+        <item>今日はゴールデンゲートブリッジおよそ3個ぶん歩きました！</item>
+        <item>今日は白頭山の高さおよそ4個ぶん歩きました！</item>
+        <item>今日は広安大橋およそ1個ぶん歩きました！</item>
+        <item>今日は汝矣島を約1周ぶん歩きました！</item>
+        <item>今日はエベレストの高さおよそ1個ぶん歩きました！</item>
+        <item>今日は仁川大橋およそ1個ぶん歩きました！</item>
+        <item>今日は63ビルの高さおよそ60個ぶん歩きました！</item>
+        <item>今日はNソウルタワーの高さおよそ68個ぶん歩きました！</item>
+        <item>今日はエッフェル塔の高さおよそ52個ぶん歩きました！</item>
+        <item>今日はロッテワールドタワーの高さおよそ32個ぶん歩きました！</item>
+        <item>今日はブルジュ・ハリファの高さおよそ23個ぶん歩きました！</item>
+        <item>今日は漢江大橋およそ24個ぶん歩きました！</item>
+        <item>今日は漢拏山の高さおよそ11個ぶん歩きました！</item>
+        <item>今日は漢拏山の高さおよそ11個ぶん歩きました！</item>
+        <item>今日は景福宮を約10周ぶん歩きました！</item>
+        <item>今日は富士山の高さおよそ6個ぶん歩きました！</item>
+        <item>今日はエベレストの高さおよそ3個ぶん歩きました！</item>
+        <item>今日は仁川大橋およそ1個ぶん歩きました！</item>
+        <item>今日はフルマラソン1回ぶんの距離です！</item>
+        <item>今日はエッフェル塔の高さおよそ85個ぶん歩きました！</item>
+        <item>今日はロッテワールドタワーの高さおよそ52個ぶん歩きました！</item>
+        <item>今日はブルジュ・ハリファの高さおよそ36個ぶん歩きました！</item>
+        <item>今日は漢江大橋およそ37個ぶん歩きました！</item>
+        <item>今日は漢拏山の高さおよそ16個ぶん歩きました！</item>
+        <item>今日は富士山の高さおよそ9個ぶん歩きました！</item>
+        <item>今日は広安大橋およそ5個ぶん歩きました！</item>
+        <item>今日は汝矣島を約4周ぶん歩きました！</item>
+        <item>今日はエベレストの高さおよそ4個ぶん歩きました！</item>
+        <item>今日は仁川大橋およそ2個ぶん歩きました！</item>
+        <item>今日はフルマラソン1回ぶんの距離です！</item>
+        <item>今日はロッテワールドタワーの高さおよそ70個ぶん歩きました！</item>
+        <item>今日はブルジュ・ハリファの高さおよそ48個ぶん歩きました！</item>
+        <item>今日は漢江大橋およそ49個ぶん歩きました！</item>
+        <item>今日は漢拏山の高さおよそ22個ぶん歩きました！</item>
+        <item>今日は景福宮を約18周ぶん歩きました！</item>
+        <item>今日はゴールデンゲートブリッジおよそ16個ぶん歩きました！</item>
+        <item>今日は白頭山の高さおよそ16個ぶん歩きました！</item>
+        <item>今日は富士山の高さおよそ12個ぶん歩きました！</item>
+        <item>今日は広安大橋およそ6個ぶん歩きました！</item>
+        <item>今日は汝矣島を約6周ぶん歩きました！</item>
+        <item>今日はエベレストの高さおよそ6個ぶん歩きました！</item>
+        <item>今日は仁川大橋およそ2個ぶん歩きました！</item>
+        <item>今日はフルマラソン1回ぶんの距離です！</item>
+        <item>今日はロッテワールドタワーの高さおよそ94個ぶん歩きました！</item>
+        <item>今日はブルジュ・ハリファの高さおよそ64個ぶん歩きました！</item>
+        <item>今日は漢江大橋およそ64個ぶん歩きました！</item>
+        <item>今日は漢拏山の高さおよそ28個ぶん歩きました！</item>
+        <item>今日は汝矣島を約7周ぶん歩きました！</item>
+        <item>今日はエベレストの高さおよそ6個ぶん歩きました！</item>
+        <item>今日は仁川大橋およそ3個ぶん歩きました！</item>
+        <item>今日はフルマラソン1回ぶんの距離です！</item>
+        <item>今日はブルジュ・ハリファの高さおよそ72個ぶん歩きました！</item>
+        <item>今日は漢江大橋およそ73個ぶん歩きました！</item>
+        <item>今日は漢拏山の高さおよそ32個ぶん歩きました！</item>
+        <item>今日は景福宮を約26周ぶん歩きました！</item>
+        <item>今日はゴールデンゲートブリッジおよそ23個ぶん歩きました！</item>
+        <item>今日は白頭山の高さおよそ24個ぶん歩きました！</item>
+        <item>今日は富士山の高さおよそ17個ぶん歩きました！</item>
+        <item>今日は広安大橋およそ9個ぶん歩きました！</item>
+        <item>今日は汝矣島を約8周ぶん歩きました！</item>
+        <item>今日はエベレストの高さおよそ8個ぶん歩きました！</item>
+        <item>今日は仁川大橋およそ3個ぶん歩きました！</item>
+        <item>今日はフルマラソン2回ぶんの距離です！</item>
+        <item>今日はブルジュ・ハリファの高さおよそ87個ぶん歩きました！</item>
+        <item>今日は漢江大橋およそ87個ぶん歩きました！</item>
+        <item>今日は漢拏山の高さおよそ38個ぶん歩きました！</item>
+        <item>今日は景福宮を約31周ぶん歩きました！</item>
+        <item>今日はゴールデンゲートブリッジおよそ28個ぶん歩きました！</item>
+        <item>今日は白頭山の高さおよそ28個ぶん歩きました！</item>
+        <item>今日は富士山の高さおよそ21個ぶん歩きました！</item>
+        <item>今日は広安大橋およそ11個ぶん歩きました！</item>
+        <item>今日は汝矣島を約10周ぶん歩きました！</item>
+        <item>今日はエベレストの高さおよそ9個ぶん歩きました！</item>
+        <item>今日は仁川大橋およそ4個ぶん歩きました！</item>
+        <item>今日は広安大橋およそ11個ぶん歩きました！</item>
+        <item>今日は富士山の高さおよそ22個ぶん歩きました！</item>
+        <item>今日は広安大橋およそ11個ぶん歩きました！</item>
+        <item>今日は汝矣島を約10周ぶん歩きました！</item>
+        <item>今日はエベレストの高さおよそ10個ぶん歩きました！</item>
+        <item>今日は仁川大橋およそ4個ぶん歩きました！</item>
+        <item>今日はフルマラソン2回ぶんの距離です！</item>
+        <item>今日は漢拏山の高さおよそ46個ぶん歩きました！</item>
+        <item>今日は景福宮を約38周ぶん歩きました！</item>
+        <item>今日はゴールデンゲートブリッジおよそ34個ぶん歩きました！</item>
+        <item>今日は白頭山の高さおよそ34個ぶん歩きました！</item>
+        <item>今日は富士山の高さおよそ25個ぶん歩きました！</item>
+        <item>今日は広安大橋およそ13個ぶん歩きました！</item>
+        <item>今日は汝矣島を約11周ぶん歩きました！</item>
+        <item>今日はエベレストの高さおよそ11個ぶん歩きました！</item>
+        <item>今日は仁川大橋およそ5個ぶん歩きました！</item>
+        <item>今日はフルマラソン2回ぶんの距離です！</item>
+        <item>今日は漢拏山の高さおよそ51個ぶん歩きました！</item>
+    </string-array>
+    <string name="distance_fact_none">今日の最初の1kmへ歩いています 👟</string>
+
+    <!-- Login -->
+    <string name="login_headline">一歩一歩が報酬に。
+StepUp と走り出そう。</string>
+    <string name="login_google">Google で続行</string>
+    <string name="login_google_progress">ログイン中…</string>
+    <string name="login_guest">ゲストモードで見てみる</string>
+    <string name="login_terms">続行するとデモ利用規約に同意したことになります。実際のアカウント情報は収集しません。</string>
+
+    <!-- Guide -->
+    <string name="settings_guide">アプリガイド</string>
+    <string name="guide_heading">StepUp の使い方</string>
+    <string name="guide_skip">スキップ</string>
+    <string name="guide_next">次へ</string>
+    <string name="guide_start">StepUp をはじめる</string>
+    <string name="guide1_title">ホームをひと目で</string>
+    <string name="guide1_body">今日の歩数・エナジー・装備スニーカーがひと画面に。歩いた距離は名所にたとえて表示されます。</string>
+    <string name="guide1_tip">ヒント: START RUN で獲得スタート。</string>
+    <string name="guide2_title">走って SUP を獲得</string>
+    <string name="guide2_body">ランセッション中はエナジーがある限り、一歩ごとに SUP が貯まります。エナジーは深夜0時に回復。</string>
+    <string name="guide2_tip">ヒント: スニーカーのブーストぶん多く貯まります。</string>
+    <string name="guide3_title">スニーカー NFT を集める</string>
+    <string name="guide3_body">炎・水・雷・風の4属性、図鑑は44枠。SUP でミントして強化し、お気に入りを装備しよう。</string>
+    <string name="guide3_tip" formatted="false">ヒント: ブースト差は等級ごとに1%だけ — 集める楽しさが本体!</string>
+    <string name="guide4_title">コミュニティ掲示板</string>
+    <string name="guide4_body">近い順のフラッシュランに参加して、お役立ち情報や雑談を投稿。ランキングカードで今週の順位もチェック。</string>
+    <string name="guide4_tip">ヒント: ＋ボタンで新規投稿。</string>
+    <string name="guide5_title">クルーとパーティラン</string>
+    <string name="guide5_body" formatted="false">クルーに参加または作成してロビーへ。全員準備完了でホストがスタート、1人につき+10%ブースト。</string>
+    <string name="guide5_tip">ヒント: ホストから100m以上離れると自動離脱!</string>
+    <string name="guide6_title">イベントと報酬</string>
+    <string name="guide6_body">週間キャンペーンや招待報酬で SUP をゲット。通知からそのまま受け取りもできます。</string>
+    <string name="guide6_tip">ヒント: イベントタブで開催中のキャンペーンを確認。</string>
+    <string name="guide7_title">プロフィールと実績</string>
+    <string name="guide7_body">アバターを選び、ランナーIDをチェック。ブロンズからダイヤまで実績100種 — 1年続ければ全達成。</string>
+    <string name="guide7_tip">ヒント: このガイドはプロフィールからいつでも見返せます。</string>
 </resources>

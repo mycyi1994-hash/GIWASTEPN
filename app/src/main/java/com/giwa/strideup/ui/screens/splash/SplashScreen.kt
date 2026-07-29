@@ -10,6 +10,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,9 +19,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,6 +38,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -45,7 +49,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.giwa.strideup.R
 import com.giwa.strideup.core.ServiceLocator
+import com.giwa.strideup.ui.components.AllSneakerImages
 import com.giwa.strideup.ui.components.HexEmblem
+import com.giwa.strideup.ui.components.Wordmark
 import com.giwa.strideup.ui.theme.Night
 import com.giwa.strideup.ui.theme.Silver
 import com.giwa.strideup.ui.theme.Slate
@@ -73,6 +79,9 @@ fun SplashScreen(onReady: () -> Unit) {
         animationSpec = tween(420, easing = LinearEasing),
         label = "splashProgress",
     )
+    // 실행할 때마다 다른 NFT를 세워둔다
+    val heroImage = remember { AllSneakerImages.random() }
+
     LaunchedEffect(Unit) {
         val startedAt = System.currentTimeMillis()
 
@@ -123,32 +132,52 @@ fun SplashScreen(onReady: () -> Unit) {
         SpeedBackdrop(Modifier.fillMaxSize())
 
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 46.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // 원본 목업 이미지 그대로 — 로고 · 슬로건 · 스니커즈 · 도시 배경
+            // 로고 + 워드마크 + 슬로건 (전부 네이티브 — 배경과 완전히 이어진다)
+            HexEmblem(size = 64.dp)
+            Spacer(Modifier.height(14.dp))
+            Wordmark(fontSize = 44.sp)
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = stringResource(R.string.splash_tagline),
+                fontSize = 13.sp,
+                color = Silver,
+                textAlign = TextAlign.Center,
+            )
+
+            // 실행할 때마다 다른 스니커즈 NFT 카드
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f),
-                contentAlignment = Alignment.TopCenter,
+                    .weight(1f)
+                    .padding(horizontal = 34.dp, vertical = 18.dp),
+                contentAlignment = Alignment.Center,
             ) {
+                // 카드 뒤 볼트 글로우
+                Canvas(Modifier.fillMaxSize()) {
+                    drawCircle(
+                        brush = Brush.radialGradient(
+                            colors = listOf(Volt.copy(alpha = 0.16f), Color.Transparent),
+                            center = center,
+                            radius = size.minDimension * 0.62f,
+                        ),
+                        radius = size.minDimension * 0.62f,
+                        center = center,
+                    )
+                }
                 Image(
-                    painter = painterResource(R.drawable.splash_hero),
+                    painter = painterResource(heroImage),
                     contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop,
-                    alignment = Alignment.TopCenter,
-                )
-                // 이미지 하단을 배경으로 자연스럽게 페이드
-                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(90.dp)
-                        .align(Alignment.BottomCenter)
-                        .background(
-                            Brush.verticalGradient(listOf(Color.Transparent, Night)),
-                        ),
+                        .heightIn(max = 260.dp)
+                        .clip(RoundedCornerShape(26.dp))
+                        .border(1.dp, Volt.copy(alpha = 0.35f), RoundedCornerShape(26.dp)),
+                    contentScale = ContentScale.Fit,
                 )
             }
 

@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EmojiEvents
@@ -82,6 +83,7 @@ import com.giwa.strideup.ui.theme.Volt
 
 @Composable
 fun ProfileScreen(
+    onOpenGuide: () -> Unit = {},
     onOpenWallet: () -> Unit = {},
     onOpenAchievements: () -> Unit = {},
     onOpenAnalytics: () -> Unit = {},
@@ -167,6 +169,11 @@ fun ProfileScreen(
                     onClick = onOpenSupport,
                 )
                 ListRow(
+                    icon = Icons.AutoMirrored.Filled.MenuBook,
+                    title = stringResource(R.string.settings_guide),
+                    onClick = onOpenGuide,
+                )
+                ListRow(
                     icon = Icons.Filled.Link,
                     title = stringResource(R.string.settings_connected),
                     onClick = onOpenConnected,
@@ -176,7 +183,7 @@ fun ProfileScreen(
 
         item {
             GlowCard(contentPadding = PaddingValues(16.dp), spacing = 9.dp) {
-                AboutRow(label = stringResource(R.string.about_version), value = "StrideUp 1.5.0")
+                AboutRow(label = stringResource(R.string.about_version), value = "StepUp 1.6.0")
                 AboutRow(
                     label = stringResource(R.string.about_network),
                     value = stringResource(R.string.about_network_value),

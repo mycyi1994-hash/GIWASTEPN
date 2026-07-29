@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -177,6 +178,9 @@ private fun BoardTab(
     }
 
     val visible = remember(posts, filter, query) { filterPosts(posts, filter, query) }
+    val flashWindow = remember(posts, query) {
+        filterPosts(posts, PostCategory.FLASH, query)
+    }
 
     Box(Modifier.fillMaxSize()) {
         LazyColumn(
@@ -219,6 +223,18 @@ private fun BoardTab(
             if (filter == null || filter == PostCategory.FLASH) {
                 item {
                     SectionHeader(title = stringResource(R.string.community_flash_nearby))
+                }
+            }
+
+            // 번개러닝 창내창 — 카드 2개 높이만 차지하고 안에서 스크롤한다
+            if (filter == null && flashWindow.isNotEmpty()) {
+                item {
+                    FlashRunWindow(
+                        posts = flashWindow,
+                        onJoin = { viewModel.toggleJoinFlash(it) },
+                        onLike = { viewModel.toggleLike(it) },
+                        onDelete = { viewModel.deletePost(it) },
+                    )
                 }
             }
 
@@ -288,8 +304,62 @@ private fun filterPosts(
     val sortedRest = rest.sortedByDescending { it.createdAt }
     return when (filter) {
         PostCategory.FLASH -> sortedFlash
-        null -> sortedFlash + sortedRest
+        // 전체 보기에서는 번개러닝을 창내창이 따로 보여주므로 일반 글만
+        null -> sortedRest
         else -> sortedRest
+    }
+}
+
+/**
+ * 번개러닝 모집 창 — 화면에는 2개 높이만 보이고 안에서 스크롤해 나머지를 본다.
+ * (그룹모집을 한눈에, 피드는 그 아래로)
+ */
+@Composable
+private fun FlashRunWindow(
+    posts: List<Post>,
+    onJoin: (Long) -> Unit,
+    onLike: (Long) -> Unit,
+    onDelete: (Long) -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(452.dp)
+            .clip(RoundedCornerShape(24.dp))
+            .background(Volt.copy(alpha = 0.05f))
+            .border(1.dp, Volt.copy(alpha = 0.18f), RoundedCornerShape(24.dp)),
+    ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(10.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            items(posts, key = { it.id }) { post ->
+                FlashRunCard(
+                    post = post,
+                    onJoin = { onJoin(post.id) },
+                    onLike = { onLike(post.id) },
+                    onDelete = { onDelete(post.id) },
+                )
+            }
+        }
+        // 아래에 더 있음을 알리는 하단 페이드
+        if (posts.size > 2) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(26.dp)
+                    .align(Alignment.BottomCenter)
+                    .background(
+                        androidx.compose.ui.graphics.Brush.verticalGradient(
+                            listOf(
+                                androidx.compose.ui.graphics.Color.Transparent,
+                                Night.copy(alpha = 0.85f),
+                            ),
+                        ),
+                    ),
+            )
+        }
     }
 }
 

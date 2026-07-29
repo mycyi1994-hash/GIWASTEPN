@@ -97,15 +97,29 @@ fun sneakerImageRes(faction: Faction, rarity: Rarity, variant: Int): Int? {
     }
 }
 
+/** 이미지가 있는 모든 도감 슬롯 — 스플래시 로테이션 등에 쓴다 */
+val AllSneakerImages: List<Int> by lazy {
+    buildList {
+        for (f in Faction.entries) {
+            for (r in Rarity.entries) {
+                for (v in 0 until r.variantCount) {
+                    sneakerImageRes(f, r, v)?.let(::add)
+                }
+            }
+        }
+    }
+}
+
 /**
  * 신발 비주얼 — 포스터 이미지가 있으면 이미지를, 없으면 Canvas 아트를 그린다.
- * 이미지는 잘림 없이 카드에 맞춰 Crop 한다.
+ * contentScale 기본은 Crop, 히어로 컨텍스트에서는 Fit으로 전체를 보여준다.
  */
 @Composable
 fun SneakerVisual(
     sneaker: Sneaker,
     modifier: Modifier = Modifier,
     animate: Boolean = false,
+    contentScale: ContentScale = ContentScale.Crop,
 ) {
     val res = sneakerImageRes(sneaker.faction, sneaker.rarity, sneaker.variant)
     if (res != null) {
@@ -113,7 +127,7 @@ fun SneakerVisual(
             painter = painterResource(res),
             contentDescription = null,
             modifier = modifier,
-            contentScale = ContentScale.Crop,
+            contentScale = contentScale,
         )
     } else if (animate) {
         SneakerHero(sneaker = sneaker, modifier = modifier)

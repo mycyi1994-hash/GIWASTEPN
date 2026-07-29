@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -456,9 +457,10 @@ fun ItemsScreen(
                         sneaker = sneaker,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(150.dp)
+                            .height(160.dp)
                             .clip(RoundedCornerShape(16.dp)),
                         animate = true,
+                        contentScale = ContentScale.Fit,
                     )
                     Text(
                         text = "${sneaker.faction.label()} ${sneaker.variantName}",

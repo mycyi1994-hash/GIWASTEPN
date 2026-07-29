@@ -528,4 +528,145 @@
     <!-- Profile identity -->
     <string name="profile_edit_avatar">更换头像</string>
     <string name="profile_uid">ID %1$s</string>
+
+    <!-- 걸음 거리 비교 문구 (1km 단위, 100종) -->
+    <string-array name="distance_facts">
+        <item>今天走的距离约等于 20 个奥运泳池！</item>
+        <item>今天走的距离约等于 8 个63大厦的高度！</item>
+        <item>今天走的距离约等于 13 个南山塔的高度！</item>
+        <item>今天走的距离约等于 12 个埃菲尔铁塔的高度！</item>
+        <item>今天走的距离约等于 6 个哈利法塔的高度！</item>
+        <item>今天走的距离约等于 7 个汉江大桥！</item>
+        <item>今天走的距离约等于 4 个汉拿山的高度！</item>
+        <item>今天大约绕景福宫走了 3 圈！</item>
+        <item>今天走的距离约等于 3 个金门大桥！</item>
+        <item>今天走的距离约等于 4 个长白山的高度！</item>
+        <item>今天走的距离约等于 1 个广安大桥！</item>
+        <item>今天大约绕汝矣岛走了 1 圈！</item>
+        <item>今天走的距离约等于 1 个珠峰的高度！</item>
+        <item>今天走的距离约等于 1 个仁川大桥！</item>
+        <item>今天走的距离约等于 60 个63大厦的高度！</item>
+        <item>今天走的距离约等于 68 个南山塔的高度！</item>
+        <item>今天走的距离约等于 52 个埃菲尔铁塔的高度！</item>
+        <item>今天走的距离约等于 32 个乐天世界塔的高度！</item>
+        <item>今天走的距离约等于 23 个哈利法塔的高度！</item>
+        <item>今天走的距离约等于 24 个汉江大桥！</item>
+        <item>今天走的距离约等于 11 个汉拿山的高度！</item>
+        <item>今天走的距离约等于 11 个汉拿山的高度！</item>
+        <item>今天大约绕景福宫走了 10 圈！</item>
+        <item>今天走的距离约等于 6 个富士山的高度！</item>
+        <item>今天走的距离约等于 3 个珠峰的高度！</item>
+        <item>今天走的距离约等于 1 个仁川大桥！</item>
+        <item>今天的距离相当于 1 次全程马拉松！</item>
+        <item>今天走的距离约等于 85 个埃菲尔铁塔的高度！</item>
+        <item>今天走的距离约等于 52 个乐天世界塔的高度！</item>
+        <item>今天走的距离约等于 36 个哈利法塔的高度！</item>
+        <item>今天走的距离约等于 37 个汉江大桥！</item>
+        <item>今天走的距离约等于 16 个汉拿山的高度！</item>
+        <item>今天走的距离约等于 9 个富士山的高度！</item>
+        <item>今天走的距离约等于 5 个广安大桥！</item>
+        <item>今天大约绕汝矣岛走了 4 圈！</item>
+        <item>今天走的距离约等于 4 个珠峰的高度！</item>
+        <item>今天走的距离约等于 2 个仁川大桥！</item>
+        <item>今天的距离相当于 1 次全程马拉松！</item>
+        <item>今天走的距离约等于 70 个乐天世界塔的高度！</item>
+        <item>今天走的距离约等于 48 个哈利法塔的高度！</item>
+        <item>今天走的距离约等于 49 个汉江大桥！</item>
+        <item>今天走的距离约等于 22 个汉拿山的高度！</item>
+        <item>今天大约绕景福宫走了 18 圈！</item>
+        <item>今天走的距离约等于 16 个金门大桥！</item>
+        <item>今天走的距离约等于 16 个长白山的高度！</item>
+        <item>今天走的距离约等于 12 个富士山的高度！</item>
+        <item>今天走的距离约等于 6 个广安大桥！</item>
+        <item>今天大约绕汝矣岛走了 6 圈！</item>
+        <item>今天走的距离约等于 6 个珠峰的高度！</item>
+        <item>今天走的距离约等于 2 个仁川大桥！</item>
+        <item>今天的距离相当于 1 次全程马拉松！</item>
+        <item>今天走的距离约等于 94 个乐天世界塔的高度！</item>
+        <item>今天走的距离约等于 64 个哈利法塔的高度！</item>
+        <item>今天走的距离约等于 64 个汉江大桥！</item>
+        <item>今天走的距离约等于 28 个汉拿山的高度！</item>
+        <item>今天大约绕汝矣岛走了 7 圈！</item>
+        <item>今天走的距离约等于 6 个珠峰的高度！</item>
+        <item>今天走的距离约等于 3 个仁川大桥！</item>
+        <item>今天的距离相当于 1 次全程马拉松！</item>
+        <item>今天走的距离约等于 72 个哈利法塔的高度！</item>
+        <item>今天走的距离约等于 73 个汉江大桥！</item>
+        <item>今天走的距离约等于 32 个汉拿山的高度！</item>
+        <item>今天大约绕景福宫走了 26 圈！</item>
+        <item>今天走的距离约等于 23 个金门大桥！</item>
+        <item>今天走的距离约等于 24 个长白山的高度！</item>
+        <item>今天走的距离约等于 17 个富士山的高度！</item>
+        <item>今天走的距离约等于 9 个广安大桥！</item>
+        <item>今天大约绕汝矣岛走了 8 圈！</item>
+        <item>今天走的距离约等于 8 个珠峰的高度！</item>
+        <item>今天走的距离约等于 3 个仁川大桥！</item>
+        <item>今天的距离相当于 2 次全程马拉松！</item>
+        <item>今天走的距离约等于 87 个哈利法塔的高度！</item>
+        <item>今天走的距离约等于 87 个汉江大桥！</item>
+        <item>今天走的距离约等于 38 个汉拿山的高度！</item>
+        <item>今天大约绕景福宫走了 31 圈！</item>
+        <item>今天走的距离约等于 28 个金门大桥！</item>
+        <item>今天走的距离约等于 28 个长白山的高度！</item>
+        <item>今天走的距离约等于 21 个富士山的高度！</item>
+        <item>今天走的距离约等于 11 个广安大桥！</item>
+        <item>今天大约绕汝矣岛走了 10 圈！</item>
+        <item>今天走的距离约等于 9 个珠峰的高度！</item>
+        <item>今天走的距离约等于 4 个仁川大桥！</item>
+        <item>今天走的距离约等于 11 个广安大桥！</item>
+        <item>今天走的距离约等于 22 个富士山的高度！</item>
+        <item>今天走的距离约等于 11 个广安大桥！</item>
+        <item>今天大约绕汝矣岛走了 10 圈！</item>
+        <item>今天走的距离约等于 10 个珠峰的高度！</item>
+        <item>今天走的距离约等于 4 个仁川大桥！</item>
+        <item>今天的距离相当于 2 次全程马拉松！</item>
+        <item>今天走的距离约等于 46 个汉拿山的高度！</item>
+        <item>今天大约绕景福宫走了 38 圈！</item>
+        <item>今天走的距离约等于 34 个金门大桥！</item>
+        <item>今天走的距离约等于 34 个长白山的高度！</item>
+        <item>今天走的距离约等于 25 个富士山的高度！</item>
+        <item>今天走的距离约等于 13 个广安大桥！</item>
+        <item>今天大约绕汝矣岛走了 11 圈！</item>
+        <item>今天走的距离约等于 11 个珠峰的高度！</item>
+        <item>今天走的距离约等于 5 个仁川大桥！</item>
+        <item>今天的距离相当于 2 次全程马拉松！</item>
+        <item>今天走的距离约等于 51 个汉拿山的高度！</item>
+    </string-array>
+    <string name="distance_fact_none">正在向今天的第一个 1 公里迈进 👟</string>
+
+    <!-- Login -->
+    <string name="login_headline">每一步都有回报。
+和 StepUp 一起开跑吧。</string>
+    <string name="login_google">使用 Google 继续</string>
+    <string name="login_google_progress">正在登录…</string>
+    <string name="login_guest">以访客模式浏览</string>
+    <string name="login_terms">继续即表示同意演示条款。不会收集真实账户信息。</string>
+
+    <!-- Guide -->
+    <string name="settings_guide">使用指南</string>
+    <string name="guide_heading">StepUp 使用方法</string>
+    <string name="guide_skip">跳过</string>
+    <string name="guide_next">下一页</string>
+    <string name="guide_start">开始使用 StepUp</string>
+    <string name="guide1_title">主页一目了然</string>
+    <string name="guide1_body">今日步数、能量和穿戴中的球鞋都在一个页面。趣味文案会把距离换算成著名地标。</string>
+    <string name="guide1_tip">提示：点 START RUN 开始赚取。</string>
+    <string name="guide2_title">跑步赚 SUP</string>
+    <string name="guide2_body">跑步时只要还有能量，每一步都能赚 SUP。能量在午夜恢复，记得合理分配。</string>
+    <string name="guide2_tip">提示：球鞋加成会放大收益。</string>
+    <string name="guide3_title">收集球鞋 NFT</string>
+    <string name="guide3_body">火、水、雷、风四大属性，共 44 格图鉴。用 SUP 铸造、强化并穿上你喜欢的那双。</string>
+    <string name="guide3_tip" formatted="false">提示：加成差距每档仅 1%——收集才是乐趣！</string>
+    <string name="guide4_title">社区论坛</string>
+    <string name="guide4_body">参加按距离排序的闪电跑，分享干货和日常。排行卡片显示你本周的名次。</string>
+    <string name="guide4_tip">提示：点 + 按钮发新帖。</string>
+    <string name="guide5_title">跑团与组队跑</string>
+    <string name="guide5_body" formatted="false">加入或创建跑团，然后打开组队大厅。全员准备好后队长开跑，每名成员 +10% 加成。</string>
+    <string name="guide5_tip">提示：离队长超过 100 米会自动退出！</string>
+    <string name="guide6_title">活动与奖励</string>
+    <string name="guide6_body">每周步数活动和邀请奖励都发真 SUP。在通知里就能直接领取奖励。</string>
+    <string name="guide6_tip">提示：在活动页查看进行中的活动。</string>
+    <string name="guide7_title">个人资料与成就</string>
+    <string name="guide7_body">选择头像、查看跑者 ID，并挑战从青铜到钻石的 100 个成就——坚持一年就能全部达成。</string>
+    <string name="guide7_tip">提示：可随时在个人资料里重看本指南。</string>
 </resources>

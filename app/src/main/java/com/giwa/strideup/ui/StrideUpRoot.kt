@@ -32,6 +32,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,7 +69,9 @@ import com.giwa.strideup.ui.screens.community.PartyLobbyScreen
 import com.giwa.strideup.ui.screens.community.PostComposeScreen
 import com.giwa.strideup.ui.screens.community.RankingScreen
 import com.giwa.strideup.ui.screens.events.EventsScreen
+import com.giwa.strideup.ui.screens.guide.GuideScreen
 import com.giwa.strideup.ui.screens.home.HomeScreen
+import com.giwa.strideup.ui.screens.login.LoginScreen
 import com.giwa.strideup.ui.screens.items.ItemsScreen
 import com.giwa.strideup.ui.screens.items.SneakerDetailScreen
 import com.giwa.strideup.ui.screens.notifications.NotificationsScreen
@@ -111,6 +114,7 @@ object Routes {
     const val SNEAKER = "sneaker/{id}"
     const val LOBBY = "lobby/{crewId}"
     const val RANKING = "ranking"
+    const val GUIDE = "guide"
     const val CREW_CREATE = "crew/create"
     const val CREW_BOARD = "crew/board/{crewId}"
     const val POST_COMPOSE = "post/compose/{crewId}"
@@ -128,14 +132,24 @@ object Routes {
 @Composable
 fun StrideUpRoot() {
     var ready by rememberSaveable { mutableStateOf(false) }
+    // 로그인/가이드는 DataStore 값이 로드될 때까지 null — 스플래시가 그 시간을 가려준다.
+    val loginMethod by ServiceLocator.userPrefs.loginMethod
+        .collectAsState(initial = null)
+    val guideSeen by ServiceLocator.userPrefs.guideSeen
+        .collectAsState(initial = null)
 
     Box(Modifier.fillMaxSize()) {
         NightCanvas(Modifier.fillMaxSize())
 
-        if (!ready) {
-            SplashScreen(onReady = { ready = true })
-        } else {
-            MainScaffold()
+        when {
+            !ready || loginMethod == null || guideSeen == null ->
+                SplashScreen(onReady = { ready = true })
+
+            loginMethod!!.isEmpty() -> LoginScreen(onDone = {})
+
+            guideSeen == false -> GuideScreen(onDone = {})
+
+            else -> MainScaffold()
         }
     }
 }
@@ -205,6 +219,7 @@ private fun MainScaffold() {
             }
             composable(Screen.Profile.route) {
                 ProfileScreen(
+                    onOpenGuide = { navController.navigate(Routes.GUIDE) },
                     onOpenWallet = { navController.navigate(Routes.WALLET) },
                     onOpenAchievements = { navController.navigate(Routes.ACHIEVEMENTS) },
                     onOpenAnalytics = { navController.navigate(Routes.ANALYTICS) },
@@ -263,6 +278,9 @@ private fun MainScaffold() {
             }
             composable(Routes.RANKING) {
                 RankingScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Routes.GUIDE) {
+                GuideScreen(onDone = { navController.popBackStack() })
             }
             composable(Routes.CREW_CREATE) {
                 CrewCreateScreen(

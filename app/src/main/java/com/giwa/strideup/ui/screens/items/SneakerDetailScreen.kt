@@ -22,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -140,9 +141,10 @@ fun SneakerDetailScreen(
                     sneaker = sneaker,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(210.dp)
+                        .height(220.dp)
                         .clip(RoundedCornerShape(18.dp)),
                     animate = true,
+                    contentScale = ContentScale.Fit,
                 )
                 Column(
                     modifier = Modifier.fillMaxWidth(),

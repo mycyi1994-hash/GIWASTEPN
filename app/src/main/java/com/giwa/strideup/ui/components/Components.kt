@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -202,7 +203,7 @@ fun GradientText(
 fun Wordmark(fontSize: TextUnit = 20.sp, modifier: Modifier = Modifier) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         Text(
-            text = "Stride",
+            text = "Step",
             fontSize = fontSize,
             fontWeight = FontWeight.Black,
             fontStyle = FontStyle.Italic,
@@ -696,7 +697,17 @@ fun PillChip(
                     .background(Volt, CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
-                Text("$badge", color = Night, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                // 폰트 패딩을 빼야 숫자가 원의 정중앙에 온다
+                Text(
+                    text = "$badge",
+                    color = Night,
+                    fontWeight = FontWeight.Bold,
+                    style = TextStyle(
+                        fontSize = 9.sp,
+                        lineHeight = 9.sp,
+                        platformStyle = PlatformTextStyle(includeFontPadding = false),
+                    ),
+                )
             }
         }
     }

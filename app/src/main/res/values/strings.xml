@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">StrideUp</string>
+    <string name="app_name" translatable="false">StepUp</string>
 
     <!-- Notification -->
     <string name="notification_channel_walk">Run session</string>
@@ -530,4 +530,145 @@
     <!-- Profile identity -->
     <string name="profile_edit_avatar">Change avatar</string>
     <string name="profile_uid">ID %1$s</string>
+
+    <!-- 걸음 거리 비교 문구 (1km 단위, 100종) -->
+    <string-array name="distance_facts">
+        <item>Today you covered about 20× an Olympic pool!</item>
+        <item>Today you covered about 8× the 63 Building!</item>
+        <item>Today you covered about 13× N Seoul Tower!</item>
+        <item>Today you covered about 12× the Eiffel Tower!</item>
+        <item>Today you covered about 6× the Burj Khalifa!</item>
+        <item>Today you covered about 7× the Hangang Bridge!</item>
+        <item>Today you covered about 4× Hallasan Mountain!</item>
+        <item>Today you walked 3 laps around Gyeongbokgung Palace!</item>
+        <item>Today you covered about 3× the Golden Gate Bridge!</item>
+        <item>Today you covered about 4× Baekdu Mountain!</item>
+        <item>Today you covered about 1× the Gwangan Bridge!</item>
+        <item>Today you walked 1 lap around Yeouido Island!</item>
+        <item>Today you covered about 1× Mt. Everest!</item>
+        <item>Today you covered about 1× the Incheon Bridge!</item>
+        <item>Today you covered about 60× the 63 Building!</item>
+        <item>Today you covered about 68× N Seoul Tower!</item>
+        <item>Today you covered about 52× the Eiffel Tower!</item>
+        <item>Today you covered about 32× Lotte World Tower!</item>
+        <item>Today you covered about 23× the Burj Khalifa!</item>
+        <item>Today you covered about 24× the Hangang Bridge!</item>
+        <item>Today you covered about 11× Hallasan Mountain!</item>
+        <item>Today you covered about 11× Hallasan Mountain!</item>
+        <item>Today you walked 10 laps around Gyeongbokgung Palace!</item>
+        <item>Today you covered about 6× Mt. Fuji!</item>
+        <item>Today you covered about 3× Mt. Everest!</item>
+        <item>Today you covered about 1× the Incheon Bridge!</item>
+        <item>Today equals running a full marathon 1 time!</item>
+        <item>Today you covered about 85× the Eiffel Tower!</item>
+        <item>Today you covered about 52× Lotte World Tower!</item>
+        <item>Today you covered about 36× the Burj Khalifa!</item>
+        <item>Today you covered about 37× the Hangang Bridge!</item>
+        <item>Today you covered about 16× Hallasan Mountain!</item>
+        <item>Today you covered about 9× Mt. Fuji!</item>
+        <item>Today you covered about 5× the Gwangan Bridge!</item>
+        <item>Today you walked 4 laps around Yeouido Island!</item>
+        <item>Today you covered about 4× Mt. Everest!</item>
+        <item>Today you covered about 2× the Incheon Bridge!</item>
+        <item>Today equals running a full marathon 1 time!</item>
+        <item>Today you covered about 70× Lotte World Tower!</item>
+        <item>Today you covered about 48× the Burj Khalifa!</item>
+        <item>Today you covered about 49× the Hangang Bridge!</item>
+        <item>Today you covered about 22× Hallasan Mountain!</item>
+        <item>Today you walked 18 laps around Gyeongbokgung Palace!</item>
+        <item>Today you covered about 16× the Golden Gate Bridge!</item>
+        <item>Today you covered about 16× Baekdu Mountain!</item>
+        <item>Today you covered about 12× Mt. Fuji!</item>
+        <item>Today you covered about 6× the Gwangan Bridge!</item>
+        <item>Today you walked 6 laps around Yeouido Island!</item>
+        <item>Today you covered about 6× Mt. Everest!</item>
+        <item>Today you covered about 2× the Incheon Bridge!</item>
+        <item>Today equals running a full marathon 1 time!</item>
+        <item>Today you covered about 94× Lotte World Tower!</item>
+        <item>Today you covered about 64× the Burj Khalifa!</item>
+        <item>Today you covered about 64× the Hangang Bridge!</item>
+        <item>Today you covered about 28× Hallasan Mountain!</item>
+        <item>Today you walked 7 laps around Yeouido Island!</item>
+        <item>Today you covered about 6× Mt. Everest!</item>
+        <item>Today you covered about 3× the Incheon Bridge!</item>
+        <item>Today equals running a full marathon 1 time!</item>
+        <item>Today you covered about 72× the Burj Khalifa!</item>
+        <item>Today you covered about 73× the Hangang Bridge!</item>
+        <item>Today you covered about 32× Hallasan Mountain!</item>
+        <item>Today you walked 26 laps around Gyeongbokgung Palace!</item>
+        <item>Today you covered about 23× the Golden Gate Bridge!</item>
+        <item>Today you covered about 24× Baekdu Mountain!</item>
+        <item>Today you covered about 17× Mt. Fuji!</item>
+        <item>Today you covered about 9× the Gwangan Bridge!</item>
+        <item>Today you walked 8 laps around Yeouido Island!</item>
+        <item>Today you covered about 8× Mt. Everest!</item>
+        <item>Today you covered about 3× the Incheon Bridge!</item>
+        <item>Today equals running a full marathon 2 times!</item>
+        <item>Today you covered about 87× the Burj Khalifa!</item>
+        <item>Today you covered about 87× the Hangang Bridge!</item>
+        <item>Today you covered about 38× Hallasan Mountain!</item>
+        <item>Today you walked 31 laps around Gyeongbokgung Palace!</item>
+        <item>Today you covered about 28× the Golden Gate Bridge!</item>
+        <item>Today you covered about 28× Baekdu Mountain!</item>
+        <item>Today you covered about 21× Mt. Fuji!</item>
+        <item>Today you covered about 11× the Gwangan Bridge!</item>
+        <item>Today you walked 10 laps around Yeouido Island!</item>
+        <item>Today you covered about 9× Mt. Everest!</item>
+        <item>Today you covered about 4× the Incheon Bridge!</item>
+        <item>Today you covered about 11× the Gwangan Bridge!</item>
+        <item>Today you covered about 22× Mt. Fuji!</item>
+        <item>Today you covered about 11× the Gwangan Bridge!</item>
+        <item>Today you walked 10 laps around Yeouido Island!</item>
+        <item>Today you covered about 10× Mt. Everest!</item>
+        <item>Today you covered about 4× the Incheon Bridge!</item>
+        <item>Today equals running a full marathon 2 times!</item>
+        <item>Today you covered about 46× Hallasan Mountain!</item>
+        <item>Today you walked 38 laps around Gyeongbokgung Palace!</item>
+        <item>Today you covered about 34× the Golden Gate Bridge!</item>
+        <item>Today you covered about 34× Baekdu Mountain!</item>
+        <item>Today you covered about 25× Mt. Fuji!</item>
+        <item>Today you covered about 13× the Gwangan Bridge!</item>
+        <item>Today you walked 11 laps around Yeouido Island!</item>
+        <item>Today you covered about 11× Mt. Everest!</item>
+        <item>Today you covered about 5× the Incheon Bridge!</item>
+        <item>Today equals running a full marathon 2 times!</item>
+        <item>Today you covered about 51× Hallasan Mountain!</item>
+    </string-array>
+    <string name="distance_fact_none">Walking toward your first km of the day 👟</string>
+
+    <!-- Login -->
+    <string name="login_headline">Every step becomes a reward.
+Start running with StepUp.</string>
+    <string name="login_google">Continue with Google</string>
+    <string name="login_google_progress">Signing in…</string>
+    <string name="login_guest">Continue in guest mode</string>
+    <string name="login_terms">By continuing you agree to the demo terms. No real account data is collected.</string>
+
+    <!-- Guide -->
+    <string name="settings_guide">App guide</string>
+    <string name="guide_heading">How StepUp works</string>
+    <string name="guide_skip">Skip</string>
+    <string name="guide_next">Next</string>
+    <string name="guide_start">Start StepUp</string>
+    <string name="guide1_title">Home at a glance</string>
+    <string name="guide1_body">Today\'s steps, energy and your equipped sneaker live on one screen. The fun fact panel turns your distance into famous landmarks.</string>
+    <string name="guide1_tip">Tip: tap START RUN to begin earning.</string>
+    <string name="guide2_title">Run &amp; earn SUP</string>
+    <string name="guide2_body">During a run session every step earns SUP while energy lasts. Energy refills at midnight — pace yourself through the day.</string>
+    <string name="guide2_tip">Tip: your sneaker\'s boost multiplies earnings.</string>
+    <string name="guide3_title">Collect sneaker NFTs</string>
+    <string name="guide3_body">Four factions — Fire, Water, Lightning, Wind — with 44 album slots. Mint with SUP, upgrade levels, and equip your favorite pair.</string>
+    <string name="guide3_tip" formatted="false">Tip: boosts stay small — collect for the look!</string>
+    <string name="guide4_title">Community board</string>
+    <string name="guide4_body">Join flash runs sorted by distance, share tips, and post freely. The ranking card shows where you stand this week.</string>
+    <string name="guide4_tip">Tip: the + button writes a new post.</string>
+    <string name="guide5_title">Crews &amp; party runs</string>
+    <string name="guide5_body" formatted="false">Join or create a crew, then open the party lobby. When everyone is ready the host starts the run — each member adds +10% boost.</string>
+    <string name="guide5_tip">Tip: stay within 100m of the host or you\'ll drop out!</string>
+    <string name="guide6_title">Events &amp; rewards</string>
+    <string name="guide6_body">Weekly step campaigns and invite rewards pay real SUP. Actionable notifications let you claim rewards right from the inbox.</string>
+    <string name="guide6_tip">Tip: check the events tab for active campaigns.</string>
+    <string name="guide7_title">Profile &amp; achievements</string>
+    <string name="guide7_body">Pick an avatar, keep your runner ID, and chase 100 achievements from Bronze to Diamond — a year of steady running clears them all.</string>
+    <string name="guide7_tip">Tip: reopen this guide anytime from Profile.</string>
 </resources>

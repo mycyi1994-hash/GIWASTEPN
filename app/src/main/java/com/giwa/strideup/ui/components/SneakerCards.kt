@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -339,9 +340,10 @@ fun EquippedSneakerCard(
             sneaker = sneaker,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(150.dp)
+                .height(170.dp)
                 .clip(RoundedCornerShape(16.dp)),
             animate = true,
+            contentScale = ContentScale.Fit,
         )
 
         Row(
