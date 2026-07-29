@@ -18,8 +18,14 @@ class NotificationRepository(
 
     suspend fun markAllRead() = dao.markAllRead()
 
-    /** "모두 읽음" — 알림함을 비운다 */
-    suspend fun clearAll() = dao.clear()
+    /**
+     * "모두 읽음" — 알림함을 비운다.
+     * 단, 아직 수령/응답하지 않은 액션형 알림(크루·파티 초대, 이벤트 보상)은 남긴다.
+     */
+    suspend fun clearAll() {
+        dao.clearExceptPendingActions()
+        dao.markAllRead()
+    }
 
     /** 크루 초대 수락 — 크루 가입 후 알림을 처리 상태로 바꾼다 */
     suspend fun acceptCrewInvite(entity: NotificationEntity, crewRepository: CrewRepository) {

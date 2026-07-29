@@ -38,6 +38,7 @@ class HomeViewModel(
         val sensorAvailable: Boolean = true,
         val equipped: Sneaker? = null,
         val avatarId: Int = 0,
+        val avatarRev: Int = 0,
     ) {
         val energyPercent: Int
             get() = if (maxEnergy > 0) ((energy / maxEnergy) * 100).toInt().coerceIn(0, 100) else 0
@@ -63,8 +64,8 @@ class HomeViewModel(
         ) { balance, streak, level -> Triple(balance, streak, level) },
         stepRepository.observeWeek(),
         sneakerRepository.equipped,
-        prefs.avatarId,
-    ) { (steps, goal, energy), (balance, streak, level), week, equipped, avatarId ->
+        combine(prefs.avatarId, prefs.avatarRev) { id, rev -> id to rev },
+    ) { (steps, goal, energy), (balance, streak, level), week, equipped, (avatarId, avatarRev) ->
         UiState(
             todaySteps = steps,
             goal = goal,
@@ -77,6 +78,7 @@ class HomeViewModel(
             sensorAvailable = stepRepository.stepSensorAvailable,
             equipped = equipped,
             avatarId = avatarId,
+            avatarRev = avatarRev,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState())
 

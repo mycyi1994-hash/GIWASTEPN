@@ -62,6 +62,8 @@ import com.giwa.strideup.ui.components.PillChip
 import com.giwa.strideup.ui.components.SectionHeader
 import com.giwa.strideup.ui.components.VoltButton
 import com.giwa.strideup.ui.components.quietClickable
+import com.giwa.strideup.ui.guide.GuideTour
+import com.giwa.strideup.ui.guide.guideTarget
 import com.giwa.strideup.ui.theme.CarbonHigh
 import com.giwa.strideup.ui.theme.Edge
 import com.giwa.strideup.ui.theme.Night
@@ -134,6 +136,7 @@ fun CommunityScreen(
                 onSelect = {
                     viewModel.selectTab(if (it == 0) CommunityTab.BOARD else CommunityTab.CREW)
                 },
+                modifier = Modifier.guideTarget(GuideTour.Targets.COMMUNITY_SEGMENTS),
             )
         }
 
@@ -238,6 +241,13 @@ private fun BoardTab(
                 }
             }
 
+            // 일반 글 목록 제목 — "가까운 번개러닝"과 짝을 이룬다
+            if (filter == null) {
+                item {
+                    SectionHeader(title = stringResource(R.string.community_board_section))
+                }
+            }
+
             if (visible.isEmpty()) {
                 item {
                     GlowCard(contentPadding = PaddingValues(26.dp)) {
@@ -276,7 +286,8 @@ private fun BoardTab(
             onClick = onWritePost,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = 18.dp, bottom = 20.dp),
+                .padding(end = 18.dp, bottom = 20.dp)
+                .guideTarget(GuideTour.Targets.COMMUNITY_WRITE),
         )
     }
 }
@@ -366,7 +377,9 @@ private fun FlashRunWindow(
 @Composable
 private fun RankingTeaser(rank: Int, weeklySteps: Long, onClick: () -> Unit) {
     GlowCard(
-        modifier = Modifier.quietClickable(onClick),
+        modifier = Modifier
+            .quietClickable(onClick)
+            .guideTarget(GuideTour.Targets.COMMUNITY_RANKING),
         accent = true,
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
         spacing = 0.dp,

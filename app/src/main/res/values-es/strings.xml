@@ -669,4 +669,35 @@ Empieza a correr con StepUp.</string>
     <string name="guide7_title">Perfil y logros</string>
     <string name="guide7_body">Elige avatar, guarda tu ID de corredor y persigue 100 logros de Bronce a Diamante: un año constante los desbloquea todos.</string>
     <string name="guide7_tip">Consejo: reabre esta guía desde tu perfil.</string>
+
+    <!-- Board / avatar -->
+    <string name="community_board_section">Publicaciones</string>
+    <string name="profile_avatar_gallery">Elegir de la galería</string>
+    <string name="profile_avatar_or_emoji">…o elige un emoji</string>
+
+    <!-- Spotlight tour -->
+    <string name="tour1_title">Pasos de hoy</string>
+    <string name="tour1_body">Aquí van tus pasos y tu objetivo diario. El panel derecho convierte la distancia en comparaciones divertidas.</string>
+    <string name="tour2_title">Energía</string>
+    <string name="tour2_body">Ganar consume energía; se recarga a medianoche. A cero, los pasos dejan de pagar hasta mañana.</string>
+    <string name="tour3_title">START RUN</string>
+    <string name="tour3_body">Toca aquí para empezar: cada paso durante la carrera gana SUP con el impulso de tu zapatilla.</string>
+    <string name="tour4_title">Publicaciones / Crews</string>
+    <string name="tour4_body">Cambia entre el tablón abierto (quedadas, consejos) y tus crews, pequeñas comunidades que puedes crear.</string>
+    <string name="tour5_title">Ranking</string>
+    <string name="tour5_body">Mira tu posición semanal. Toca para abrir la clasificación completa: pasos o saldo SUP.</string>
+    <string name="tour6_title">Publicar</string>
+    <string name="tour6_body">Convoca una quedada o comparte consejos. Las quedadas se ordenan por cercanía.</string>
+    <string name="tour7_title">Zapatilla equipada</string>
+    <string name="tour7_body">El impulso de este par se aplica a cada carrera. Tócalo para ver stats, mejorar o cambiar.</string>
+    <string name="tour8_title">Minteo</string>
+    <string name="tour8_body">Gasta SUP para mintear una zapatilla NFT aleatoria. La suerte de tu par equipado mejora las probabilidades.</string>
+    <string name="tour9_title">Colección</string>
+    <string name="tour9_body">Desliza para ver tu colección. Los duplicados se apilan con ×N. ¡44 huecos por completar!</string>
+    <string name="tour10_title">Eventos</string>
+    <string name="tour10_body">Las campañas semanales pagan SUP real. Revisa tu progreso y reclama al llegar a la meta.</string>
+    <string name="tour11_title">Tu perfil</string>
+    <string name="tour11_body">Aquí está tu ID de corredor. Toca el lápiz para cambiar tu avatar: emoji o foto de tu galería.</string>
+    <string name="tour12_title">100 logros</string>
+    <string name="tour12_body">De Bronce a Diamante: un año constante los desbloquea todos. Fin del tour, ¡a correr!</string>
 </resources>

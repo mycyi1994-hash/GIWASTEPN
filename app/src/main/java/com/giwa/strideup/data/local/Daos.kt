@@ -233,4 +233,17 @@ interface NotificationDao {
 
     @Query("DELETE FROM notifications")
     suspend fun clear()
+
+    /**
+     * "모두 읽음" 청소 — 아직 처리하지 않은 액션형 알림(초대·미수령 보상)은 남긴다.
+     * 나머지는 전부 지운다.
+     */
+    @Query(
+        """
+        DELETE FROM notifications
+        WHERE actioned = 1
+           OR type NOT IN ('CREW_INVITE', 'PARTY_INVITE', 'EVENT_REWARD')
+        """
+    )
+    suspend fun clearExceptPendingActions()
 }

@@ -33,6 +33,7 @@ class UserPrefs(private val context: Context) {
         val BASELINE_STEPS = longPreferencesKey("baseline_steps")
         val RUNNER_UID = stringPreferencesKey("runner_uid")
         val AVATAR_ID = intPreferencesKey("avatar_id")
+        val AVATAR_REV = intPreferencesKey("avatar_rev")
         val LOGIN_METHOD = stringPreferencesKey("login_method")
         val GUIDE_SEEN = intPreferencesKey("guide_seen")
     }
@@ -44,11 +45,18 @@ class UserPrefs(private val context: Context) {
     /** 러너 고유 ID — "SU-XXXXXX". 발급 전이면 빈 문자열. */
     val runnerUid: Flow<String> = context.dataStore.data.map { it[Keys.RUNNER_UID] ?: "" }
 
-    /** 선택한 아바타 인덱스 (기본 0) */
+    /** 선택한 아바타 인덱스 (기본 0, [AVATAR_CUSTOM]이면 갤러리 사진) */
     val avatarId: Flow<Int> = context.dataStore.data.map { it[Keys.AVATAR_ID] ?: 0 }
+
+    /** 갤러리 사진이 바뀔 때마다 올라가는 리비전 — UI가 파일을 다시 읽는 신호 */
+    val avatarRev: Flow<Int> = context.dataStore.data.map { it[Keys.AVATAR_REV] ?: 0 }
 
     suspend fun setAvatarId(id: Int) {
         context.dataStore.edit { it[Keys.AVATAR_ID] = id }
+    }
+
+    suspend fun bumpAvatarRev() {
+        context.dataStore.edit { it[Keys.AVATAR_REV] = (it[Keys.AVATAR_REV] ?: 0) + 1 }
     }
 
     /** 로그인 방식 — "google" / "guest" / ""(미선택) */
@@ -169,5 +177,11 @@ class UserPrefs(private val context: Context) {
         const val DEFAULT_GOAL = 8000
         const val MIN_GOAL = 3000
         const val MAX_GOAL = 20000
+
+        /** avatarId가 이 값이면 갤러리에서 고른 사진을 쓴다 */
+        const val AVATAR_CUSTOM = -2
+
+        /** 갤러리 아바타 저장 파일명 (filesDir) */
+        const val AVATAR_FILE = "avatar_custom.jpg"
     }
 }

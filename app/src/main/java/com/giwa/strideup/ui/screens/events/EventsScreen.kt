@@ -59,6 +59,8 @@ import com.giwa.strideup.ui.components.GlowCard
 import com.giwa.strideup.ui.components.HexEmblem
 import com.giwa.strideup.ui.components.PillChip
 import com.giwa.strideup.ui.components.SectionHeader
+import com.giwa.strideup.ui.guide.GuideTour
+import com.giwa.strideup.ui.guide.guideTarget
 import com.giwa.strideup.ui.components.VoltButton
 import com.giwa.strideup.ui.components.Wordmark
 import com.giwa.strideup.ui.theme.CarbonHigh
@@ -193,11 +195,13 @@ fun EventsScreen(
 
         if (showCampaigns) {
             item {
+                Box(Modifier.guideTarget(GuideTour.Targets.EVENTS_FEATURED)) {
                 FeaturedCampaign(
                     targetMillis = featuredTarget,
                     claimed = claimed.contains(Events.NEON_HORIZON.id),
                     onClaim = { viewModel.claim(Events.NEON_HORIZON, 1f) },
                 )
+                }
             }
             item {
                 Row(

@@ -669,4 +669,35 @@
     <string name="guide7_title">个人资料与成就</string>
     <string name="guide7_body">选择头像、查看跑者 ID，并挑战从青铜到钻石的 100 个成就——坚持一年就能全部达成。</string>
     <string name="guide7_tip">提示：可随时在个人资料里重看本指南。</string>
+
+    <!-- Board / avatar -->
+    <string name="community_board_section">帖子</string>
+    <string name="profile_avatar_gallery">从相册选择</string>
+    <string name="profile_avatar_or_emoji">…或选择表情</string>
+
+    <!-- Spotlight tour -->
+    <string name="tour1_title">今日步数</string>
+    <string name="tour1_body">今日步数和每日目标都在这里。右侧面板会把距离换算成有趣的地标。</string>
+    <string name="tour2_title">能量</string>
+    <string name="tour2_body">赚取会消耗能量，午夜恢复。归零后要等到明天才能继续赚。</string>
+    <string name="tour3_title">START RUN</string>
+    <string name="tour3_body">点这里开始跑步。跑步中的每一步都会按球鞋加成赚取 SUP。</string>
+    <string name="tour4_title">帖子 / 跑团</string>
+    <string name="tour4_body">在公开帖子（闪电跑、干货）和跑团（可自建的小社群）之间切换。</string>
+    <string name="tour5_title">排行榜</string>
+    <string name="tour5_body">查看你本周的名次。点开可见完整榜单：周步数或 SUP 余额。</string>
+    <string name="tour6_title">发帖</string>
+    <string name="tour6_body">发起闪电跑或分享干货。闪电跑按距离排序，附近的跑者最先看到。</string>
+    <string name="tour7_title">穿戴中的球鞋</string>
+    <string name="tour7_body">这双鞋的加成作用于每次跑步。点开可查看属性、强化或更换。</string>
+    <string name="tour8_title">铸造</string>
+    <string name="tour8_body">花 SUP 铸造随机球鞋 NFT。穿戴中球鞋的幸运值会提高高稀有度概率。</string>
+    <string name="tour9_title">收藏</string>
+    <string name="tour9_body">左右滑动浏览收藏。重复的以 ×N 叠放，点开可选具体那双。共 44 格图鉴！</string>
+    <string name="tour10_title">活动</string>
+    <string name="tour10_body">每周活动发放真 SUP。在这里查看进度，达标后领取奖励。</string>
+    <string name="tour11_title">我的资料</string>
+    <string name="tour11_body">跑者 ID 在这里。点铅笔更换头像——可选表情或相册照片。</string>
+    <string name="tour12_title">100 个成就</string>
+    <string name="tour12_body">从青铜到钻石，坚持一年就能全部解锁。导览到此结束，开跑吧！</string>
 </resources>

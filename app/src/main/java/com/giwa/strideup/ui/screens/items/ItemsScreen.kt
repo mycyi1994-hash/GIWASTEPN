@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -69,6 +71,8 @@ import com.giwa.strideup.ui.components.Wordmark
 import com.giwa.strideup.ui.components.label
 import com.giwa.strideup.ui.components.quietClickable
 import com.giwa.strideup.ui.components.tint
+import com.giwa.strideup.ui.guide.GuideTour
+import com.giwa.strideup.ui.guide.guideTarget
 import com.giwa.strideup.ui.theme.Carbon
 import com.giwa.strideup.ui.theme.CarbonHigh
 import com.giwa.strideup.ui.theme.Silver
@@ -156,6 +160,7 @@ fun ItemsScreen(
             item {
                 EquippedSneakerCard(
                     sneaker = sneaker,
+                    modifier = Modifier.guideTarget(GuideTour.Targets.ITEMS_EQUIPPED),
                     onClick = { onOpenSneaker(sneaker.id) },
                 )
             }
@@ -207,7 +212,11 @@ fun ItemsScreen(
 
         // ── 민팅 ────────────────────────────────────────────
         item {
-            GlowCard(contentPadding = PaddingValues(18.dp), spacing = 12.dp) {
+            GlowCard(
+                modifier = Modifier.guideTarget(GuideTour.Targets.ITEMS_MINT),
+                contentPadding = PaddingValues(18.dp),
+                spacing = 12.dp,
+            ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(13.dp),
@@ -311,41 +320,39 @@ fun ItemsScreen(
             }
         }
 
+        // ── 컬렉션 — 한 줄, 옆으로 밀어서 넘긴다 ───────────────
         item {
             val filtered = groups.filter { g ->
                 (rarityFilter == null || g.representative.rarity.id == rarityFilter) &&
                     (factionFilter == null || g.representative.faction.id == factionFilter)
             }
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                if (filtered.isEmpty()) {
-                    GlowCard(contentPadding = PaddingValues(24.dp)) {
-                        Text(
-                            text = stringResource(R.string.common_none),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Silver,
-                        )
-                    }
+            if (filtered.isEmpty()) {
+                GlowCard(contentPadding = PaddingValues(24.dp)) {
+                    Text(
+                        text = stringResource(R.string.common_none),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Silver,
+                    )
                 }
-                filtered.chunked(2).forEach { row ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        row.forEach { group ->
-                            SneakerCollectionCard(
-                                sneaker = group.representative,
-                                count = group.count,
-                                modifier = Modifier.weight(1f),
-                                onClick = {
-                                    if (group.count == 1) {
-                                        onOpenSneaker(group.representative.id)
-                                    } else {
-                                        copiesFor = group.representative.slotKey
-                                    }
-                                },
-                            )
-                        }
-                        if (row.size == 1) Spacer(Modifier.weight(1f))
+            } else {
+                LazyRow(
+                    modifier = Modifier.guideTarget(GuideTour.Targets.ITEMS_COLLECTION),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    items(filtered.size, key = { filtered[it].representative.slotKey }) { index ->
+                        val group = filtered[index]
+                        SneakerCollectionCard(
+                            sneaker = group.representative,
+                            count = group.count,
+                            modifier = Modifier.width(172.dp),
+                            onClick = {
+                                if (group.count == 1) {
+                                    onOpenSneaker(group.representative.id)
+                                } else {
+                                    copiesFor = group.representative.slotKey
+                                }
+                            },
+                        )
                     }
                 }
             }

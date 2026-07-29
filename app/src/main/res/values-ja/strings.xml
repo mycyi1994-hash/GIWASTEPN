@@ -670,4 +670,35 @@ StepUp と走り出そう。</string>
     <string name="guide7_title">プロフィールと実績</string>
     <string name="guide7_body">アバターを選び、ランナーIDをチェック。ブロンズからダイヤまで実績100種 — 1年続ければ全達成。</string>
     <string name="guide7_tip">ヒント: このガイドはプロフィールからいつでも見返せます。</string>
+
+    <!-- Board / avatar -->
+    <string name="community_board_section">掲示板</string>
+    <string name="profile_avatar_gallery">ギャラリーから選ぶ</string>
+    <string name="profile_avatar_or_emoji">…または絵文字を選ぶ</string>
+
+    <!-- Spotlight tour -->
+    <string name="tour1_title">今日の歩数</string>
+    <string name="tour1_body">今日の歩数と目標はここに。右のパネルは距離を名所にたとえて表示します。</string>
+    <string name="tour2_title">エナジー</string>
+    <string name="tour2_body">獲得にはエナジーを使います。深夜0時に回復し、0になると明日まで貯まりません。</string>
+    <string name="tour3_title">START RUN</string>
+    <string name="tour3_body">ここをタップしてセッション開始。ラン中の一歩ごとにスニーカーのブースト付きで SUP が貯まります。</string>
+    <string name="tour4_title">掲示板 / クルー</string>
+    <string name="tour4_body">オープン掲示板（フラッシュラン・お役立ち）とクルー（自分で作れる小さなコミュニティ）を切り替えます。</string>
+    <string name="tour5_title">ランキング</string>
+    <string name="tour5_body">今週の順位をチェック。タップすると週間歩数／SUP 残高の全ランキングが開きます。</string>
+    <string name="tour6_title">投稿</string>
+    <string name="tour6_body">フラッシュランを募集したりお役立ち情報をシェア。近い順に並ぶので近くのランナーに先に届きます。</string>
+    <string name="tour7_title">装備中のスニーカー</string>
+    <string name="tour7_body">この一足のブーストが毎回のランに反映。タップでステータス確認・強化・履き替え。</string>
+    <string name="tour8_title">ミント</string>
+    <string name="tour8_body">SUP でランダムなスニーカー NFT をミント。装備中の運が上位レアリティの確率を上げます。</string>
+    <string name="tour9_title">コレクション</string>
+    <string name="tour9_body">横にスワイプして倉庫を閲覧。重複は ×N でまとまり、タップで個体を選べます。図鑑は全44枠！</string>
+    <string name="tour10_title">イベント</string>
+    <string name="tour10_body">週間キャンペーンで SUP を獲得。進行度を確認し、達成したら報酬を受け取りましょう。</string>
+    <string name="tour11_title">マイプロフィール</string>
+    <string name="tour11_body">ランナーID はここ。鉛筆をタップしてアバター変更 — 絵文字かギャラリーの写真を選べます。</string>
+    <string name="tour12_title">実績100種</string>
+    <string name="tour12_body">ブロンズからダイヤまで、1年続ければ全解除。ツアーはここまで — さあ走ろう！</string>
 </resources>

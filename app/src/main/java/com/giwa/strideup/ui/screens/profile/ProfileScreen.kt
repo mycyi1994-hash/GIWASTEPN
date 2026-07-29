@@ -1,5 +1,8 @@
 package com.giwa.strideup.ui.screens.profile
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -69,9 +72,13 @@ import com.giwa.strideup.ui.components.LevelAvatar
 import com.giwa.strideup.ui.components.ListRow
 import com.giwa.strideup.ui.components.SectionHeader
 import com.giwa.strideup.ui.components.TokenCard
+import com.giwa.strideup.ui.components.VoltButton
+import com.giwa.strideup.ui.components.rememberCustomAvatar
 import com.giwa.strideup.ui.components.VerticalHairline
 import com.giwa.strideup.ui.components.Wordmark
 import com.giwa.strideup.ui.components.quietClickable
+import com.giwa.strideup.ui.guide.GuideTour
+import com.giwa.strideup.ui.guide.guideTarget
 import com.giwa.strideup.ui.screens.home.runnerTier
 import com.giwa.strideup.ui.theme.Carbon
 import com.giwa.strideup.ui.theme.CarbonHigh
@@ -97,12 +104,27 @@ fun ProfileScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var showAvatarPicker by rememberSaveable { mutableStateOf(false) }
 
+    // 갤러리 사진 선택 — 시스템 포토 피커 (권한 불필요)
+    val photoPicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        if (uri != null) {
+            viewModel.setCustomAvatar(uri)
+            showAvatarPicker = false
+        }
+    }
+
     if (showAvatarPicker) {
         AvatarPickerDialog(
             selected = state.avatarId,
             onPick = { id ->
                 viewModel.setAvatar(id)
                 showAvatarPicker = false
+            },
+            onPickGallery = {
+                photoPicker.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
             },
             onDismiss = { showAvatarPicker = false },
         )
@@ -126,11 +148,19 @@ fun ProfileScreen(
             }
         }
 
-        item { ProfileHeader(state, onEditAvatar = { showAvatarPicker = true }) }
+        item {
+            Box(Modifier.guideTarget(GuideTour.Targets.PROFILE_AVATAR)) {
+                ProfileHeader(state, onEditAvatar = { showAvatarPicker = true })
+            }
+        }
 
         item { StatsRow(state) }
 
-        item { AchievementsCard(state, onOpenAchievements) }
+        item {
+            Box(Modifier.guideTarget(GuideTour.Targets.PROFILE_ACHIEVEMENTS)) {
+                AchievementsCard(state, onOpenAchievements)
+            }
+        }
 
         item {
             SneakersCard(
@@ -183,7 +213,7 @@ fun ProfileScreen(
 
         item {
             GlowCard(contentPadding = PaddingValues(16.dp), spacing = 9.dp) {
-                AboutRow(label = stringResource(R.string.about_version), value = "StepUp 1.6.1")
+                AboutRow(label = stringResource(R.string.about_version), value = "StepUp 1.7.0")
                 AboutRow(
                     label = stringResource(R.string.about_network),
                     value = stringResource(R.string.about_network_value),
@@ -220,6 +250,7 @@ private fun ProfileHeader(
                     size = 72.dp,
                     contentDescription = stringResource(R.string.cd_profile),
                     avatarId = state.avatarId,
+                    customBitmap = rememberCustomAvatar(state.avatarRev),
                 )
                 Box(
                     modifier = Modifier
@@ -516,6 +547,7 @@ private fun SneakersCard(
 private fun AvatarPickerDialog(
     selected: Int,
     onPick: (Int) -> Unit,
+    onPickGallery: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     AlertDialog(
@@ -540,6 +572,16 @@ private fun AvatarPickerDialog(
         },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                VoltButton(
+                    text = stringResource(R.string.profile_avatar_gallery),
+                    onClick = onPickGallery,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Text(
+                    text = stringResource(R.string.profile_avatar_or_emoji),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Slate,
+                )
                 AvatarEmojis.chunked(4).forEachIndexed { rowIndex, row ->
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         row.forEachIndexed { colIndex, emoji ->

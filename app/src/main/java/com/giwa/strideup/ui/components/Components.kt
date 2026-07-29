@@ -46,6 +46,8 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -58,6 +60,8 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.giwa.strideup.R
+import com.giwa.strideup.core.ServiceLocator
+import com.giwa.strideup.data.prefs.UserPrefs
 import com.giwa.strideup.ui.theme.CardFill
 import com.giwa.strideup.ui.theme.Carbon
 import com.giwa.strideup.ui.theme.CarbonHigh
@@ -313,6 +317,22 @@ val AvatarEmojis = listOf(
 
 fun avatarEmoji(id: Int): String = AvatarEmojis[id.coerceIn(0, AvatarEmojis.size - 1)]
 
+/**
+ * 갤러리 아바타 파일을 읽는다. rev가 바뀔 때만 다시 읽어 깜빡임을 막는다.
+ * 파일이 없거나 손상됐으면 null.
+ */
+@Composable
+fun rememberCustomAvatar(rev: Int): ImageBitmap? = remember(rev) {
+    runCatching {
+        val file = java.io.File(ServiceLocator.appContext.filesDir, UserPrefs.AVATAR_FILE)
+        if (file.exists()) {
+            android.graphics.BitmapFactory.decodeFile(file.absolutePath)?.asImageBitmap()
+        } else {
+            null
+        }
+    }.getOrNull()
+}
+
 /** 프로필 아바타 — 볼트 링 + 우하단 육각 레벨 배지 */
 @Composable
 fun LevelAvatar(
@@ -321,6 +341,7 @@ fun LevelAvatar(
     size: Dp = 52.dp,
     contentDescription: String? = null,
     avatarId: Int = -1,
+    customBitmap: ImageBitmap? = null,
 ) {
     Box(modifier = modifier.size(size + 6.dp)) {
         Box(
@@ -331,13 +352,22 @@ fun LevelAvatar(
                 .background(CarbonHigh, CircleShape),
             contentAlignment = Alignment.Center,
         ) {
-            if (avatarId >= 0) {
-                Text(
+            when {
+                avatarId == UserPrefs.AVATAR_CUSTOM && customBitmap != null -> Image(
+                    bitmap = customBitmap,
+                    contentDescription = contentDescription,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop,
+                )
+
+                avatarId >= 0 -> Text(
                     text = avatarEmoji(avatarId),
                     fontSize = (size.value * 0.42f).sp,
                 )
-            } else {
-                Icon(
+
+                else -> Icon(
                     imageVector = Icons.Outlined.Person,
                     contentDescription = contentDescription,
                     tint = Silver,

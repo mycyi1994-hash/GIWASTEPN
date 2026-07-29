@@ -62,6 +62,9 @@ import com.giwa.strideup.ui.components.Wordmark
 import com.giwa.strideup.ui.components.animatedInt
 import com.giwa.strideup.ui.components.label
 import com.giwa.strideup.ui.components.quietClickable
+import com.giwa.strideup.ui.components.rememberCustomAvatar
+import com.giwa.strideup.ui.guide.GuideTour
+import com.giwa.strideup.ui.guide.guideTarget
 import com.giwa.strideup.ui.components.tint
 import com.giwa.strideup.ui.theme.CarbonHigh
 import com.giwa.strideup.ui.theme.Night
@@ -134,6 +137,7 @@ fun HomeScreen(
         GreetingRow(
             level = state.level,
             avatarId = state.avatarId,
+            avatarRev = state.avatarRev,
             balance = state.balance,
             onOpenWallet = onOpenWallet,
             onOpenProfile = onOpenProfile,
@@ -150,7 +154,8 @@ fun HomeScreen(
             onOpenProfile = onOpenProfile,
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1.30f),
+                .weight(1.30f)
+                .guideTarget(GuideTour.Targets.HOME_STEPS),
         )
 
         Row(
@@ -165,7 +170,8 @@ fun HomeScreen(
                 percent = state.energyPercent,
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxHeight(),
+                    .fillMaxHeight()
+                    .guideTarget(GuideTour.Targets.HOME_ENERGY),
             )
             DistanceCard(
                 week = state.week,
@@ -188,6 +194,7 @@ fun HomeScreen(
             title = stringResource(R.string.start_run),
             subtitle = stringResource(R.string.start_run_sub),
             onClick = onStartRun,
+            modifier = Modifier.guideTarget(GuideTour.Targets.HOME_START_RUN),
         )
     }
 }
@@ -220,6 +227,7 @@ private fun TopBar(unread: Int, onOpenNotifications: () -> Unit, onOpenWallet: (
 private fun GreetingRow(
     level: Int,
     avatarId: Int,
+    avatarRev: Int,
     balance: Double,
     onOpenWallet: () -> Unit,
     onOpenProfile: () -> Unit,
@@ -237,6 +245,7 @@ private fun GreetingRow(
     ) {
         LevelAvatar(
             avatarId = avatarId,
+            customBitmap = rememberCustomAvatar(avatarRev),
             level = level,
             size = 46.dp,
             modifier = Modifier.quietClickable(onOpenProfile),

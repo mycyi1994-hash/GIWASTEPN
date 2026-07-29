@@ -10,6 +10,7 @@ import com.giwa.strideup.data.repo.RewardRepository
 import com.giwa.strideup.data.repo.SneakerRepository
 import com.giwa.strideup.data.repo.StepRepository
 import com.giwa.strideup.domain.RewardEconomy
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -33,6 +34,7 @@ class ProfileViewModel(
         val ownedSneakers: Int = 0,
         val runnerUid: String = "",
         val avatarId: Int = 0,
+        val avatarRev: Int = 0,
         val equippedName: String = "",
     ) {
         val multiplier: Double get() = RewardEconomy.sneakerMultiplier(sneakerLevel)
@@ -57,20 +59,24 @@ class ProfileViewModel(
         combine(
             prefs.runnerUid,
             prefs.avatarId,
+            prefs.avatarRev,
             sneakerRepository.equipped,
-        ) { uid, avatar, equipped -> Triple(uid, avatar, equipped) },
-    ) { (goal, level, balance), (streak, lifetime, month), owned, (uid, avatar, equipped) ->
+        ) { uid, avatar, rev, equipped -> Ident(uid, avatar, rev, equipped) },
+    ) { (goal, level, balance), (streak, lifetime, month), owned, ident ->
         UiState(
             goal = goal,
-            sneakerLevel = equipped?.level ?: level,
+            sneakerLevel = ident.equipped?.level ?: level,
             balance = balance,
             streak = streak,
             lifetimeSteps = lifetime,
             monthSteps = month,
             ownedSneakers = owned,
-            runnerUid = uid,
-            avatarId = avatar,
-            equippedName = equipped?.let { "${it.faction.displayName} ${it.variantName}" }.orEmpty(),
+            runnerUid = ident.uid,
+            avatarId = ident.avatarId,
+            avatarRev = ident.avatarRev,
+            equippedName = ident.equipped
+                ?.let { "${it.faction.displayName} ${it.variantName}" }
+                .orEmpty(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState())
 
@@ -81,6 +87,50 @@ class ProfileViewModel(
     fun setAvatar(id: Int) {
         viewModelScope.launch { prefs.setAvatarId(id) }
     }
+
+    /**
+     * 갤러리에서 고른 사진을 아바타로 저장한다.
+     * 내부 저장소에 512px 이하 JPEG로 축소 보관하고, 리비전을 올려 UI가 다시 읽게 한다.
+     */
+    fun setCustomAvatar(uri: android.net.Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val ctx = ServiceLocator.appContext
+            val saved = runCatching {
+                ctx.contentResolver.openInputStream(uri)?.use { input ->
+                    val raw = android.graphics.BitmapFactory.decodeStream(input)
+                        ?: return@use false
+                    val maxSide = 512f
+                    val scale = minOf(maxSide / raw.width, maxSide / raw.height, 1f)
+                    val bmp = if (scale < 1f) {
+                        android.graphics.Bitmap.createScaledBitmap(
+                            raw,
+                            (raw.width * scale).toInt().coerceAtLeast(1),
+                            (raw.height * scale).toInt().coerceAtLeast(1),
+                            true,
+                        )
+                    } else {
+                        raw
+                    }
+                    java.io.File(ctx.filesDir, UserPrefs.AVATAR_FILE).outputStream().use { out ->
+                        bmp.compress(android.graphics.Bitmap.CompressFormat.JPEG, 90, out)
+                    }
+                    true
+                } ?: false
+            }.getOrDefault(false)
+            if (saved) {
+                prefs.setAvatarId(UserPrefs.AVATAR_CUSTOM)
+                prefs.bumpAvatarRev()
+            }
+        }
+    }
+
+    /** combine 5개 값 묶음 */
+    private data class Ident(
+        val uid: String,
+        val avatarId: Int,
+        val avatarRev: Int,
+        val equipped: com.giwa.strideup.domain.Sneaker?,
+    )
 
     companion object {
         val Factory = viewModelFactory {

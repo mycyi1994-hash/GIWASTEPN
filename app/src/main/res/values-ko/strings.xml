@@ -669,4 +669,35 @@ StepUp과 함께 달려보세요.</string>
     <string name="guide7_title">프로필과 업적</string>
     <string name="guide7_body">아바타를 고르고 러너 ID를 확인하세요. 브론즈부터 다이아까지 업적 100종 — 1년 꾸준히 달리면 전부 달성할 수 있어요.</string>
     <string name="guide7_tip">팁: 이 가이드는 프로필에서 언제든 다시 볼 수 있어요.</string>
+
+    <!-- Board / avatar -->
+    <string name="community_board_section">게시판</string>
+    <string name="profile_avatar_gallery">갤러리에서 사진 선택</string>
+    <string name="profile_avatar_or_emoji">…또는 이모지 고르기</string>
+
+    <!-- Spotlight tour -->
+    <string name="tour1_title">오늘 걸음</string>
+    <string name="tour1_body">오늘 걸음과 일일 목표가 여기 모여요. 오른쪽 패널은 걸은 거리를 랜드마크에 빗대 재미있게 보여줘요.</string>
+    <string name="tour2_title">에너지</string>
+    <string name="tour2_body">적립할 때마다 에너지를 써요. 자정에 다시 차고, 0이 되면 내일까지 적립이 멈춰요.</string>
+    <string name="tour3_title">START RUN</string>
+    <string name="tour3_body">여기를 눌러 세션을 시작하세요. 러닝 중의 걸음마다 스니커즈 부스트가 붙은 SUP가 쌓여요.</string>
+    <string name="tour4_title">게시판 / 크루</string>
+    <string name="tour4_body">열린 게시판(번개러닝·꿀팁)과 크루(직접 만들 수 있는 소모임) 사이를 전환해요.</string>
+    <string name="tour5_title">랭킹</string>
+    <string name="tour5_body">이번 주 내 순위를 확인하세요. 누르면 주간 걸음/보유 SUP 전체 순위표가 열려요.</string>
+    <string name="tour6_title">글쓰기</string>
+    <string name="tour6_body">번개러닝을 모집하거나 꿀팁을 나눠보세요. 번개러닝은 가까운 순이라 근처 러너에게 먼저 보여요.</string>
+    <string name="tour7_title">착용 중인 스니커즈</string>
+    <string name="tour7_body">이 신발의 부스트가 모든 러닝에 적용돼요. 눌러서 스탯 확인·강화·교체를 할 수 있어요.</string>
+    <string name="tour8_title">민팅</string>
+    <string name="tour8_body">SUP로 랜덤 스니커즈 NFT를 민팅해요. 착용 중인 신발의 행운이 상위 등급 확률을 올려줘요.</string>
+    <string name="tour9_title">컬렉션</string>
+    <string name="tour9_body">옆으로 밀어 보관함을 넘겨보세요. 중복은 ×N으로 묶이고, 눌러서 원하는 사본을 고를 수 있어요. 도감은 총 44칸!</string>
+    <string name="tour10_title">이벤트</string>
+    <string name="tour10_body">주간 캠페인에서 실제 SUP를 받아요. 진행도를 확인하고 목표 달성 시 보상을 수령하세요.</string>
+    <string name="tour11_title">내 프로필</string>
+    <string name="tour11_body">러너 ID가 여기 있어요. 연필을 눌러 아바타를 바꿔보세요 — 이모지나 갤러리 사진을 고를 수 있어요.</string>
+    <string name="tour12_title">업적 100종</string>
+    <string name="tour12_body">브론즈부터 다이아까지, 1년 꾸준히 달리면 전부 달성할 수 있어요. 투어는 여기까지 — 이제 달려볼까요!</string>
 </resources>

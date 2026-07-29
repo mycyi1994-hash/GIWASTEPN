@@ -17,6 +17,8 @@ import com.giwa.strideup.sensor.StepTracker
 /** 간단한 수동 DI 컨테이너. Application.onCreate에서 [init]을 호출한다. */
 object ServiceLocator {
 
+    lateinit var appContext: Context
+        private set
     lateinit var database: AppDatabase
         private set
     lateinit var userPrefs: UserPrefs
@@ -43,6 +45,7 @@ object ServiceLocator {
     fun init(context: Context) {
         if (this::database.isInitialized) return
         val app = context.applicationContext
+        appContext = app
         database = Room.databaseBuilder(app, AppDatabase::class.java, "strideup.db")
             // 스키마가 확장되는 개발 단계 — 마이그레이션 실패로 앱이 죽는 것보다
             // 로컬 데모 데이터를 다시 만드는 편이 안전하다.

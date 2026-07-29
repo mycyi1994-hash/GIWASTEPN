@@ -671,4 +671,35 @@ Start running with StepUp.</string>
     <string name="guide7_title">Profile &amp; achievements</string>
     <string name="guide7_body">Pick an avatar, keep your runner ID, and chase 100 achievements from Bronze to Diamond — a year of steady running clears them all.</string>
     <string name="guide7_tip">Tip: reopen this guide anytime from Profile.</string>
+
+    <!-- Board / avatar -->
+    <string name="community_board_section">Board</string>
+    <string name="profile_avatar_gallery">Choose from gallery</string>
+    <string name="profile_avatar_or_emoji">…or pick an emoji</string>
+
+    <!-- Spotlight tour -->
+    <string name="tour1_title">Today\'s steps</string>
+    <string name="tour1_body">Your steps and daily goal live here. The right panel turns today\'s distance into fun landmark comparisons.</string>
+    <string name="tour2_title">Energy</string>
+    <string name="tour2_body">Earning uses energy — it refills at midnight. When it hits zero, steps stop paying until tomorrow.</string>
+    <string name="tour3_title">START RUN</string>
+    <string name="tour3_body">Tap here to start a session — every step during a run earns SUP with your sneaker\'s boost.</string>
+    <string name="tour4_title">Board / Crews</string>
+    <string name="tour4_body">Switch between the open board (flash runs, tips) and your crews — small communities you can create yourself.</string>
+    <string name="tour5_title">Ranking</string>
+    <string name="tour5_body">See where you stand this week. Tap to open the full leaderboard — weekly steps or SUP balance.</string>
+    <string name="tour6_title">Write a post</string>
+    <string name="tour6_body">Recruit a flash run or share tips. Flash runs are sorted by distance, so nearby runners see yours first.</string>
+    <string name="tour7_title">Equipped sneaker</string>
+    <string name="tour7_body">This pair\'s boost applies to every run. Tap it to see stats, upgrade, or swap pairs.</string>
+    <string name="tour8_title">Minting</string>
+    <string name="tour8_body">Spend SUP to mint a random sneaker NFT. Your equipped pair\'s luck raises the odds of higher rarities.</string>
+    <string name="tour9_title">Collection</string>
+    <string name="tour9_body">Swipe sideways to browse your vault. Duplicates stack with ×N — tap to pick a specific copy. 44 slots to complete!</string>
+    <string name="tour10_title">Events</string>
+    <string name="tour10_body">Weekly campaigns pay real SUP. Check progress here and claim rewards when you hit the target.</string>
+    <string name="tour11_title">Your profile</string>
+    <string name="tour11_body">Your runner ID lives here. Tap the pencil to change your avatar — pick an emoji or a photo from your gallery.</string>
+    <string name="tour12_title">100 achievements</string>
+    <string name="tour12_body">From Bronze to Diamond — a year of steady running unlocks them all. That\'s the tour, enjoy StepUp!</string>
 </resources>

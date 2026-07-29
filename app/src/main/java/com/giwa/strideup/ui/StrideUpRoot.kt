@@ -36,6 +36,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -57,11 +58,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import kotlinx.coroutines.launch
 import com.giwa.strideup.R
 import com.giwa.strideup.core.ServiceLocator
 import com.giwa.strideup.ui.components.HairlineDivider
 import com.giwa.strideup.ui.components.NightCanvas
 import com.giwa.strideup.ui.components.quietClickable
+import com.giwa.strideup.ui.guide.GuideOverlay
+import com.giwa.strideup.ui.guide.GuideTour
 import com.giwa.strideup.ui.screens.community.CommunityScreen
 import com.giwa.strideup.ui.screens.community.CrewBoardScreen
 import com.giwa.strideup.ui.screens.community.CrewCreateScreen
@@ -69,7 +73,6 @@ import com.giwa.strideup.ui.screens.community.PartyLobbyScreen
 import com.giwa.strideup.ui.screens.community.PostComposeScreen
 import com.giwa.strideup.ui.screens.community.RankingScreen
 import com.giwa.strideup.ui.screens.events.EventsScreen
-import com.giwa.strideup.ui.screens.guide.GuideScreen
 import com.giwa.strideup.ui.screens.home.HomeScreen
 import com.giwa.strideup.ui.screens.login.LoginScreen
 import com.giwa.strideup.ui.screens.items.ItemsScreen
@@ -114,7 +117,6 @@ object Routes {
     const val SNEAKER = "sneaker/{id}"
     const val LOBBY = "lobby/{crewId}"
     const val RANKING = "ranking"
-    const val GUIDE = "guide"
     const val CREW_CREATE = "crew/create"
     const val CREW_BOARD = "crew/board/{crewId}"
     const val POST_COMPOSE = "post/compose/{crewId}"
@@ -147,16 +149,23 @@ fun StrideUpRoot() {
 
             loginMethod!!.isEmpty() -> LoginScreen(onDone = {})
 
-            guideSeen == false -> GuideScreen(onDone = {})
-
-            else -> MainScaffold()
+            else -> MainScaffold(startTour = guideSeen == false)
         }
     }
 }
 
 @Composable
-private fun MainScaffold() {
+private fun MainScaffold(startTour: Boolean = false) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    // 첫 실행이면 화면이 자리를 잡은 뒤 스포트라이트 투어를 시작한다
+    LaunchedEffect(startTour) {
+        if (startTour) {
+            kotlinx.coroutines.delay(450)
+            GuideTour.start()
+        }
+    }
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) {
@@ -175,6 +184,7 @@ private fun MainScaffold() {
     val currentRoute = backStack?.destination?.route
     val showBar = currentRoute in tabRoutes
 
+    Box(Modifier.fillMaxSize()) {
     Scaffold(
         containerColor = Color.Transparent,
         bottomBar = {
@@ -219,7 +229,10 @@ private fun MainScaffold() {
             }
             composable(Screen.Profile.route) {
                 ProfileScreen(
-                    onOpenGuide = { navController.navigate(Routes.GUIDE) },
+                    onOpenGuide = {
+                        navController.switchTab(Screen.Home)
+                        GuideTour.start()
+                    },
                     onOpenWallet = { navController.navigate(Routes.WALLET) },
                     onOpenAchievements = { navController.navigate(Routes.ACHIEVEMENTS) },
                     onOpenAnalytics = { navController.navigate(Routes.ANALYTICS) },
@@ -279,9 +292,6 @@ private fun MainScaffold() {
             composable(Routes.RANKING) {
                 RankingScreen(onBack = { navController.popBackStack() })
             }
-            composable(Routes.GUIDE) {
-                GuideScreen(onDone = { navController.popBackStack() })
-            }
             composable(Routes.CREW_CREATE) {
                 CrewCreateScreen(
                     onBack = { navController.popBackStack() },
@@ -315,6 +325,19 @@ private fun MainScaffold() {
                 )
             }
         }
+    }
+
+    // 스포트라이트 가이드 오버레이 — 하단 바까지 덮는다
+    if (GuideTour.active) {
+        GuideOverlay(
+            onSwitchTab = { route ->
+                bottomTabs.firstOrNull { it.route == route }?.let { navController.switchTab(it) }
+            },
+            onFinished = {
+                scope.launch { ServiceLocator.userPrefs.setGuideSeen() }
+            },
+        )
+    }
     }
 }
 
