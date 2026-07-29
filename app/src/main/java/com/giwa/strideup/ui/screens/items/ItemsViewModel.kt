@@ -26,8 +26,8 @@ sealed interface ItemsMessage {
     data object BoostAlreadyActive : ItemsMessage
     data object BoostBought : ItemsMessage
     data object MaxLevel : ItemsMessage
-    data class Upgraded(val name: String) : ItemsMessage
-    data class Equipped(val name: String) : ItemsMessage
+    data class Upgraded(val sneaker: Sneaker) : ItemsMessage
+    data class Equipped(val sneaker: Sneaker) : ItemsMessage
 }
 
 /** 같은 (속성 × 등급 × 변형) 사본 묶음 — 그리드에 ×N 으로 표시한다 */
@@ -97,8 +97,8 @@ class ItemsViewModel(
     fun equip(id: Long) {
         viewModelScope.launch {
             sneakerRepository.equip(id)
-            val name = inventory.value.firstOrNull { it.id == id }?.displayName.orEmpty()
-            message.value = ItemsMessage.Equipped(name)
+            val target = inventory.value.firstOrNull { it.id == id }
+            if (target != null) message.value = ItemsMessage.Equipped(target)
         }
     }
 
@@ -111,7 +111,7 @@ class ItemsViewModel(
             }
             val result = sneakerRepository.upgrade(id)
             message.value = if (result != null) {
-                ItemsMessage.Upgraded(result.displayName)
+                ItemsMessage.Upgraded(result)
             } else {
                 ItemsMessage.NotEnoughBalance
             }

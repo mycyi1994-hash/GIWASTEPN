@@ -1046,7 +1046,7 @@ fun TokenCard(
     ) {
         HexEmblem(size = 38.dp)
         Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
-            Text("StrideTokens", color = Silver, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+            Text("StepUp Token", color = Silver, fontSize = 11.sp, fontWeight = FontWeight.Medium)
             Text(
                 text = "%,.2f".format(balance),
                 color = Snow,

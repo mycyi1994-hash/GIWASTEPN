@@ -731,4 +731,35 @@ StepUp과 함께 달려보세요.</string>
     <string name="seed_reply2">가볍게 뛸 거예요. 아무도 안 떨어뜨려요.</string>
     <string name="seed_reply3">괜찮아요, 기다릴게요.</string>
     <string name="seed_reply4">좋아요, 현장에서 봬요!</string>
+
+    <!-- Language -->
+    <string name="settings_language">언어</string>
+    <string name="language_system">시스템 기본</string>
+    <string name="language_en">영어</string>
+    <string name="language_ko">한국어</string>
+    <string name="language_zh">중국어</string>
+    <string name="language_ja">일본어</string>
+    <string name="language_note">앱 전체가 바로 바뀝니다 — 화면, 알림, 게시글까지. 사람·크루 이름만 원래대로 남습니다.</string>
+
+    <!-- Runner titles -->
+    <string name="tier_rookie">루키</string>
+    <string name="tier_strider">스트라이더</string>
+    <string name="tier_trailblazer">트레일블레이저</string>
+    <string name="tier_pacesetter">페이스세터</string>
+    <string name="tier_elite">엘리트</string>
+    <string name="tier_master">마스터</string>
+    <string name="tier_legend">레전드</string>
+
+    <!-- Sneaker models -->
+    <string name="variant_runner">러너</string>
+    <string name="variant_trainer">트레이너</string>
+    <string name="variant_trail">트레일</string>
+    <string name="variant_racer">레이서</string>
+    <string name="variant_glide">글라이드</string>
+    <string name="variant_blade">블레이드</string>
+    <string name="variant_apex">에이펙스</string>
+    <string name="variant_phantom">팬텀</string>
+    <string name="variant_titan">타이탄</string>
+    <string name="variant_seraph">세라프</string>
+    <string name="variant_dragon">드래곤</string>
 </resources>

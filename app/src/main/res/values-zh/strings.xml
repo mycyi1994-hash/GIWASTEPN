@@ -731,4 +731,35 @@
     <string name="seed_reply2">轻松配速，不会有人掉队。</string>
     <string name="seed_reply3">完全没问题，我们等你。</string>
     <string name="seed_reply4">好的，到时候见！</string>
+
+    <!-- Language -->
+    <string name="settings_language">语言</string>
+    <string name="language_system">跟随系统</string>
+    <string name="language_en">英语</string>
+    <string name="language_ko">韩语</string>
+    <string name="language_zh">中文</string>
+    <string name="language_ja">日语</string>
+    <string name="language_note">整个应用会立刻切换——界面、通知、帖子都是。只有人名和跑团名保持原样。</string>
+
+    <!-- Runner titles -->
+    <string name="tier_rookie">新秀</string>
+    <string name="tier_strider">迈步者</string>
+    <string name="tier_trailblazer">开拓者</string>
+    <string name="tier_pacesetter">领跑者</string>
+    <string name="tier_elite">精英</string>
+    <string name="tier_master">大师</string>
+    <string name="tier_legend">传奇</string>
+
+    <!-- Sneaker models -->
+    <string name="variant_runner">跑者</string>
+    <string name="variant_trainer">训练</string>
+    <string name="variant_trail">越野</string>
+    <string name="variant_racer">竞速</string>
+    <string name="variant_glide">滑翔</string>
+    <string name="variant_blade">刀锋</string>
+    <string name="variant_apex">巅峰</string>
+    <string name="variant_phantom">幻影</string>
+    <string name="variant_titan">泰坦</string>
+    <string name="variant_seraph">炽天使</string>
+    <string name="variant_dragon">龙</string>
 </resources>

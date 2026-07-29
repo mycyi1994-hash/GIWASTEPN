@@ -65,6 +65,7 @@ import com.giwa.strideup.ui.components.RarityChip
 import com.giwa.strideup.ui.components.SectionHeader
 import com.giwa.strideup.ui.components.SneakerCollectionCard
 import com.giwa.strideup.ui.components.SneakerFrame
+import com.giwa.strideup.ui.components.fullLabel
 import com.giwa.strideup.ui.components.TokenCard
 import com.giwa.strideup.ui.components.VoltButton
 import com.giwa.strideup.ui.components.Wordmark
@@ -114,7 +115,7 @@ fun ItemsScreen(
             ItemsMessage.BoostBought -> msgBoostBought
             ItemsMessage.MaxLevel -> msgMaxLevel
             is ItemsMessage.Upgraded -> msgUpgraded
-            is ItemsMessage.Equipped -> equippedFmt.format(m.name)
+            is ItemsMessage.Equipped -> equippedFmt.format(m.sneaker.fullLabel(context))
         }
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
         viewModel.consumeMessage()
@@ -469,7 +470,7 @@ fun ItemsScreen(
                         animate = true,
                     )
                     Text(
-                        text = "${sneaker.faction.label()} ${sneaker.variantName}",
+                        text = sneaker.fullLabel(),
                         style = MaterialTheme.typography.titleMedium,
                         color = Snow,
                         textAlign = TextAlign.Center,
@@ -547,7 +548,7 @@ private fun CopiesDialog(
         },
         title = {
             Text(
-                text = "${first.faction.label()} ${first.variantName} ×${copies.size}",
+                text = first.fullLabel() + " ×${copies.size}",
                 fontWeight = FontWeight.Black,
             )
         },

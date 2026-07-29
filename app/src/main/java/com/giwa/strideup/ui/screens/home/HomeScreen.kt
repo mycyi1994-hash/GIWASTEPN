@@ -57,6 +57,7 @@ import com.giwa.strideup.ui.components.LevelAvatar
 import com.giwa.strideup.ui.components.NeonRing
 import com.giwa.strideup.domain.runnerTitle
 import com.giwa.strideup.ui.components.SneakerFrame
+import com.giwa.strideup.ui.components.fullLabel
 import com.giwa.strideup.ui.components.StartRunButton
 import com.giwa.strideup.ui.components.TokenCard
 import com.giwa.strideup.ui.components.Wordmark
@@ -257,7 +258,7 @@ private fun GreetingRow(
                 color = Snow,
             )
             Text(
-                text = stringResource(R.string.level_chip, level) + " · " + runnerTitle(level),
+                text = stringResource(R.string.level_chip, level) + " · " + runnerTitle(level).label(),
                 fontSize = 10.sp,
                 color = Volt,
                 fontWeight = FontWeight.SemiBold,
@@ -620,8 +621,11 @@ private fun SneakerStrip(
                 verticalArrangement = Arrangement.spacedBy(3.dp),
             ) {
                 Text(
-                    text = sneaker?.let { "${it.faction.label()} ${it.variantName}" }
-                        ?: "Wind Runner",
+                    text = if (sneaker != null) {
+                        sneaker.fullLabel()
+                    } else {
+                        stringResource(R.string.common_none)
+                    },
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     color = Snow,

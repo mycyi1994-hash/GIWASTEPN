@@ -21,6 +21,10 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Redeem
+import androidx.compose.material.icons.filled.Whatshot
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Upgrade
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -379,6 +383,10 @@ private fun LedgerRow(entry: RewardEntity) {
         RewardType.EARN_WALK -> Icons.AutoMirrored.Filled.DirectionsWalk to R.string.ledger_earn_walk
         RewardType.BONUS_GOAL -> Icons.Filled.EmojiEvents to R.string.ledger_bonus_goal
         RewardType.SPEND_UPGRADE -> Icons.Filled.Upgrade to R.string.ledger_spend_upgrade
+        RewardType.SPEND_MINT -> Icons.Filled.AutoAwesome to R.string.ledger_spend_mint
+        RewardType.SPEND_BOOST -> Icons.Filled.Whatshot to R.string.ledger_spend_boost
+        RewardType.EARN_EVENT -> Icons.Filled.Redeem to R.string.ledger_earn_event
+        RewardType.EARN_PARTY -> Icons.Filled.Groups to R.string.ledger_earn_party
         else -> Icons.Filled.EmojiEvents to R.string.ledger_other
     }
     GlowCard(

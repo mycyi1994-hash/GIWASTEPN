@@ -732,4 +732,35 @@ StepUp と走り出そう。</string>
     <string name="seed_reply2">ゆっくりペースなので誰も置いていきません。</string>
     <string name="seed_reply3">大丈夫です、待っています。</string>
     <string name="seed_reply4">いいですね、現地で！</string>
+
+    <!-- Language -->
+    <string name="settings_language">言語</string>
+    <string name="language_system">システムに合わせる</string>
+    <string name="language_en">英語</string>
+    <string name="language_ko">韓国語</string>
+    <string name="language_zh">中国語</string>
+    <string name="language_ja">日本語</string>
+    <string name="language_note">アプリ全体がすぐ切り替わります — 画面も通知も投稿も。人名とクルー名だけそのままです。</string>
+
+    <!-- Runner titles -->
+    <string name="tier_rookie">ルーキー</string>
+    <string name="tier_strider">ストライダー</string>
+    <string name="tier_trailblazer">トレイルブレイザー</string>
+    <string name="tier_pacesetter">ペースセッター</string>
+    <string name="tier_elite">エリート</string>
+    <string name="tier_master">マスター</string>
+    <string name="tier_legend">レジェンド</string>
+
+    <!-- Sneaker models -->
+    <string name="variant_runner">ランナー</string>
+    <string name="variant_trainer">トレーナー</string>
+    <string name="variant_trail">トレイル</string>
+    <string name="variant_racer">レーサー</string>
+    <string name="variant_glide">グライド</string>
+    <string name="variant_blade">ブレード</string>
+    <string name="variant_apex">エイペックス</string>
+    <string name="variant_phantom">ファントム</string>
+    <string name="variant_titan">タイタン</string>
+    <string name="variant_seraph">セラフ</string>
+    <string name="variant_dragon">ドラゴン</string>
 </resources>

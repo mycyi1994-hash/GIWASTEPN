@@ -38,6 +38,8 @@ import com.giwa.strideup.ui.components.GhostButton
 import com.giwa.strideup.ui.components.GlowCard
 import com.giwa.strideup.ui.components.RarityChip
 import com.giwa.strideup.ui.components.SneakerFrame
+import com.giwa.strideup.ui.components.fullLabel
+import com.giwa.strideup.ui.components.variantLabel
 import com.giwa.strideup.ui.components.StatBar
 import com.giwa.strideup.ui.components.VoltButton
 import com.giwa.strideup.ui.components.label
@@ -70,7 +72,7 @@ fun SneakerDetailScreen(
             ItemsMessage.NotEnoughBalance -> msgNoBalance
             ItemsMessage.MaxLevel -> msgMaxLevel
             is ItemsMessage.Upgraded -> msgUpgraded
-            is ItemsMessage.Equipped -> equippedFmt.format(m.name)
+            is ItemsMessage.Equipped -> equippedFmt.format(m.sneaker.fullLabel(context))
             else -> null
         }
         if (text != null) Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
@@ -96,7 +98,7 @@ fun SneakerDetailScreen(
                     onClick = onBack,
                 )
                 Text(
-                    text = sneaker?.let { "${it.faction.label()} ${it.variantName}" }.orEmpty(),
+                    text = if (sneaker != null) sneaker.fullLabel() else "",
                     modifier = Modifier.weight(1f),
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Black,
@@ -151,7 +153,7 @@ fun SneakerDetailScreen(
                     verticalArrangement = Arrangement.spacedBy(3.dp),
                 ) {
                     Text(
-                        text = sneaker.variantName,
+                        text = sneaker.variantLabel(),
                         style = MaterialTheme.typography.titleMedium,
                         color = Snow,
                     )

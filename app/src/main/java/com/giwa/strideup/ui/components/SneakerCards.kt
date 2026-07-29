@@ -1,5 +1,7 @@
 package com.giwa.strideup.ui.components
 
+import android.content.Context
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -30,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import com.giwa.strideup.R
 import com.giwa.strideup.domain.Faction
 import com.giwa.strideup.domain.Rarity
+import com.giwa.strideup.domain.RunnerTitle
 import com.giwa.strideup.domain.Sneaker
 import com.giwa.strideup.ui.theme.CarbonHigh
 import com.giwa.strideup.ui.theme.Edge
@@ -61,12 +64,57 @@ fun Rarity.label(): String = stringResource(
 fun Faction.tint(): Color = Color(accent)
 
 @Composable
-fun Faction.label(): String = stringResource(
+fun Faction.label(): String = stringResource(factionNameRes(this))
+
+/** 등급·변형별 모델명 리소스 */
+@StringRes
+fun variantNameRes(rarity: Rarity, variant: Int): Int {
+    val names = when (rarity) {
+        Rarity.COMMON -> listOf(R.string.variant_runner, R.string.variant_trainer, R.string.variant_trail)
+        Rarity.RARE -> listOf(R.string.variant_racer, R.string.variant_glide, R.string.variant_blade)
+        Rarity.EPIC -> listOf(R.string.variant_apex, R.string.variant_phantom, R.string.variant_titan)
+        Rarity.LEGENDARY -> listOf(R.string.variant_seraph, R.string.variant_dragon)
+    }
+    return names[variant.coerceIn(0, names.lastIndex)]
+}
+
+@StringRes
+fun factionNameRes(faction: Faction): Int = when (faction) {
+    Faction.FIRE -> R.string.faction_fire
+    Faction.WATER -> R.string.faction_water
+    Faction.LIGHTNING -> R.string.faction_lightning
+    Faction.WIND -> R.string.faction_wind
+}
+
+/** 등급·변형별 모델명 — "Apex", "드래곤" */
+@Composable
+fun variantLabel(rarity: Rarity, variant: Int): String = stringResource(variantNameRes(rarity, variant))
+
+/** 모델명만 — "드래곤" */
+@Composable
+fun Sneaker.variantLabel(): String = variantLabel(rarity, variant)
+
+/** 속성 + 모델명 — "번개 드래곤" */
+@Composable
+fun Sneaker.fullLabel(): String = "${faction.label()} ${variantLabel()}"
+
+/** Composable 밖(토스트·알림)에서 쓰는 같은 이름 */
+fun Sneaker.fullLabel(context: Context): String = fullSneakerLabel(context, faction, rarity, variant)
+
+fun fullSneakerLabel(context: Context, faction: Faction, rarity: Rarity, variant: Int): String =
+    context.getString(factionNameRes(faction)) + " " + context.getString(variantNameRes(rarity, variant))
+
+/** 러너 칭호 */
+@Composable
+fun RunnerTitle.label(): String = stringResource(
     when (this) {
-        Faction.FIRE -> R.string.faction_fire
-        Faction.WATER -> R.string.faction_water
-        Faction.LIGHTNING -> R.string.faction_lightning
-        Faction.WIND -> R.string.faction_wind
+        RunnerTitle.ROOKIE -> R.string.tier_rookie
+        RunnerTitle.STRIDER -> R.string.tier_strider
+        RunnerTitle.TRAILBLAZER -> R.string.tier_trailblazer
+        RunnerTitle.PACESETTER -> R.string.tier_pacesetter
+        RunnerTitle.ELITE -> R.string.tier_elite
+        RunnerTitle.MASTER -> R.string.tier_master
+        RunnerTitle.LEGEND -> R.string.tier_legend
     }
 )
 
@@ -191,7 +239,7 @@ fun SneakerCollectionCard(
         }
 
         Text(
-            text = sneaker.variantName,
+            text = sneaker.variantLabel(),
             style = MaterialTheme.typography.titleSmall,
             color = Snow,
             fontSize = 13.sp,
@@ -321,7 +369,7 @@ fun EquippedSneakerCard(
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
                 Text(
-                    text = "${sneaker.faction.label()} ${sneaker.variantName}",
+                    text = sneaker.fullLabel(),
                     style = MaterialTheme.typography.titleMedium,
                     color = Snow,
                 )

@@ -68,13 +68,15 @@ object RunnerLevels {
         of(steps * RewardEconomy.STRIDE_METERS / 1000)
 }
 
-/** 레벨 구간별 러너 칭호 */
-fun runnerTitle(level: Int): String = when {
-    level >= RunnerLevels.MAX_LEVEL -> "Legend"
-    level >= 45 -> "Master"
-    level >= 30 -> "Elite"
-    level >= 20 -> "Pacesetter"
-    level >= 10 -> "Trailblazer"
-    level >= 5 -> "Strider"
-    else -> "Rookie"
+/** 레벨 구간별 러너 칭호 — 표시용 이름은 화면에서 현지화한다 */
+enum class RunnerTitle { ROOKIE, STRIDER, TRAILBLAZER, PACESETTER, ELITE, MASTER, LEGEND }
+
+fun runnerTitle(level: Int): RunnerTitle = when {
+    level >= RunnerLevels.MAX_LEVEL -> RunnerTitle.LEGEND
+    level >= 45 -> RunnerTitle.MASTER
+    level >= 30 -> RunnerTitle.ELITE
+    level >= 20 -> RunnerTitle.PACESETTER
+    level >= 10 -> RunnerTitle.TRAILBLAZER
+    level >= 5 -> RunnerTitle.STRIDER
+    else -> RunnerTitle.ROOKIE
 }

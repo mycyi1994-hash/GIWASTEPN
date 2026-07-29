@@ -139,8 +139,8 @@ data class Silhouette(
 )
 
 /**
- * 등급·변형별 모델명. 속성명과 합쳐 "Fire Apex" 같은 이름이 된다.
- * 브랜드명 성격이라 현지화하지 않는다.
+ * 등급·변형별 모델 키. 화면에서는 이 키에 대응하는 현지화 문자열을 쓰고,
+ * 여기 영문 값은 로그·저장용 식별자로만 남긴다.
  */
 object VariantNames {
     private val common = listOf("Runner", "Trainer", "Trail")
@@ -289,4 +289,14 @@ object SneakerMint {
         equipped = true,
         acquiredAt = System.currentTimeMillis(),
     )
+}
+
+/** "fire:epic:1" 같은 슬롯 키를 되돌린다. 형식이 어긋나면 null */
+fun parseSlotKey(key: String): Triple<Faction, Rarity, Int>? {
+    val parts = key.split(':')
+    if (parts.size != 3) return null
+    val faction = Faction.entries.firstOrNull { it.id == parts[0] } ?: return null
+    val rarity = Rarity.entries.firstOrNull { it.id == parts[1] } ?: return null
+    val variant = parts[2].toIntOrNull() ?: return null
+    return Triple(faction, rarity, variant)
 }

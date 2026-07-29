@@ -52,6 +52,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.giwa.strideup.R
+import com.giwa.strideup.domain.parseSlotKey
+import com.giwa.strideup.ui.components.label
+import com.giwa.strideup.ui.components.variantLabel
 import com.giwa.strideup.core.ServiceLocator
 import com.giwa.strideup.data.local.NotificationEntity
 import com.giwa.strideup.data.local.NotificationType
@@ -330,6 +333,14 @@ private fun iconFor(type: String): ImageVector = when (type) {
 }
 
 /** 저장된 인자를 표시 시점 로케일로 조립한다. */
+/** 알림에 저장된 슬롯 키를 지금 언어의 신발 이름으로 되살린다 */
+@Composable
+private fun sneakerLabel(slotKey: String): String {
+    val parsed = parseSlotKey(slotKey) ?: return slotKey
+    val (faction, rarity, variant) = parsed
+    return faction.label() + " " + variantLabel(rarity, variant)
+}
+
 @Composable
 private fun messageFor(entity: NotificationEntity): String {
     val amount = "%,.2f".format(entity.argAmount)
@@ -341,10 +352,10 @@ private fun messageFor(entity: NotificationEntity): String {
             stringResource(R.string.notif_goal_reached, entity.argText, amount)
 
         NotificationType.SNEAKER_MINTED ->
-            stringResource(R.string.notif_sneaker_minted, entity.argText)
+            stringResource(R.string.notif_sneaker_minted, sneakerLabel(entity.argText))
 
         NotificationType.SNEAKER_UPGRADED ->
-            stringResource(R.string.notif_sneaker_upgraded, entity.argText)
+            stringResource(R.string.notif_sneaker_upgraded, sneakerLabel(entity.argText))
 
         NotificationType.BOOST_ACTIVATED ->
             stringResource(R.string.notif_boost_activated)

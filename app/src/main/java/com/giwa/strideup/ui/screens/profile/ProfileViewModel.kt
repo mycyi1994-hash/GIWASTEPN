@@ -12,6 +12,7 @@ import com.giwa.strideup.data.repo.StepRepository
 import com.giwa.strideup.domain.RewardEconomy
 import com.giwa.strideup.domain.RunnerLevels
 import com.giwa.strideup.domain.RunnerProgress
+import com.giwa.strideup.domain.Sneaker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -37,7 +38,7 @@ class ProfileViewModel(
         val runnerUid: String = "",
         val avatarId: Int = 0,
         val avatarRev: Int = 0,
-        val equippedName: String = "",
+        val equipped: Sneaker? = null,
     ) {
         /** 러너 레벨 — 누적으로 걸은 거리가 곧 경험치다 */
         val runner: RunnerProgress get() = RunnerLevels.of(lifetimeKm)
@@ -78,9 +79,7 @@ class ProfileViewModel(
             runnerUid = ident.uid,
             avatarId = ident.avatarId,
             avatarRev = ident.avatarRev,
-            equippedName = ident.equipped
-                ?.let { "${it.faction.displayName} ${it.variantName}" }
-                .orEmpty(),
+            equipped = ident.equipped,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState())
 

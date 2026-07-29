@@ -412,7 +412,7 @@ private fun FeaturedCampaign(
             RewardPill(
                 modifier = Modifier.weight(1f),
                 top = "+15,000",
-                bottom = "StrideTokens",
+                bottom = "StepUp Token",
             )
             if (claimed) {
                 GhostButton(
@@ -552,7 +552,7 @@ private fun EventCard(
                         color = Volt,
                     )
                 }
-                Text("StrideTokens", fontSize = 9.sp, color = Slate)
+                Text("StepUp Token", fontSize = 9.sp, color = Slate)
             }
         }
 

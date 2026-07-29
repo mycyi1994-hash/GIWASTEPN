@@ -59,7 +59,7 @@ class SneakerRepository(
         sneakerDao.update(upgraded)
         rewardRepository.notify(
             NotificationType.SNEAKER_UPGRADED,
-            current.displayName,
+            current.slotKey,
             (entity.level + 1).toDouble(),
         )
         return upgraded.toDomain()
@@ -83,7 +83,7 @@ class SneakerRepository(
         val newId = sneakerDao.insert(minted.toEntity())
         rewardRepository.notify(
             NotificationType.SNEAKER_MINTED,
-            minted.displayName,
+            minted.slotKey,
             minted.rarity.ordinal.toDouble(),
         )
         return minted.copy(id = newId)

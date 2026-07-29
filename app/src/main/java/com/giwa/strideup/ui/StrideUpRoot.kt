@@ -83,6 +83,7 @@ import com.giwa.strideup.ui.screens.profile.AnalyticsScreen
 import com.giwa.strideup.ui.screens.profile.ProfileScreen
 import com.giwa.strideup.ui.screens.rewards.WalletScreen
 import com.giwa.strideup.ui.screens.settings.ConnectedAccountsScreen
+import com.giwa.strideup.ui.screens.settings.LanguageScreen
 import com.giwa.strideup.ui.screens.settings.NotificationSettingsScreen
 import com.giwa.strideup.ui.screens.settings.PrivacyScreen
 import com.giwa.strideup.ui.screens.settings.SupportScreen
@@ -114,6 +115,7 @@ object Routes {
     const val SETTINGS_PRIVACY = "settings/privacy"
     const val SETTINGS_SUPPORT = "settings/support"
     const val SETTINGS_CONNECTED = "settings/connected"
+    const val SETTINGS_LANGUAGE = "settings/language"
     const val SNEAKER = "sneaker/{id}"
     const val LOBBY = "lobby/{crewId}"
     const val RANKING = "ranking"
@@ -240,6 +242,7 @@ private fun MainScaffold(startTour: Boolean = false) {
                     onOpenPrivacy = { navController.navigate(Routes.SETTINGS_PRIVACY) },
                     onOpenSupport = { navController.navigate(Routes.SETTINGS_SUPPORT) },
                     onOpenConnected = { navController.navigate(Routes.SETTINGS_CONNECTED) },
+                    onOpenLanguage = { navController.navigate(Routes.SETTINGS_LANGUAGE) },
                     onOpenItems = { navController.switchTab(Screen.Items) },
                 )
             }
@@ -269,6 +272,9 @@ private fun MainScaffold(startTour: Boolean = false) {
             }
             composable(Routes.SETTINGS_CONNECTED) {
                 ConnectedAccountsScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Routes.SETTINGS_LANGUAGE) {
+                LanguageScreen(onBack = { navController.popBackStack() })
             }
             composable(
                 route = Routes.SNEAKER,

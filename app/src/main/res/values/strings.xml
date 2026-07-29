@@ -733,4 +733,35 @@ Start running with StepUp.</string>
     <string name="seed_reply2">Easy pace, no one gets dropped.</string>
     <string name="seed_reply3">Totally fine — we\'ll wait for you.</string>
     <string name="seed_reply4">Nice, see you out there!</string>
+
+    <!-- Language -->
+    <string name="settings_language">Language</string>
+    <string name="language_system">System default</string>
+    <string name="language_en">English</string>
+    <string name="language_ko">Korean</string>
+    <string name="language_zh">Chinese</string>
+    <string name="language_ja">Japanese</string>
+    <string name="language_note">Everything in the app switches instantly — screens, notifications and posts. Only names stay as they are.</string>
+
+    <!-- Runner titles -->
+    <string name="tier_rookie">Rookie</string>
+    <string name="tier_strider">Strider</string>
+    <string name="tier_trailblazer">Trailblazer</string>
+    <string name="tier_pacesetter">Pacesetter</string>
+    <string name="tier_elite">Elite</string>
+    <string name="tier_master">Master</string>
+    <string name="tier_legend">Legend</string>
+
+    <!-- Sneaker models -->
+    <string name="variant_runner">Runner</string>
+    <string name="variant_trainer">Trainer</string>
+    <string name="variant_trail">Trail</string>
+    <string name="variant_racer">Racer</string>
+    <string name="variant_glide">Glide</string>
+    <string name="variant_blade">Blade</string>
+    <string name="variant_apex">Apex</string>
+    <string name="variant_phantom">Phantom</string>
+    <string name="variant_titan">Titan</string>
+    <string name="variant_seraph">Seraph</string>
+    <string name="variant_dragon">Dragon</string>
 </resources>

@@ -27,6 +27,7 @@ import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MilitaryTech
@@ -61,6 +62,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.giwa.strideup.BuildConfig
 import com.giwa.strideup.R
 import com.giwa.strideup.data.prefs.UserPrefs
 import com.giwa.strideup.domain.RewardEconomy
@@ -79,7 +81,10 @@ import com.giwa.strideup.ui.components.Wordmark
 import com.giwa.strideup.ui.components.quietClickable
 import com.giwa.strideup.ui.guide.GuideTour
 import com.giwa.strideup.ui.guide.guideTarget
+import com.giwa.strideup.domain.Sneaker
 import com.giwa.strideup.domain.runnerTitle
+import com.giwa.strideup.ui.components.fullLabel
+import com.giwa.strideup.ui.components.label
 import com.giwa.strideup.ui.theme.Carbon
 import com.giwa.strideup.ui.theme.CarbonHigh
 import com.giwa.strideup.ui.theme.Edge
@@ -98,6 +103,7 @@ fun ProfileScreen(
     onOpenPrivacy: () -> Unit = {},
     onOpenSupport: () -> Unit = {},
     onOpenConnected: () -> Unit = {},
+    onOpenLanguage: () -> Unit = {},
     onOpenItems: () -> Unit = {},
     viewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory),
 ) {
@@ -166,7 +172,7 @@ fun ProfileScreen(
             SneakersCard(
                 level = state.sneakerLevel,
                 owned = state.ownedSneakers,
-                equippedName = state.equippedName,
+                equipped = state.equipped,
                 onOpenItems = onOpenItems,
             )
         }
@@ -204,6 +210,11 @@ fun ProfileScreen(
                     onClick = onOpenGuide,
                 )
                 ListRow(
+                    icon = Icons.Filled.Language,
+                    title = stringResource(R.string.settings_language),
+                    onClick = onOpenLanguage,
+                )
+                ListRow(
                     icon = Icons.Filled.Link,
                     title = stringResource(R.string.settings_connected),
                     onClick = onOpenConnected,
@@ -213,7 +224,10 @@ fun ProfileScreen(
 
         item {
             GlowCard(contentPadding = PaddingValues(16.dp), spacing = 9.dp) {
-                AboutRow(label = stringResource(R.string.about_version), value = "StepUp 1.7.0")
+                AboutRow(
+                    label = stringResource(R.string.about_version),
+                    value = "StepUp " + BuildConfig.VERSION_NAME,
+                )
                 AboutRow(
                     label = stringResource(R.string.about_network),
                     value = stringResource(R.string.about_network_value),
@@ -290,7 +304,7 @@ private fun ProfileHeader(
                 ) {
                     HexEmblem(size = 14.dp, glow = false)
                     Text(
-                        text = runnerTitle(state.runner.level),
+                        text = runnerTitle(state.runner.level).label(),
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.SemiBold,
                         color = Volt,
@@ -501,7 +515,7 @@ private fun AchPreview(
 private fun SneakersCard(
     level: Int,
     owned: Int,
-    equippedName: String,
+    equipped: Sneaker?,
     onOpenItems: () -> Unit,
 ) {
     GlowCard(
@@ -529,7 +543,11 @@ private fun SneakersCard(
             }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(
-                    text = equippedName.ifBlank { stringResource(R.string.common_none) },
+                    text = if (equipped != null) {
+                        equipped.fullLabel()
+                    } else {
+                        stringResource(R.string.common_none)
+                    },
                     style = MaterialTheme.typography.titleSmall,
                     color = Snow,
                 )
