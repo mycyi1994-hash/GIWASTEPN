@@ -1,6 +1,7 @@
 package com.giwa.strideup.ui.components
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -46,15 +47,17 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.giwa.strideup.R
 import com.giwa.strideup.ui.theme.CardFill
 import com.giwa.strideup.ui.theme.Carbon
 import com.giwa.strideup.ui.theme.CarbonHigh
@@ -198,27 +201,23 @@ fun GradientText(
     )
 }
 
-/** StrideUp 워드마크 — 이탤릭 블랙, "Stride" 화이트 + "Up" 볼트 */
+/**
+ * STEPUP 워드마크 — 브랜드 로고 이미지.
+ *
+ * [fontSize]는 기존 호출부와의 호환을 위해 남겨둔 이름이고, 실제로는
+ * 로고 높이를 정한다(대문자 높이 기준이라 글자 크기와 비슷하게 보인다).
+ * 가로폭은 5.76:1 비율로 자동 결정된다.
+ */
 @Composable
 fun Wordmark(fontSize: TextUnit = 20.sp, modifier: Modifier = Modifier) {
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            text = "Step",
-            fontSize = fontSize,
-            fontWeight = FontWeight.Black,
-            fontStyle = FontStyle.Italic,
-            color = Snow,
-            letterSpacing = (-0.5).sp,
-        )
-        Text(
-            text = "Up",
-            fontSize = fontSize,
-            fontWeight = FontWeight.Black,
-            fontStyle = FontStyle.Italic,
-            color = Volt,
-            letterSpacing = (-0.5).sp,
-        )
-    }
+    Image(
+        painter = painterResource(R.drawable.logo_wordmark),
+        contentDescription = "STEPUP",
+        modifier = modifier.height(fontSize.value.dp * 0.92f),
+        contentScale = ContentScale.Fit,
+        // weight(1f)로 늘어난 헤더에서도 로고는 왼쪽에 붙어 있게 한다
+        alignment = Alignment.CenterStart,
+    )
 }
 
 /** 섹션 헤더 (제목 + 우측 액션) */

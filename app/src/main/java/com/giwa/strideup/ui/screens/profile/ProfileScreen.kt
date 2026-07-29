@@ -183,7 +183,7 @@ fun ProfileScreen(
 
         item {
             GlowCard(contentPadding = PaddingValues(16.dp), spacing = 9.dp) {
-                AboutRow(label = stringResource(R.string.about_version), value = "StepUp 1.6.0")
+                AboutRow(label = stringResource(R.string.about_version), value = "StepUp 1.6.1")
                 AboutRow(
                     label = stringResource(R.string.about_network),
                     value = stringResource(R.string.about_network_value),
