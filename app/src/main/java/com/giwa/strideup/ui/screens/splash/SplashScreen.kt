@@ -171,12 +171,14 @@ fun SplashScreen(onReady: () -> Unit) {
                         center = center,
                     )
                 }
-                // 테두리 없이 가장자리를 녹여 스피드 라인 배경 위에 자연스럽게 띄운다
+                // 테두리 없이 가장자리를 녹여 스피드 라인 배경 위에 자연스럽게 띄운다.
+                // fillMaxWidth를 붙이면 최소 폭이 고정돼 aspectRatio가 자리보다 큰
+                // 크기로 측정될 수 있다(짧은 화면·가로 모드에서 위아래로 넘침).
+                // Box 자식의 느슨한 제약 그대로 두면 항상 자리 안에 내접한다.
                 Image(
                     painter = painterResource(heroImage),
                     contentDescription = null,
                     modifier = Modifier
-                        .fillMaxWidth()
                         .aspectRatio(4f / 3f)
                         .fadedEdges(0.2f),
                     contentScale = ContentScale.Fit,
