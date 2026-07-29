@@ -762,4 +762,9 @@ StepUp과 함께 달려보세요.</string>
     <string name="variant_titan">타이탄</string>
     <string name="variant_seraph">세라프</string>
     <string name="variant_dragon">드래곤</string>
+
+    <!-- Run metrics -->
+    <string name="stat_pace">페이스 /km</string>
+    <string name="stat_speed">속도 km/h</string>
+    <string name="stat_cadence">케이던스 spm</string>
 </resources>

@@ -569,6 +569,7 @@ private fun CopiesDialog(
                             sneaker = copy,
                             modifier = Modifier.size(52.dp),
                             corner = 10.dp,
+                            fade = false,
                         )
                         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             Row(

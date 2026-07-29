@@ -13,6 +13,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -50,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import com.giwa.strideup.R
 import com.giwa.strideup.core.ServiceLocator
 import com.giwa.strideup.ui.components.AllSneakerImages
+import com.giwa.strideup.ui.components.fadedEdges
 import com.giwa.strideup.ui.components.HexEmblem
 import com.giwa.strideup.ui.components.Wordmark
 import com.giwa.strideup.ui.theme.Night
@@ -169,14 +171,14 @@ fun SplashScreen(onReady: () -> Unit) {
                         center = center,
                     )
                 }
+                // 테두리 없이 가장자리를 녹여 스피드 라인 배경 위에 자연스럽게 띄운다
                 Image(
                     painter = painterResource(heroImage),
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(max = 260.dp)
-                        .clip(RoundedCornerShape(26.dp))
-                        .border(1.dp, Volt.copy(alpha = 0.35f), RoundedCornerShape(26.dp)),
+                        .aspectRatio(4f / 3f)
+                        .fadedEdges(0.2f),
                     contentScale = ContentScale.Fit,
                 )
             }

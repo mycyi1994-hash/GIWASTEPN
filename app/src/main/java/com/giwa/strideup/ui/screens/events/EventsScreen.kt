@@ -137,14 +137,16 @@ fun EventsScreen(
         verticalArrangement = Arrangement.spacedBy(15.dp),
     ) {
         item {
+            // 로고 · 누적 리워드 · 알림을 한 줄에 — 제목은 그 아래 전체 폭을 쓴다
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                Wordmark(fontSize = 22.sp)
+                Wordmark(fontSize = 22.sp, modifier = Modifier.weight(1f))
+                TotalRewardsCard(balance)
                 DarkIconButton(
                     icon = Icons.Filled.Notifications,
                     contentDescription = stringResource(R.string.cd_notifications),
@@ -155,29 +157,19 @@ fun EventsScreen(
         }
 
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    Text(
-                        text = stringResource(R.string.tab_events),
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = (-1).sp,
-                        color = Snow,
-                    )
-                    Text(
-                        text = stringResource(R.string.events_sub),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Silver,
-                    )
-                }
-                TotalRewardsCard(balance)
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = stringResource(R.string.tab_events),
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = (-1).sp,
+                    color = Snow,
+                )
+                Text(
+                    text = stringResource(R.string.events_sub),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Silver,
+                )
             }
         }
 
@@ -306,29 +298,37 @@ private fun TotalRewardsCard(balance: Double) {
         modifier = Modifier
             .clip(shape)
             .background(CarbonHigh, shape)
-            .padding(horizontal = 14.dp, vertical = 12.dp),
+            .padding(horizontal = 12.dp, vertical = 7.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        HexEmblem(size = 34.dp)
+        HexEmblem(size = 24.dp)
         Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
             Text(
                 text = stringResource(R.string.events_total_rewards),
-                fontSize = 10.sp,
+                fontSize = 9.sp,
                 color = Silver,
+                maxLines = 1,
             )
-            Text(
-                text = "%,.2f".format(balance),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Snow,
-            )
-            Text(
-                text = "+$%,.2f".format(balance * 0.01),
-                fontSize = 10.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Volt,
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+            ) {
+                Text(
+                    text = "%,.2f".format(balance),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Snow,
+                    maxLines = 1,
+                )
+                Text(
+                    text = "+$%,.2f".format(balance * 0.01),
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Volt,
+                    maxLines = 1,
+                )
+            }
         }
     }
 }

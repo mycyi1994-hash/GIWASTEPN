@@ -764,4 +764,9 @@ Start running with StepUp.</string>
     <string name="variant_titan">Titan</string>
     <string name="variant_seraph">Seraph</string>
     <string name="variant_dragon">Dragon</string>
+
+    <!-- Run metrics -->
+    <string name="stat_pace">Pace /km</string>
+    <string name="stat_speed">Speed km/h</string>
+    <string name="stat_cadence">Cadence spm</string>
 </resources>

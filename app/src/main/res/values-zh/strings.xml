@@ -762,4 +762,9 @@
     <string name="variant_titan">泰坦</string>
     <string name="variant_seraph">炽天使</string>
     <string name="variant_dragon">龙</string>
+
+    <!-- Run metrics -->
+    <string name="stat_pace">配速 /km</string>
+    <string name="stat_speed">速度 km/h</string>
+    <string name="stat_cadence">步频 spm</string>
 </resources>

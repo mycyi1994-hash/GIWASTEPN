@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.DirectionsRun
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.LocalFireDepartment
@@ -29,7 +30,9 @@ import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -116,6 +119,24 @@ fun RunScreen(
     val calories = RewardEconomy.calories(session.steps)
     val running = session.isActive && !session.isPaused
 
+    // 러닝 지표 — 아직 값이 없으면 대시로 둔다
+    val pace = if (distanceKm >= 0.01 && session.elapsedSec > 0) {
+        val secPerKm = (session.elapsedSec / distanceKm).toLong()
+        "%d'%02d\"".format(secPerKm / 60, secPerKm % 60)
+    } else {
+        "—"
+    }
+    val speedKmh = if (session.elapsedSec > 0) {
+        "%.1f".format(distanceKm / (session.elapsedSec / 3600.0))
+    } else {
+        "—"
+    }
+    val cadence = if (session.elapsedSec > 0) {
+        "%d".format(session.steps * 60L / session.elapsedSec)
+    } else {
+        "—"
+    }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 10.dp, bottom = 22.dp),
@@ -187,6 +208,27 @@ fun RunScreen(
                         icon = Icons.Filled.LocalFireDepartment,
                         value = "%,.0f".format(calories),
                         label = stringResource(R.string.stat_calories),
+                    )
+                }
+                HairlineDivider(Modifier.padding(horizontal = 10.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Metric(
+                        icon = Icons.Filled.Timer,
+                        value = pace,
+                        label = stringResource(R.string.stat_pace),
+                    )
+                    Metric(
+                        icon = Icons.Filled.Speed,
+                        value = speedKmh,
+                        label = stringResource(R.string.stat_speed),
+                    )
+                    Metric(
+                        icon = Icons.AutoMirrored.Filled.DirectionsRun,
+                        value = cadence,
+                        label = stringResource(R.string.stat_cadence),
                     )
                 }
             }

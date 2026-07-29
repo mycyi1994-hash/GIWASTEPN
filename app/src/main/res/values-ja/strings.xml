@@ -763,4 +763,9 @@ StepUp と走り出そう。</string>
     <string name="variant_titan">タイタン</string>
     <string name="variant_seraph">セラフ</string>
     <string name="variant_dragon">ドラゴン</string>
+
+    <!-- Run metrics -->
+    <string name="stat_pace">ペース /km</string>
+    <string name="stat_speed">速度 km/h</string>
+    <string name="stat_cadence">ケイデンス spm</string>
 </resources>
