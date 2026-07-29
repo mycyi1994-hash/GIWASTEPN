@@ -12,6 +12,8 @@ import com.giwa.strideup.data.repo.RewardRepository
 import com.giwa.strideup.data.repo.SneakerRepository
 import com.giwa.strideup.data.repo.StepRepository
 import com.giwa.strideup.domain.RewardEconomy
+import com.giwa.strideup.domain.RunnerLevels
+import com.giwa.strideup.domain.RunnerProgress
 import com.giwa.strideup.domain.Sneaker
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -34,6 +36,7 @@ class HomeViewModel(
         val balance: Double = 0.0,
         val streak: Int = 0,
         val sneakerLevel: Int = 1,
+        val lifetimeSteps: Long = 0,
         val week: List<DailyStepsEntity> = emptyList(),
         val sensorAvailable: Boolean = true,
         val equipped: Sneaker? = null,
@@ -44,9 +47,18 @@ class HomeViewModel(
             get() = if (maxEnergy > 0) ((energy / maxEnergy) * 100).toInt().coerceIn(0, 100) else 0
         val goalPercent: Int
             get() = if (goal > 0) (todaySteps * 100 / goal) else 0
-        val level: Int
-            get() = equipped?.level ?: sneakerLevel
+
+        /** 러너 레벨 — 누적으로 걸은 거리가 곧 경험치다 */
+        val runner: RunnerProgress get() = RunnerLevels.ofSteps(lifetimeSteps)
+        val level: Int get() = runner.level
     }
+
+    private data class Wallet(
+        val balance: Double,
+        val streak: Int,
+        val sneakerLevel: Int,
+        val lifetimeSteps: Long,
+    )
 
     val unreadCount: StateFlow<Int> = notificationRepository.unreadCount
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
@@ -61,19 +73,21 @@ class HomeViewModel(
             rewardRepository.balance,
             stepRepository.streak,
             rewardRepository.sneakerLevel,
-        ) { balance, streak, level -> Triple(balance, streak, level) },
+            stepRepository.observeLifetimeSteps(),
+        ) { balance, streak, level, lifetime -> Wallet(balance, streak, level, lifetime) },
         stepRepository.observeWeek(),
         sneakerRepository.equipped,
         combine(prefs.avatarId, prefs.avatarRev) { id, rev -> id to rev },
-    ) { (steps, goal, energy), (balance, streak, level), week, equipped, (avatarId, avatarRev) ->
+    ) { (steps, goal, energy), wallet, week, equipped, (avatarId, avatarRev) ->
         UiState(
             todaySteps = steps,
             goal = goal,
             energy = energy,
-            maxEnergy = RewardEconomy.maxEnergy(equipped?.level ?: level),
-            balance = balance,
-            streak = streak,
-            sneakerLevel = level,
+            maxEnergy = RewardEconomy.maxEnergy(equipped?.level ?: wallet.sneakerLevel),
+            balance = wallet.balance,
+            streak = wallet.streak,
+            sneakerLevel = wallet.sneakerLevel,
+            lifetimeSteps = wallet.lifetimeSteps,
             week = week,
             sensorAvailable = stepRepository.stepSensorAvailable,
             equipped = equipped,

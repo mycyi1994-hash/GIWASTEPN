@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -41,6 +43,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.giwa.strideup.R
+import com.giwa.strideup.core.ExternalIntents
 import com.giwa.strideup.domain.Post
 import com.giwa.strideup.domain.PostCategory
 import com.giwa.strideup.ui.components.GlowCard
@@ -151,8 +154,11 @@ fun FlashRunCard(
     post: Post,
     onJoin: () -> Unit,
     onLike: () -> Unit,
+    onComment: () -> Unit,
     onDelete: (() -> Unit)? = null,
 ) {
+    val context = LocalContext.current
+    val hasPlace = post.place.isNotBlank()
     GlowCard(
         contentPadding = PaddingValues(15.dp),
         spacing = 10.dp,
@@ -205,11 +211,21 @@ fun FlashRunCard(
             )
         }
 
+        // 장소를 누르면 구글 지도에서 집결지를 연다
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
                 .background(CarbonHigh.copy(alpha = 0.55f))
+                .then(
+                    if (hasPlace) {
+                        Modifier.quietClickable {
+                            ExternalIntents.openPlaceInMaps(context, post.place)
+                        }
+                    } else {
+                        Modifier
+                    }
+                )
                 .padding(horizontal = 11.dp, vertical = 9.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -217,7 +233,7 @@ fun FlashRunCard(
             Icon(
                 Icons.Filled.LocationOn,
                 contentDescription = null,
-                tint = Slate,
+                tint = if (hasPlace) Volt else Slate,
                 modifier = Modifier.size(12.dp),
             )
             Text(
@@ -228,6 +244,14 @@ fun FlashRunCard(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
             )
+            if (hasPlace) {
+                Icon(
+                    Icons.Filled.Map,
+                    contentDescription = stringResource(R.string.post_open_map),
+                    tint = Volt,
+                    modifier = Modifier.size(12.dp),
+                )
+            }
             Icon(
                 Icons.Filled.Schedule,
                 contentDescription = null,
@@ -252,7 +276,12 @@ fun FlashRunCard(
                 fontSize = 11.sp,
                 color = Silver,
             )
-            LikeRow(post = post, onLike = onLike, modifier = Modifier.weight(1f))
+            LikeRow(
+                post = post,
+                onLike = onLike,
+                onComment = onComment,
+                modifier = Modifier.weight(1f),
+            )
             JoinPill(
                 joined = post.joined,
                 enabled = !post.isClosed && (post.joined || !post.isFull),
@@ -267,6 +296,7 @@ fun FlashRunCard(
 fun TextPostCard(
     post: Post,
     onLike: () -> Unit,
+    onComment: () -> Unit,
     onDelete: (() -> Unit)? = null,
 ) {
     GlowCard(contentPadding = PaddingValues(15.dp), spacing = 9.dp) {
@@ -325,12 +355,17 @@ fun TextPostCard(
                 overflow = TextOverflow.Ellipsis,
             )
         }
-        LikeRow(post = post, onLike = onLike)
+        LikeRow(post = post, onLike = onLike, onComment = onComment)
     }
 }
 
 @Composable
-private fun LikeRow(post: Post, onLike: () -> Unit, modifier: Modifier = Modifier) {
+private fun LikeRow(
+    post: Post,
+    onLike: () -> Unit,
+    onComment: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
@@ -350,12 +385,13 @@ private fun LikeRow(post: Post, onLike: () -> Unit, modifier: Modifier = Modifie
             Text("${post.likes}", fontSize = 11.sp, color = Silver)
         }
         Row(
+            modifier = Modifier.quietClickable(onComment),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Icon(
                 Icons.Filled.ChatBubbleOutline,
-                contentDescription = null,
+                contentDescription = stringResource(R.string.comments_open),
                 tint = Silver,
                 modifier = Modifier.size(14.dp),
             )

@@ -700,4 +700,35 @@ StepUp과 함께 달려보세요.</string>
     <string name="tour11_body">러너 ID가 여기 있어요. 연필을 눌러 아바타를 바꿔보세요 — 이모지나 갤러리 사진을 고를 수 있어요.</string>
     <string name="tour12_title">업적 100종</string>
     <string name="tour12_body">브론즈부터 다이아까지, 1년 꾸준히 달리면 전부 달성할 수 있어요. 투어는 여기까지 — 이제 달려볼까요!</string>
+
+    <!-- Runner level -->
+    <string name="profile_level_progress">%1$s / %2$s km</string>
+    <string name="profile_level_max">최고 레벨</string>
+    <string name="profile_level_hint">다음 레벨까지 %1$s km</string>
+    <string name="profile_level_hint_max">걸은 거리가 곧 경험치예요. 최고 레벨에 도달했어요.</string>
+    <string name="profile_sneaker_level">신발 강화</string>
+
+    <!-- Comments -->
+    <string name="comments_title">댓글 %1$d</string>
+    <string name="comments_empty">아직 댓글이 없어요. 첫 댓글을 남겨보세요.</string>
+    <string name="comments_hint">댓글을 입력하세요</string>
+    <string name="comments_reply_hint">답글을 입력하세요</string>
+    <string name="comments_reply">답글</string>
+    <string name="comments_replying_to">%1$s님에게 답글</string>
+    <string name="comments_send">보내기</string>
+    <string name="comments_open">댓글 보기</string>
+    <string name="post_open_map">지도로 보기</string>
+    <string name="notif_comment_reply">%1$s님이 내 댓글에 답글을 남겼어요</string>
+
+    <!-- Seed comments -->
+    <string name="seed_comment1">저도 갈게요, 거기서 봬요!</string>
+    <string name="seed_comment2">페이스는 어느 정도로 잡나요?</string>
+    <string name="seed_comment3">5분 정도 늦어도 괜찮을까요?</string>
+    <string name="seed_comment4">좋은 정보 감사합니다.</string>
+    <string name="seed_comment5">친구 한 명 데려가도 될까요?</string>
+    <string name="seed_comment6">지난주에 이 코스 뛰었는데 밤에 정말 좋아요.</string>
+    <string name="seed_reply1">저도요! 입구에서 만나요.</string>
+    <string name="seed_reply2">가볍게 뛸 거예요. 아무도 안 떨어뜨려요.</string>
+    <string name="seed_reply3">괜찮아요, 기다릴게요.</string>
+    <string name="seed_reply4">좋아요, 현장에서 봬요!</string>
 </resources>

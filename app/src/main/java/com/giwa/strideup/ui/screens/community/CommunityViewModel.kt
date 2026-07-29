@@ -10,6 +10,7 @@ import com.giwa.strideup.data.repo.Crew
 import com.giwa.strideup.data.repo.CrewRepository
 import com.giwa.strideup.data.repo.RewardRepository
 import com.giwa.strideup.data.repo.StepRepository
+import com.giwa.strideup.domain.CommentThread
 import com.giwa.strideup.domain.Post
 import com.giwa.strideup.domain.PostCategory
 import kotlinx.coroutines.flow.Flow
@@ -54,6 +55,30 @@ class CommunityViewModel(
 
     /** 게시판 카테고리 필터. null이면 전체 */
     val categoryFilter = MutableStateFlow<PostCategory?>(null)
+
+    /** 댓글 창을 열어 둔 글의 id. null이면 닫혀 있다 */
+    val openCommentsFor = MutableStateFlow<Long?>(null)
+
+    fun openComments(postId: Long) {
+        openCommentsFor.value = postId
+    }
+
+    fun closeComments() {
+        openCommentsFor.value = null
+    }
+
+    fun commentThreads(postId: Long): Flow<List<CommentThread>> =
+        communityRepository.commentThreads(postId)
+
+    fun sendComment(postId: Long, body: String, parentId: Long, author: String) {
+        viewModelScope.launch {
+            communityRepository.addComment(postId, body, author, parentId)
+        }
+    }
+
+    fun deleteComment(id: Long) {
+        viewModelScope.launch { communityRepository.deleteComment(id) }
+    }
 
     fun crewOf(id: String): Crew? = crewRepository.crewOf(id)
 

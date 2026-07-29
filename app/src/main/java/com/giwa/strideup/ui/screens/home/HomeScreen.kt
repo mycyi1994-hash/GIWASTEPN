@@ -55,7 +55,8 @@ import com.giwa.strideup.ui.components.DarkIconButton
 import com.giwa.strideup.ui.components.GlowCard
 import com.giwa.strideup.ui.components.LevelAvatar
 import com.giwa.strideup.ui.components.NeonRing
-import com.giwa.strideup.ui.components.SneakerVisual
+import com.giwa.strideup.domain.runnerTitle
+import com.giwa.strideup.ui.components.SneakerFrame
 import com.giwa.strideup.ui.components.StartRunButton
 import com.giwa.strideup.ui.components.TokenCard
 import com.giwa.strideup.ui.components.Wordmark
@@ -77,15 +78,6 @@ import java.time.LocalTime
 import java.time.format.TextStyle
 import java.util.Locale
 import kotlinx.coroutines.delay
-
-/** 스니커즈 레벨 → 러너 칭호 (브랜드 고정 명칭) */
-fun runnerTier(level: Int): String = when {
-    level >= 7 -> "Legend"
-    level >= 5 -> "Pacesetter"
-    level >= 3 -> "Trailblazer"
-    level >= 2 -> "Strider"
-    else -> "Rookie"
-}
 
 /**
  * 홈 — 스크롤 없이 한 화면에 전부 담는다.
@@ -265,7 +257,7 @@ private fun GreetingRow(
                 color = Snow,
             )
             Text(
-                text = stringResource(R.string.level_chip, level) + " · " + runnerTier(level),
+                text = stringResource(R.string.level_chip, level) + " · " + runnerTitle(level),
                 fontSize = 10.sp,
                 color = Volt,
                 fontWeight = FontWeight.SemiBold,
@@ -613,12 +605,12 @@ private fun SneakerStrip(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             if (sneaker != null) {
-                SneakerVisual(
+                SneakerFrame(
                     sneaker = sneaker,
                     modifier = Modifier
                         .weight(0.62f)
-                        .fillMaxHeight()
-                        .clip(RoundedCornerShape(12.dp)),
+                        .fillMaxHeight(),
+                    corner = 12.dp,
                 )
             } else {
                 Spacer(Modifier.weight(0.62f))

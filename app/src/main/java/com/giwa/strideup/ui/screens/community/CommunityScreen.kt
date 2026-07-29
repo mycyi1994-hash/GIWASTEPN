@@ -94,6 +94,9 @@ fun CommunityScreen(
         stringResource(R.string.community_seg_crew),
     )
 
+    // 댓글 창은 어느 세그먼트에 있든 같은 뷰모델이 열고 닫는다
+    CommentSheetHost(viewModel)
+
     Column(Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier.padding(start = 18.dp, end = 18.dp, top = 14.dp),
@@ -236,6 +239,7 @@ private fun BoardTab(
                         posts = flashWindow,
                         onJoin = { viewModel.toggleJoinFlash(it) },
                         onLike = { viewModel.toggleLike(it) },
+                        onComment = { viewModel.openComments(it) },
                         onDelete = { viewModel.deletePost(it) },
                     )
                 }
@@ -270,12 +274,14 @@ private fun BoardTab(
                         post = post,
                         onJoin = { viewModel.toggleJoinFlash(post.id) },
                         onLike = { viewModel.toggleLike(post.id) },
+                        onComment = { viewModel.openComments(post.id) },
                         onDelete = { viewModel.deletePost(post.id) },
                     )
                 } else {
                     TextPostCard(
                         post = post,
                         onLike = { viewModel.toggleLike(post.id) },
+                        onComment = { viewModel.openComments(post.id) },
                         onDelete = { viewModel.deletePost(post.id) },
                     )
                 }
@@ -330,6 +336,7 @@ private fun FlashRunWindow(
     posts: List<Post>,
     onJoin: (Long) -> Unit,
     onLike: (Long) -> Unit,
+    onComment: (Long) -> Unit,
     onDelete: (Long) -> Unit,
 ) {
     Box(
@@ -350,6 +357,7 @@ private fun FlashRunWindow(
                     post = post,
                     onJoin = { onJoin(post.id) },
                     onLike = { onLike(post.id) },
+                    onComment = { onComment(post.id) },
                     onDelete = { onDelete(post.id) },
                 )
             }

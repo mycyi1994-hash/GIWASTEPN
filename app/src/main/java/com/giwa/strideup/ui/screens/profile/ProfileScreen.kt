@@ -79,7 +79,7 @@ import com.giwa.strideup.ui.components.Wordmark
 import com.giwa.strideup.ui.components.quietClickable
 import com.giwa.strideup.ui.guide.GuideTour
 import com.giwa.strideup.ui.guide.guideTarget
-import com.giwa.strideup.ui.screens.home.runnerTier
+import com.giwa.strideup.domain.runnerTitle
 import com.giwa.strideup.ui.theme.Carbon
 import com.giwa.strideup.ui.theme.CarbonHigh
 import com.giwa.strideup.ui.theme.Edge
@@ -246,7 +246,7 @@ private fun ProfileHeader(
         ) {
             Box {
                 LevelAvatar(
-                    level = state.sneakerLevel,
+                    level = state.runner.level,
                     size = 72.dp,
                     contentDescription = stringResource(R.string.cd_profile),
                     avatarId = state.avatarId,
@@ -290,7 +290,7 @@ private fun ProfileHeader(
                 ) {
                     HexEmblem(size = 14.dp, glow = false)
                     Text(
-                        text = runnerTier(state.sneakerLevel),
+                        text = runnerTitle(state.runner.level),
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.SemiBold,
                         color = Volt,
@@ -320,26 +320,33 @@ private fun ProfileHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = stringResource(R.string.level_chip, state.sneakerLevel),
+                text = stringResource(R.string.level_chip, state.runner.level),
                 style = MaterialTheme.typography.titleSmall,
                 color = Volt,
             )
             Text(
-                text = stringResource(
-                    R.string.profile_next_level,
-                    "%,.0f".format(state.balance.coerceAtMost(state.upgradeCost)),
-                    "%,.0f".format(state.upgradeCost),
-                ),
+                text = if (state.runner.isMax) {
+                    stringResource(R.string.profile_level_max)
+                } else {
+                    stringResource(
+                        R.string.profile_level_progress,
+                        "%.1f".format(state.runner.intoLevelKm),
+                        "%.0f".format(state.runner.levelSpanKm),
+                    )
+                },
                 style = MaterialTheme.typography.bodySmall,
                 color = Silver,
             )
         }
-        BarMeter(
-            fraction = if (state.upgradeCost > 0) {
-                (state.balance / state.upgradeCost).coerceIn(0.0, 1.0).toFloat()
+        BarMeter(fraction = state.runner.progress)
+        Text(
+            text = if (state.runner.isMax) {
+                stringResource(R.string.profile_level_hint_max)
             } else {
-                0f
+                stringResource(R.string.profile_level_hint, "%.1f".format(state.runner.remainingKm))
             },
+            fontSize = 10.sp,
+            color = Slate,
         )
     }
 }
@@ -527,7 +534,7 @@ private fun SneakersCard(
                     color = Snow,
                 )
                 Text(
-                    text = stringResource(R.string.level_chip, level) + " · " + runnerTier(level),
+                    text = stringResource(R.string.level_chip, level) + " · " + stringResource(R.string.profile_sneaker_level),
                     fontSize = 11.sp,
                     color = Silver,
                 )

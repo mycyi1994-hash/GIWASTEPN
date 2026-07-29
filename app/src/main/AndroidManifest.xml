@@ -11,6 +11,18 @@
         android:name="android.hardware.sensor.stepcounter"
         android:required="false" />
 
+    <!-- 번개러닝 집결지를 지도 앱으로 열기 위한 패키지 가시성 (Android 11+) -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="geo" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+    </queries>
+
     <application
         android:name=".StrideUpApp"
         android:allowBackup="true"

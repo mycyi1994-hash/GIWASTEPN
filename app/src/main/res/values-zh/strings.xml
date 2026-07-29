@@ -700,4 +700,35 @@
     <string name="tour11_body">跑者 ID 在这里。点铅笔更换头像——可选表情或相册照片。</string>
     <string name="tour12_title">100 个成就</string>
     <string name="tour12_body">从青铜到钻石，坚持一年就能全部解锁。导览到此结束，开跑吧！</string>
+
+    <!-- Runner level -->
+    <string name="profile_level_progress">%1$s / %2$s km</string>
+    <string name="profile_level_max">满级</string>
+    <string name="profile_level_hint">距离下一级还有 %1$s km</string>
+    <string name="profile_level_hint_max">你走过的每一公里都是经验值 — 已经满级了。</string>
+    <string name="profile_sneaker_level">球鞋强化</string>
+
+    <!-- Comments -->
+    <string name="comments_title">评论 %1$d</string>
+    <string name="comments_empty">还没有评论，来抢沙发。</string>
+    <string name="comments_hint">写评论</string>
+    <string name="comments_reply_hint">写回复</string>
+    <string name="comments_reply">回复</string>
+    <string name="comments_replying_to">回复 %1$s</string>
+    <string name="comments_send">发送</string>
+    <string name="comments_open">查看评论</string>
+    <string name="post_open_map">在地图中打开</string>
+    <string name="notif_comment_reply">%1$s 回复了你的评论</string>
+
+    <!-- Seed comments -->
+    <string name="seed_comment1">算我一个，到时候见！</string>
+    <string name="seed_comment2">配速大概是多少？</string>
+    <string name="seed_comment3">我可能晚五分钟，可以吗？</string>
+    <string name="seed_comment4">干货满满，谢谢分享。</string>
+    <string name="seed_comment5">我带个朋友一起，可以吗？</string>
+    <string name="seed_comment6">上周跑过这条路线，晚上特别舒服。</string>
+    <string name="seed_reply1">我也是，门口见吧。</string>
+    <string name="seed_reply2">轻松配速，不会有人掉队。</string>
+    <string name="seed_reply3">完全没问题，我们等你。</string>
+    <string name="seed_reply4">好的，到时候见！</string>
 </resources>

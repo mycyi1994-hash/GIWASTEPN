@@ -701,4 +701,35 @@ StepUp と走り出そう。</string>
     <string name="tour11_body">ランナーID はここ。鉛筆をタップしてアバター変更 — 絵文字かギャラリーの写真を選べます。</string>
     <string name="tour12_title">実績100種</string>
     <string name="tour12_body">ブロンズからダイヤまで、1年続ければ全解除。ツアーはここまで — さあ走ろう！</string>
+
+    <!-- Runner level -->
+    <string name="profile_level_progress">%1$s / %2$s km</string>
+    <string name="profile_level_max">最大レベル</string>
+    <string name="profile_level_hint">次のレベルまで %1$s km</string>
+    <string name="profile_level_hint_max">歩いた距離がそのまま経験値。最大レベルに到達しました。</string>
+    <string name="profile_sneaker_level">スニーカー強化</string>
+
+    <!-- Comments -->
+    <string name="comments_title">コメント %1$d</string>
+    <string name="comments_empty">まだコメントがありません。最初の一言をどうぞ。</string>
+    <string name="comments_hint">コメントを入力</string>
+    <string name="comments_reply_hint">返信を入力</string>
+    <string name="comments_reply">返信</string>
+    <string name="comments_replying_to">%1$s さんに返信</string>
+    <string name="comments_send">送信</string>
+    <string name="comments_open">コメントを見る</string>
+    <string name="post_open_map">地図で見る</string>
+    <string name="notif_comment_reply">%1$s さんがあなたのコメントに返信しました</string>
+
+    <!-- Seed comments -->
+    <string name="seed_comment1">参加します、現地で会いましょう！</string>
+    <string name="seed_comment2">ペースはどのくらいですか？</string>
+    <string name="seed_comment3">5分ほど遅れても大丈夫ですか？</string>
+    <string name="seed_comment4">有益な情報、ありがとうございます。</string>
+    <string name="seed_comment5">友達を一人連れて行ってもいいですか？</string>
+    <string name="seed_comment6">先週このコースを走りました、夜が最高です。</string>
+    <string name="seed_reply1">私もです、ゲートで会いましょう。</string>
+    <string name="seed_reply2">ゆっくりペースなので誰も置いていきません。</string>
+    <string name="seed_reply3">大丈夫です、待っています。</string>
+    <string name="seed_reply4">いいですね、現地で！</string>
 </resources>

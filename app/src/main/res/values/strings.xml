@@ -702,4 +702,35 @@ Start running with StepUp.</string>
     <string name="tour11_body">Your runner ID lives here. Tap the pencil to change your avatar — pick an emoji or a photo from your gallery.</string>
     <string name="tour12_title">100 achievements</string>
     <string name="tour12_body">From Bronze to Diamond — a year of steady running unlocks them all. That\'s the tour, enjoy StepUp!</string>
+
+    <!-- Runner level -->
+    <string name="profile_level_progress">%1$s / %2$s km</string>
+    <string name="profile_level_max">MAX LEVEL</string>
+    <string name="profile_level_hint">%1$s km to the next level</string>
+    <string name="profile_level_hint_max">Every kilometre you walk is your XP — you\'ve maxed it out.</string>
+    <string name="profile_sneaker_level">Sneaker tune</string>
+
+    <!-- Comments -->
+    <string name="comments_title">Comments %1$d</string>
+    <string name="comments_empty">No comments yet. Be the first.</string>
+    <string name="comments_hint">Write a comment</string>
+    <string name="comments_reply_hint">Write a reply</string>
+    <string name="comments_reply">Reply</string>
+    <string name="comments_replying_to">Replying to %1$s</string>
+    <string name="comments_send">Send</string>
+    <string name="comments_open">Open comments</string>
+    <string name="post_open_map">Open in Maps</string>
+    <string name="notif_comment_reply">%1$s replied to your comment</string>
+
+    <!-- Seed comments -->
+    <string name="seed_comment1">Count me in — see you there!</string>
+    <string name="seed_comment2">What pace are we running?</string>
+    <string name="seed_comment3">Is it okay if I\'m five minutes late?</string>
+    <string name="seed_comment4">Great tip, thanks for sharing.</string>
+    <string name="seed_comment5">Bringing a friend — hope that\'s fine.</string>
+    <string name="seed_comment6">Ran this route last week, it\'s lovely at night.</string>
+    <string name="seed_reply1">Same here, let\'s meet at the gate.</string>
+    <string name="seed_reply2">Easy pace, no one gets dropped.</string>
+    <string name="seed_reply3">Totally fine — we\'ll wait for you.</string>
+    <string name="seed_reply4">Nice, see you out there!</string>
 </resources>

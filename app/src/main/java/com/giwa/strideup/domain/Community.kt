@@ -54,6 +54,44 @@ data class Post(
 }
 
 // ─────────────────────────────────────────────────────────────
+// 댓글
+// ─────────────────────────────────────────────────────────────
+
+data class Comment(
+    val id: Long,
+    val postId: Long,
+    /** 0이면 최상위 댓글, 그 외에는 부모 댓글 id */
+    val parentId: Long,
+    val author: String,
+    val body: String,
+    val createdAt: Long,
+    val mine: Boolean,
+) {
+    val isReply: Boolean get() = parentId != 0L
+}
+
+/** 댓글 하나와 거기 달린 답글들 */
+data class CommentThread(
+    val comment: Comment,
+    val replies: List<Comment>,
+) {
+    val size: Int get() = 1 + replies.size
+}
+
+/** 평평한 댓글 목록을 부모–답글 묶음으로 정리한다. 고아 답글은 최상위로 올린다. */
+fun List<Comment>.toThreads(): List<CommentThread> {
+    val byParent = filter { it.isReply }.groupBy { it.parentId }
+    val ids = mapTo(mutableSetOf()) { it.id }
+    val roots = filter { !it.isReply || it.parentId !in ids }
+    return roots.map { root ->
+        CommentThread(
+            comment = root,
+            replies = byParent[root.id].orEmpty().sortedBy { it.createdAt },
+        )
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
 // 랭킹
 // ─────────────────────────────────────────────────────────────
 

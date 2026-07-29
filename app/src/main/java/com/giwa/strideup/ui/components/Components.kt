@@ -303,8 +303,11 @@ fun HexBadge(text: String, modifier: Modifier = Modifier, size: Dp = 26.dp) {
         Text(
             text = text,
             color = Snow,
-            fontSize = (size.value * 0.36f).sp,
+            // 두 자리 레벨(최대 60)도 육각형 안에 들어오게 살짝 줄인다
+            fontSize = (size.value * if (text.length >= 2) 0.30f else 0.36f).sp,
             fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            softWrap = false,
         )
     }
 }

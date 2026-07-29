@@ -10,6 +10,8 @@ import com.giwa.strideup.data.repo.RewardRepository
 import com.giwa.strideup.data.repo.SneakerRepository
 import com.giwa.strideup.data.repo.StepRepository
 import com.giwa.strideup.domain.RewardEconomy
+import com.giwa.strideup.domain.RunnerLevels
+import com.giwa.strideup.domain.RunnerProgress
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -37,6 +39,8 @@ class ProfileViewModel(
         val avatarRev: Int = 0,
         val equippedName: String = "",
     ) {
+        /** 러너 레벨 — 누적으로 걸은 거리가 곧 경험치다 */
+        val runner: RunnerProgress get() = RunnerLevels.of(lifetimeKm)
         val multiplier: Double get() = RewardEconomy.sneakerMultiplier(sneakerLevel)
         val upgradeCost: Double get() = RewardEconomy.upgradeCost(sneakerLevel)
         val lifetimeKm: Double get() = lifetimeSteps * RewardEconomy.STRIDE_METERS / 1000

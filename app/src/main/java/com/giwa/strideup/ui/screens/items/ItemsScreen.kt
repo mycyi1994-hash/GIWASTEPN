@@ -64,7 +64,7 @@ import com.giwa.strideup.ui.components.PillChip
 import com.giwa.strideup.ui.components.RarityChip
 import com.giwa.strideup.ui.components.SectionHeader
 import com.giwa.strideup.ui.components.SneakerCollectionCard
-import com.giwa.strideup.ui.components.SneakerVisual
+import com.giwa.strideup.ui.components.SneakerFrame
 import com.giwa.strideup.ui.components.TokenCard
 import com.giwa.strideup.ui.components.VoltButton
 import com.giwa.strideup.ui.components.Wordmark
@@ -460,14 +460,13 @@ fun ItemsScreen(
                         FactionChip(sneaker.faction)
                         RarityChip(sneaker.rarity)
                     }
-                    SneakerVisual(
+                    SneakerFrame(
                         sneaker = sneaker,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(160.dp)
-                            .clip(RoundedCornerShape(16.dp)),
+                            .height(160.dp),
+                        corner = 16.dp,
                         animate = true,
-                        contentScale = ContentScale.Fit,
                     )
                     Text(
                         text = "${sneaker.faction.label()} ${sneaker.variantName}",
@@ -565,11 +564,10 @@ private fun CopiesDialog(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(11.dp),
                     ) {
-                        SneakerVisual(
+                        SneakerFrame(
                             sneaker = copy,
-                            modifier = Modifier
-                                .size(52.dp)
-                                .clip(RoundedCornerShape(10.dp)),
+                            modifier = Modifier.size(52.dp),
+                            corner = 10.dp,
                         )
                         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             Row(

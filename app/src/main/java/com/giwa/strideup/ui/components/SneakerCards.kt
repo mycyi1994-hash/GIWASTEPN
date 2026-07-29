@@ -3,6 +3,7 @@ package com.giwa.strideup.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -162,12 +163,12 @@ fun SneakerCollectionCard(
         }
 
         Box(modifier = Modifier.fillMaxWidth()) {
-            SneakerVisual(
+            SneakerFrame(
                 sneaker = sneaker,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(96.dp)
-                    .clip(RoundedCornerShape(14.dp)),
+                    .aspectRatio(4f / 3f),
+                corner = 14.dp,
             )
             if (count > 1) {
                 Box(
@@ -336,14 +337,13 @@ fun EquippedSneakerCard(
             }
         }
 
-        SneakerVisual(
+        SneakerFrame(
             sneaker = sneaker,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(170.dp)
-                .clip(RoundedCornerShape(16.dp)),
+                .height(170.dp),
+            corner = 16.dp,
             animate = true,
-            contentScale = ContentScale.Fit,
         )
 
         Row(

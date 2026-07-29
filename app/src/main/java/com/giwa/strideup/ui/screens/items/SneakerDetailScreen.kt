@@ -37,7 +37,7 @@ import com.giwa.strideup.ui.components.FactionChip
 import com.giwa.strideup.ui.components.GhostButton
 import com.giwa.strideup.ui.components.GlowCard
 import com.giwa.strideup.ui.components.RarityChip
-import com.giwa.strideup.ui.components.SneakerVisual
+import com.giwa.strideup.ui.components.SneakerFrame
 import com.giwa.strideup.ui.components.StatBar
 import com.giwa.strideup.ui.components.VoltButton
 import com.giwa.strideup.ui.components.label
@@ -137,14 +137,13 @@ fun SneakerDetailScreen(
                         color = Slate,
                     )
                 }
-                SneakerVisual(
+                SneakerFrame(
                     sneaker = sneaker,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(220.dp)
-                        .clip(RoundedCornerShape(18.dp)),
+                        .height(220.dp),
+                    corner = 18.dp,
                     animate = true,
-                    contentScale = ContentScale.Fit,
                 )
                 Column(
                     modifier = Modifier.fillMaxWidth(),

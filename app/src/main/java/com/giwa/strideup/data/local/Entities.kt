@@ -131,6 +131,22 @@ data class PostEntity(
 )
 
 /**
+ * 게시글 댓글. parentId가 0이면 최상위 댓글, 아니면 그 댓글에 달린 답글이다.
+ */
+@Entity(tableName = "comments")
+data class CommentEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val postId: Long,
+    /** 0이면 최상위 댓글, 그 외에는 부모 댓글 id */
+    val parentId: Long,
+    val author: String,
+    val body: String,
+    val createdAt: Long,
+    /** 내가 쓴 댓글 */
+    val mine: Boolean,
+)
+
+/**
  * 앱 내 알림. 본문은 type + 인자로 표시 시점에 현지화한다.
  * 액션형 알림(초대 수락, 보상 받기)은 argExtra에 대상 ID를 담고
  * actioned로 처리 여부를 기록한다.
@@ -163,6 +179,9 @@ object NotificationType {
     // ── 액션형 ──
     /** 크루 초대 — 수락하면 해당 크루에 가입 (argExtra = crewId) */
     const val CREW_INVITE = "CREW_INVITE"
+
+    /** 내 댓글에 답글이 달림 (argExtra = postId) */
+    const val COMMENT_REPLY = "COMMENT_REPLY"
 
     /** 파티런 초대 — 수락하면 로비로 이동 (argExtra = crewId) */
     const val PARTY_INVITE = "PARTY_INVITE"

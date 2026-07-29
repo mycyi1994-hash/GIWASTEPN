@@ -14,9 +14,10 @@ import androidx.room.RoomDatabase
         CrewMembershipEntity::class,
         CrewEntity::class,
         PostEntity::class,
+        CommentEntity::class,
         NotificationEntity::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -29,5 +30,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun crewDao(): CrewDao
     abstract fun crewInfoDao(): CrewInfoDao
     abstract fun postDao(): PostDao
+    abstract fun commentDao(): CommentDao
     abstract fun notificationDao(): NotificationDao
 }

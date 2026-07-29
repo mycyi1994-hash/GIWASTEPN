@@ -186,7 +186,7 @@ interface PostDao {
     suspend fun insert(entity: PostEntity): Long
 
     @Insert
-    suspend fun insertAll(entities: List<PostEntity>)
+    suspend fun insertAll(entities: List<PostEntity>): List<Long>
 
     @Update
     suspend fun update(entity: PostEntity)
@@ -205,6 +205,43 @@ interface PostDao {
 
     @Query("SELECT COUNT(*) FROM posts WHERE mine = 1")
     fun observeMineCount(): Flow<Int>
+}
+
+@Dao
+interface CommentDao {
+
+    @Insert
+    suspend fun insert(entity: CommentEntity): Long
+
+    @Insert
+    suspend fun insertAll(entities: List<CommentEntity>)
+
+    @Query("DELETE FROM comments WHERE id = :id OR parentId = :id")
+    suspend fun deleteWithReplies(id: Long)
+
+    @Query("DELETE FROM comments WHERE postId = :postId")
+    suspend fun deleteForPost(postId: Long)
+
+    @Query("SELECT * FROM comments WHERE postId = :postId ORDER BY createdAt ASC")
+    fun observeForPost(postId: Long): Flow<List<CommentEntity>>
+
+    @Query("SELECT * FROM comments WHERE id = :id")
+    suspend fun byId(id: Long): CommentEntity?
+
+    @Query("SELECT COUNT(*) FROM comments WHERE postId = :postId")
+    suspend fun countForPost(postId: Long): Int
+
+    @Query("SELECT COUNT(*) FROM comments WHERE parentId = :commentId")
+    suspend fun replyCount(commentId: Long): Int
+
+    @Query(
+        "SELECT * FROM comments WHERE postId = :postId AND parentId = 0 AND mine = 1 " +
+            "ORDER BY createdAt DESC LIMIT 1"
+    )
+    suspend fun latestMineTopLevel(postId: Long): CommentEntity?
+
+    @Query("SELECT COUNT(*) FROM comments")
+    suspend fun count(): Int
 }
 
 @Dao

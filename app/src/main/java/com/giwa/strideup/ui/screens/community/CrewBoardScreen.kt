@@ -70,6 +70,8 @@ fun CrewBoardScreen(
             .thenByDescending { it.createdAt })
     }
 
+    CommentSheetHost(viewModel)
+
     Box(Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -191,12 +193,14 @@ fun CrewBoardScreen(
                         post = post,
                         onJoin = { viewModel.toggleJoinFlash(post.id) },
                         onLike = { viewModel.toggleLike(post.id) },
+                        onComment = { viewModel.openComments(post.id) },
                         onDelete = { viewModel.deletePost(post.id) },
                     )
                 } else {
                     TextPostCard(
                         post = post,
                         onLike = { viewModel.toggleLike(post.id) },
+                        onComment = { viewModel.openComments(post.id) },
                         onDelete = { viewModel.deletePost(post.id) },
                     )
                 }

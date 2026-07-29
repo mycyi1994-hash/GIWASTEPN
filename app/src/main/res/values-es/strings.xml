@@ -700,4 +700,35 @@ Empieza a correr con StepUp.</string>
     <string name="tour11_body">Aquí está tu ID de corredor. Toca el lápiz para cambiar tu avatar: emoji o foto de tu galería.</string>
     <string name="tour12_title">100 logros</string>
     <string name="tour12_body">De Bronce a Diamante: un año constante los desbloquea todos. Fin del tour, ¡a correr!</string>
+
+    <!-- Runner level -->
+    <string name="profile_level_progress">%1$s / %2$s km</string>
+    <string name="profile_level_max">NIVEL MÁX</string>
+    <string name="profile_level_hint">%1$s km para el siguiente nivel</string>
+    <string name="profile_level_hint_max">Cada kilómetro es tu XP: ya llegaste al máximo.</string>
+    <string name="profile_sneaker_level">Mejora de zapatilla</string>
+
+    <!-- Comments -->
+    <string name="comments_title">Comentarios %1$d</string>
+    <string name="comments_empty">Aún no hay comentarios. Sé el primero.</string>
+    <string name="comments_hint">Escribe un comentario</string>
+    <string name="comments_reply_hint">Escribe una respuesta</string>
+    <string name="comments_reply">Responder</string>
+    <string name="comments_replying_to">Respondiendo a %1$s</string>
+    <string name="comments_send">Enviar</string>
+    <string name="comments_open">Ver comentarios</string>
+    <string name="post_open_map">Abrir en Maps</string>
+    <string name="notif_comment_reply">%1$s respondió a tu comentario</string>
+
+    <!-- Seed comments -->
+    <string name="seed_comment1">¡Me apunto, nos vemos allí!</string>
+    <string name="seed_comment2">¿A qué ritmo vamos?</string>
+    <string name="seed_comment3">¿Pasa algo si llego cinco minutos tarde?</string>
+    <string name="seed_comment4">Gran consejo, gracias por compartir.</string>
+    <string name="seed_comment5">Llevo a un amigo, espero que no haya problema.</string>
+    <string name="seed_comment6">Corrí esta ruta la semana pasada, de noche es preciosa.</string>
+    <string name="seed_reply1">Yo igual, nos vemos en la entrada.</string>
+    <string name="seed_reply2">Ritmo suave, nadie se queda atrás.</string>
+    <string name="seed_reply3">Sin problema, te esperamos.</string>
+    <string name="seed_reply4">¡Genial, nos vemos allí!</string>
 </resources>
