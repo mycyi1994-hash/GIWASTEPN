@@ -1,5 +1,6 @@
 package com.giwa.strideup.ui.guide
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -25,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -111,6 +114,8 @@ object GuideTour {
     val current: GuideStep? get() = if (active) steps.getOrNull(stepIndex) else null
 
     fun start() {
+        // 이전 실행에서 남은 좌표로 엉뚱한 곳에 구멍이 뚫리지 않게 비운다
+        bounds.clear()
         stepIndex = 0
         active = true
     }
@@ -130,9 +135,15 @@ object GuideTour {
     }
 }
 
-/** 이 요소를 가이드 투어 스포트라이트 대상으로 등록한다 */
-fun Modifier.guideTarget(key: String): Modifier = onGloballyPositioned {
-    GuideTour.bounds[key] = it.boundsInRoot()
+/**
+ * 이 요소를 가이드 투어 스포트라이트 대상으로 등록한다.
+ * 화면에서 사라지면 등록도 해제해, 옛 좌표에 구멍이 뚫리는 일을 막는다.
+ */
+fun Modifier.guideTarget(key: String): Modifier = composed {
+    DisposableEffect(key) {
+        onDispose { GuideTour.bounds.remove(key) }
+    }
+    Modifier.onGloballyPositioned { GuideTour.bounds[key] = it.boundsInRoot() }
 }
 
 /**
@@ -148,6 +159,12 @@ fun GuideOverlay(
 ) {
     val step = GuideTour.current ?: return
     val isLast = GuideTour.stepIndex == GuideTour.steps.lastIndex
+
+    // 투어 중 뒤로가기 = 건너뛰기와 동일하게 처리 (탭 스택이 꼬이지 않게)
+    BackHandler {
+        GuideTour.stop()
+        onFinished()
+    }
 
     // 스텝의 탭으로 자동 전환
     LaunchedEffect(step.tabRoute) { onSwitchTab(step.tabRoute) }
