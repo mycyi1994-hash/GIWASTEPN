@@ -11,22 +11,13 @@ import com.giwa.strideup.data.repo.SneakerRepository
 import com.giwa.strideup.data.repo.StepRepository
 import com.giwa.strideup.domain.BoostType
 import com.giwa.strideup.domain.Sneaker
+import com.giwa.strideup.service.RunLap
 import com.giwa.strideup.service.WalkSessionService
 import com.giwa.strideup.service.WalkSessionState
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
-
-/** 랩 스냅샷 — km·splitSec은 랩을 찍은 시점의 "누적" 값. 구간값은 UI에서 이전 랩과의 차로 구한다. */
-data class Lap(
-    val index: Int,
-    val km: Double,
-    val splitSec: Long,
-)
 
 class WalkViewModel(
     private val stepRepository: StepRepository,
@@ -55,28 +46,22 @@ class WalkViewModel(
     val balance: StateFlow<Double> = rewardRepository.balance
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0.0)
 
-    private val _laps = MutableStateFlow<List<Lap>>(emptyList())
-    val laps: StateFlow<List<Lap>> = _laps.asStateFlow()
+    /**
+     * 랩은 세션 상태의 일부로 서비스가 소유한다.
+     * 화면(뷰모델)이 죽었다 살아나도 랩이 유지되고, 세션 시작 시 함께 초기화된다.
+     */
+    val laps: StateFlow<List<RunLap>> = WalkSessionService.state
+        .map { it.laps }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    init {
-        // 세션이 비활성 → 활성으로 넘어가는 순간에만 이전 랩을 비운다 (진행 중 재구독에는 유지)
-        viewModelScope.launch {
-            var wasActive = session.value.isActive
-            session.collect { s ->
-                if (s.isActive && !wasActive) _laps.value = emptyList()
-                wasActive = s.isActive
-            }
-        }
-    }
+    /** 수동 랩 */
+    fun recordLap() = WalkSessionService.recordManualLap()
 
-    /** 현재 누적 거리·경과 시간 스냅샷을 랩으로 추가 */
-    fun recordLap(currentKm: Double, elapsedSec: Long) {
-        val list = _laps.value
-        _laps.value = list + Lap(index = list.size + 1, km = currentKm, splitSec = elapsedSec)
-    }
+    /** 목표 거리 — 프로세스 수명이라 화면을 오가도 유지된다 */
+    val goalKm: StateFlow<Double> = WalkSessionService.goalKm
 
-    fun clearLaps() {
-        _laps.value = emptyList()
+    fun setGoalKm(km: Double) {
+        WalkSessionService.goalKm.value = km.coerceIn(1.0, 42.2)
     }
 
     val sensorAvailable: Boolean get() = stepRepository.stepSensorAvailable

@@ -27,6 +27,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
+/** 랩 스냅샷 — km·splitSec은 랩을 찍은 시점의 "누적" 값. 구간값은 UI에서 이전 랩과의 차로 구한다. */
+data class RunLap(
+    val index: Int,
+    val km: Double,
+    val splitSec: Long,
+)
+
 /** 워킹 세션의 현재 상태. 화면과 서비스가 공유한다. */
 data class WalkSessionState(
     val isActive: Boolean = false,
@@ -41,6 +48,11 @@ data class WalkSessionState(
     val lastRewardedSteps: Int = 0,
     val lastSessionSteps: Int = 0,
     val lastPartySize: Int = 1,
+    /**
+     * 이번 세션의 랩 기록. 화면이 아니라 세션과 함께 살아서,
+     * 러닝 중 화면을 나갔다 돌아와도 랩이 사라지거나 꼬이지 않는다.
+     */
+    val laps: List<RunLap> = emptyList(),
 )
 
 /**
@@ -102,7 +114,19 @@ class WalkSessionService : Service() {
                 val delta = (today - last).coerceAtLeast(0)
                 val current = _state.value
                 if (current.isActive && !current.isPaused && delta > 0) {
-                    val updated = current.copy(steps = current.steps + delta)
+                    var updated = current.copy(steps = current.steps + delta)
+                    // 1km 경계를 넘을 때마다 자동 랩 — 경계 km 값으로 기록하므로
+                    // 여러 번 재구성돼도, 화면이 없어도 랩은 정확히 km당 하나다.
+                    val km = RewardEconomy.distanceMeters(updated.steps) / 1000
+                    var laps = updated.laps
+                    while (laps.size < km.toInt()) {
+                        laps = laps + RunLap(
+                            index = laps.size + 1,
+                            km = (laps.size + 1).toDouble(),
+                            splitSec = updated.elapsedSec,
+                        )
+                    }
+                    if (laps !== updated.laps) updated = updated.copy(laps = laps)
                     _state.value = updated
                     updateNotification(updated.steps)
                 }
@@ -213,6 +237,25 @@ class WalkSessionService : Service() {
     companion object {
         private val _state = MutableStateFlow(WalkSessionState())
         val state: StateFlow<WalkSessionState> = _state
+
+        /** 러닝 목표 거리(km). 화면이 아니라 프로세스에 살아서 화면을 오가도 유지된다. */
+        val goalKm = MutableStateFlow(5.0)
+
+        /** 수동 랩 — 마지막 랩에서 50m 이상 나아갔을 때만 추가한다. */
+        fun recordManualLap() {
+            val current = _state.value
+            if (!current.isActive || current.isPaused) return
+            val km = RewardEconomy.distanceMeters(current.steps) / 1000
+            val lastKm = current.laps.lastOrNull()?.km ?: 0.0
+            if (km < lastKm + 0.05) return
+            _state.value = current.copy(
+                laps = current.laps + RunLap(
+                    index = current.laps.size + 1,
+                    km = km,
+                    splitSec = current.elapsedSec,
+                ),
+            )
+        }
 
         const val EXTRA_PARTY_SIZE = "com.giwa.strideup.extra.PARTY_SIZE"
 

@@ -382,11 +382,14 @@ fun EquippedSneakerCard(
                 RarityChip(
                     sneaker.rarity,
                     small = true,
-                    modifier = Modifier.align(Alignment.TopStart),
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(4.dp),
                 )
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
+                        .padding(4.dp)
                         .clip(RoundedCornerShape(50))
                         .background(Volt)
                         .padding(horizontal = 8.dp, vertical = 3.dp),

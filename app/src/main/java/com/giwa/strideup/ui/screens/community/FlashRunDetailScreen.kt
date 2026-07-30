@@ -309,7 +309,12 @@ private fun FlashInfoGrid(post: Post) {
             else -> R.string.pace_fast
         }
     )
-    val estDistance = "%.2f".format(listOf(5.0, 8.0, 10.0)[demoIndex]) + " km"
+    // 카드에 보이는 실제 거리값을 그대로 쓴다. 값이 없을 때만 데모 거리로 채운다.
+    val estDistance = if (post.distanceKm > 0.0) {
+        "%.2f km".format(post.distanceKm)
+    } else {
+        "%.2f km".format(listOf(5.0, 8.0, 10.0)[demoIndex])
+    }
     val meetTime = remember(post.meetAt) {
         Instant.ofEpochMilli(post.meetAt)
             .atZone(ZoneId.systemDefault())

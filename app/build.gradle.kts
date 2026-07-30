@@ -13,8 +13,8 @@ android {
         applicationId = "com.giwa.strideup"
         minSdk = 26
         targetSdk = 35
-        versionCode = 16
-        versionName = "1.11.0"
+        versionCode = 17
+        versionName = "1.11.1"
     }
 
     signingConfigs {

@@ -72,6 +72,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.giwa.strideup.BuildConfig
 import com.giwa.strideup.R
 import com.giwa.strideup.domain.RewardEconomy
+import com.giwa.strideup.service.RunLap
 import com.giwa.strideup.service.WalkSessionService
 import com.giwa.strideup.ui.StepPermissions
 import com.giwa.strideup.ui.components.BarMeter
@@ -97,7 +98,6 @@ import com.giwa.strideup.ui.theme.Silver
 import com.giwa.strideup.ui.theme.Slate
 import com.giwa.strideup.ui.theme.Snow
 import com.giwa.strideup.ui.theme.Volt
-import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.sin
 
@@ -123,8 +123,8 @@ fun RunScreen(
     val laps by viewModel.laps.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    // 목표 거리(km) — 다이얼로그 스테퍼로 0.5 단위 조절, 회전에도 유지
-    var goalKm by rememberSaveable { mutableStateOf(5.0) }
+    // 목표 거리(km) — 프로세스에 살아서 화면을 나갔다 와도, 회전해도 유지된다
+    val goalKm by viewModel.goalKm.collectAsStateWithLifecycle()
     var showGoalDialog by remember { mutableStateOf(false) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -179,12 +179,6 @@ fun RunScreen(
 
     val segments = lapSegments(laps)
 
-    // 1km 경계를 넘어설 때마다 자동 랩 — 수동 랩과 합쳐 랩 수가 이미 앞서 있으면 건너뛴다
-    LaunchedEffect(distanceKm) {
-        if (session.isActive && distanceKm >= 1.0 && floor(distanceKm) > laps.size) {
-            viewModel.recordLap(distanceKm, session.elapsedSec)
-        }
-    }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -296,10 +290,7 @@ fun RunScreen(
                                 fontWeight = FontWeight.Bold,
                                 color = Volt,
                             )
-                            Row(
-                                modifier = Modifier.quietClickable {},
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     text = stringResource(R.string.run_course_info),
                                     fontSize = 11.sp,
@@ -774,7 +765,7 @@ fun RunScreen(
                     )
                     LapButton(
                         text = stringResource(R.string.run_lap),
-                        onClick = { viewModel.recordLap(distanceKm, session.elapsedSec) },
+                        onClick = { viewModel.recordLap() },
                         modifier = Modifier.weight(1f),
                         // 직전 랩에서 최소 50m는 나아가야 새 랩을 찍을 수 있다
                         enabled = running && distanceKm > (laps.lastOrNull()?.km ?: 0.0) + 0.05,
@@ -829,7 +820,7 @@ fun RunScreen(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
                     StepperButton(text = "−") {
-                        goalKm = (goalKm - 0.5).coerceIn(1.0, 42.2)
+                        viewModel.setGoalKm(if (goalKm > 42.0) 42.0 else goalKm - 0.5)
                     }
                     Text(
                         text = "%.1f km".format(goalKm),
@@ -838,7 +829,7 @@ fun RunScreen(
                         color = Snow,
                     )
                     StepperButton(text = "+") {
-                        goalKm = (goalKm + 0.5).coerceIn(1.0, 42.2)
+                        viewModel.setGoalKm(if (goalKm >= 42.0) 42.2 else goalKm + 0.5)
                     }
                 }
             },
@@ -1134,7 +1125,7 @@ private fun StepperButton(text: String, onClick: () -> Unit) {
 }
 
 /** 누적 랩 스냅샷 → 구간 리스트 (직전 랩과의 차) */
-private fun lapSegments(laps: List<Lap>): List<LapSegment> {
+private fun lapSegments(laps: List<RunLap>): List<LapSegment> {
     var prevKm = 0.0
     var prevSec = 0L
     return laps.map { lap ->
