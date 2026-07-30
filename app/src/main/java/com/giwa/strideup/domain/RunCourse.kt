@@ -39,35 +39,8 @@ data class RunCourse(
     /** 좌표가 없으면 지도를 그릴 수 없다 */
     val hasTrack: Boolean get() = points.size >= 2
 
-    /**
-     * 좌표를 0..1 화면 비율로 편다.
-     * 위도·경도의 실제 거리 비율(경도는 cos(위도)만큼 좁다)을 반영하고,
-     * 짧은 축을 가운데로 밀어 코스 모양이 찌그러지지 않게 한다.
-     */
-    fun normalized(): List<Pair<Float, Float>> {
-        if (points.size < 2) return emptyList()
-        val lats = points.map { it.lat }
-        val lngs = points.map { it.lng }
-        val minLat = lats.min()
-        val maxLat = lats.max()
-        val minLng = lngs.min()
-        val maxLng = lngs.max()
-        val midLat = (minLat + maxLat) / 2
-        val scaleLng = cos(Math.toRadians(midLat)).coerceAtLeast(0.05)
-
-        val spanY = max(maxLat - minLat, 1e-6)
-        val spanX = max((maxLng - minLng) * scaleLng, 1e-6)
-        val span = max(spanX, spanY)
-        val padX = (span - spanX) / 2
-        val padY = (span - spanY) / 2
-
-        return points.map { p ->
-            val x = ((p.lng - minLng) * scaleLng + padX) / span
-            // 화면 y는 아래로 증가하므로 위도를 뒤집는다
-            val y = 1.0 - ((p.lat - minLat) + padY) / span
-            x.toFloat().coerceIn(0f, 1f) to y.toFloat().coerceIn(0f, 1f)
-        }
-    }
+    /** 좌표를 0..1 화면 비율로 편다 — [normalizedTrack] 참고 */
+    fun normalized(): List<Pair<Float, Float>> = points.normalizedTrack()
 
     fun encode(): String = points.joinToString(";") { "${it.lat},${it.lng}" }
 
@@ -94,6 +67,36 @@ object CourseRewards {
 
     fun forDistance(distanceKm: Double): Double =
         (distanceKm * SUP_PER_KM).coerceIn(0.0, MAX_REWARD)
+}
+
+/**
+ * 좌표를 0..1 화면 비율로 편다.
+ * 위도·경도의 실제 거리 비율(경도는 cos(위도)만큼 좁다)을 반영하고,
+ * 짧은 축을 가운데로 밀어 코스 모양이 찌그러지지 않게 한다.
+ */
+fun List<GeoPoint>.normalizedTrack(): List<Pair<Float, Float>> {
+    if (size < 2) return emptyList()
+    val lats = map { it.lat }
+    val lngs = map { it.lng }
+    val minLat = lats.min()
+    val maxLat = lats.max()
+    val minLng = lngs.min()
+    val maxLng = lngs.max()
+    val midLat = (minLat + maxLat) / 2
+    val scaleLng = cos(Math.toRadians(midLat)).coerceAtLeast(0.05)
+
+    val spanY = max(maxLat - minLat, 1e-6)
+    val spanX = max((maxLng - minLng) * scaleLng, 1e-6)
+    val span = max(spanX, spanY)
+    val padX = (span - spanX) / 2
+    val padY = (span - spanY) / 2
+
+    return map { p ->
+        val x = ((p.lng - minLng) * scaleLng + padX) / span
+        // 화면 y는 아래로 증가하므로 위도를 뒤집는다
+        val y = 1.0 - ((p.lat - minLat) + padY) / span
+        x.toFloat().coerceIn(0f, 1f) to y.toFloat().coerceIn(0f, 1f)
+    }
 }
 
 /** 좌표 사이 실제 거리(m) — 하버사인 */

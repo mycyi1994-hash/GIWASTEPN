@@ -33,6 +33,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
@@ -86,14 +87,16 @@ class WalkSessionService : Service() {
      */
     private val locationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
-            val current = _state.value
-            if (!current.isActive || current.isPaused) return
             val p = GeoPoint(location.latitude, location.longitude)
-            val track = current.track
-            if (track.isEmpty() || haversineMeters(track.last(), p) >= 8.0) {
-                _state.value = current.copy(track = track + p, gpsFix = true)
-            } else if (!current.gpsFix) {
-                _state.value = current.copy(gpsFix = true)
+            // 걸음 수집기·타이머와 서로 덮어쓰지 않게 원자적으로 갱신한다
+            _state.update { current ->
+                if (!current.isActive || current.isPaused) return@update current
+                val track = current.track
+                if (track.isEmpty() || haversineMeters(track.last(), p) >= 8.0) {
+                    current.copy(track = track + p, gpsFix = true)
+                } else {
+                    current.copy(gpsFix = true)
+                }
             }
         }
 
@@ -188,8 +191,9 @@ class WalkSessionService : Service() {
                 lastTodaySteps = today
                 if (last == null) return@collect
                 val delta = (today - last).coerceAtLeast(0)
-                val current = _state.value
-                if (current.isActive && !current.isPaused && delta > 0) {
+                var stepsAfter = -1
+                _state.update { current ->
+                    if (!current.isActive || current.isPaused || delta <= 0) return@update current
                     var updated = current.copy(steps = current.steps + delta)
                     // 1km 경계를 넘을 때마다 자동 랩 — 경계 km 값으로 기록하므로
                     // 여러 번 재구성돼도, 화면이 없어도 랩은 정확히 km당 하나다.
@@ -203,17 +207,21 @@ class WalkSessionService : Service() {
                         )
                     }
                     if (laps !== updated.laps) updated = updated.copy(laps = laps)
-                    _state.value = updated
-                    updateNotification(updated.steps)
+                    stepsAfter = updated.steps
+                    updated
                 }
+                if (stepsAfter >= 0) updateNotification(stepsAfter)
             }
         }
         timerJob = scope.launch {
             while (isActive) {
                 delay(1_000)
-                val current = _state.value
-                if (current.isActive && !current.isPaused) {
-                    _state.value = current.copy(elapsedSec = current.elapsedSec + 1)
+                _state.update { current ->
+                    if (current.isActive && !current.isPaused) {
+                        current.copy(elapsedSec = current.elapsedSec + 1)
+                    } else {
+                        current
+                    }
                 }
             }
         }
@@ -334,18 +342,19 @@ class WalkSessionService : Service() {
 
         /** 수동 랩 — 마지막 랩에서 50m 이상 나아갔을 때만 추가한다. */
         fun recordManualLap() {
-            val current = _state.value
-            if (!current.isActive || current.isPaused) return
-            val km = RewardEconomy.distanceMeters(current.steps) / 1000
-            val lastKm = current.laps.lastOrNull()?.km ?: 0.0
-            if (km < lastKm + 0.05) return
-            _state.value = current.copy(
-                laps = current.laps + RunLap(
-                    index = current.laps.size + 1,
-                    km = km,
-                    splitSec = current.elapsedSec,
-                ),
-            )
+            _state.update { current ->
+                if (!current.isActive || current.isPaused) return@update current
+                val km = RewardEconomy.distanceMeters(current.steps) / 1000
+                val lastKm = current.laps.lastOrNull()?.km ?: 0.0
+                if (km < lastKm + 0.05) return@update current
+                current.copy(
+                    laps = current.laps + RunLap(
+                        index = current.laps.size + 1,
+                        km = km,
+                        splitSec = current.elapsedSec,
+                    ),
+                )
+            }
         }
 
         const val EXTRA_PARTY_SIZE = "com.giwa.strideup.extra.PARTY_SIZE"

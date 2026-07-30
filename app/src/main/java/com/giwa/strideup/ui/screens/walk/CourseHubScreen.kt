@@ -48,6 +48,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.giwa.strideup.R
 import com.giwa.strideup.domain.CourseRewards
 import com.giwa.strideup.domain.RunCourse
+import com.giwa.strideup.domain.normalizedTrack
 import com.giwa.strideup.domain.trackDistanceKm
 import com.giwa.strideup.service.WalkSessionService
 import com.giwa.strideup.ui.components.CourseTrackMap
@@ -411,13 +412,7 @@ private fun CourseMaker(
                     .border(1.dp, Edge, RoundedCornerShape(18.dp)),
             ) {
                 CourseTrackMap(
-                    points = remember(lastTrack) {
-                        RunCourse(
-                            id = 0, name = "", area = "", distanceKm = km, elevationM = 0,
-                            points = lastTrack, author = "", mine = true, shared = false,
-                            likes = 0, liked = false, runCount = 0, createdAt = 0,
-                        ).normalized()
-                    },
+                    points = remember(lastTrack) { lastTrack.normalizedTrack() },
                     seed = lastTrack.size,
                     modifier = Modifier.fillMaxSize(),
                 )

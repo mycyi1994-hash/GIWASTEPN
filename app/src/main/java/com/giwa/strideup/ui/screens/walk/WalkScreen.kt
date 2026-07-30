@@ -75,6 +75,7 @@ import com.giwa.strideup.domain.CourseRewards
 import com.giwa.strideup.domain.GeoPoint
 import com.giwa.strideup.domain.RewardEconomy
 import com.giwa.strideup.domain.RunCourse
+import com.giwa.strideup.domain.normalizedTrack
 import com.giwa.strideup.service.RunLap
 import com.giwa.strideup.service.WalkSessionService
 import com.giwa.strideup.ui.StepPermissions
@@ -1093,21 +1094,30 @@ private fun CourseChallengeCard(
                 .fillMaxWidth()
                 .height(200.dp),
         ) {
-            if (course != null && course.hasTrack) {
-                val points = remember(course.id) { course.normalized() }
-                val progress = if (course.distanceKm > 0) {
-                    (sessionKm / course.distanceKm).toFloat().coerceIn(0f, 1f)
-                } else {
-                    0f
+            when {
+                course != null && course.hasTrack -> {
+                    val points = remember(course.id) { course.normalized() }
+                    val progress = if (course.distanceKm > 0) {
+                        (sessionKm / course.distanceKm).toFloat().coerceIn(0f, 1f)
+                    } else {
+                        0f
+                    }
+                    CourseTrackMap(
+                        points = points,
+                        seed = course.id.toInt(),
+                        progress = progress.takeIf { sessionKm > 0.005 },
+                        modifier = Modifier.fillMaxSize(),
+                    )
                 }
-                CourseTrackMap(
-                    points = points,
-                    seed = course.id.toInt(),
-                    progress = progress.takeIf { sessionKm > 0.005 },
+
+                // 코스는 없지만 GPS가 잡혀 있으면 지금 그리고 있는 실제 경로를 보여준다
+                liveTrack.size >= 2 -> CourseTrackMap(
+                    points = liveTrack.normalizedTrack(),
+                    seed = liveTrack.size / 8,
                     modifier = Modifier.fillMaxSize(),
                 )
-            } else {
-                RouteMap(Modifier.fillMaxSize())
+
+                else -> RouteMap(Modifier.fillMaxSize())
             }
 
             // 오늘의 챌린지 + GPS 상태
