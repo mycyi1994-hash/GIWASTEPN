@@ -829,4 +829,34 @@ StepUp과 함께 달려보세요.</string>
     <string name="run_lap">랩 기록</string>
     <string name="run_finish">러닝 종료</string>
     <string name="run_pace_chart">페이스</string>
+
+    <!-- Running courses -->
+    <string name="courses_title">러닝 코스</string>
+    <string name="courses_select">코스 선택</string>
+    <string name="courses_make">코스 만들기</string>
+    <string name="courses_board">코스 게시판</string>
+    <string name="courses_empty">아직 코스가 없어요. 러닝을 기록해 만들거나 게시판을 둘러보세요.</string>
+    <string name="courses_board_empty">아직 공유된 코스가 없어요. 첫 코스를 공유해보세요!</string>
+    <string name="course_selected">선택됨</string>
+    <string name="course_today">오늘의 챌린지</string>
+    <string name="course_reward_value">+%1$s SUP</string>
+    <string name="course_per_km">1km당 %1$s SUP · 최대 %2$s</string>
+    <string name="course_to_finish">완주까지</string>
+    <string name="course_none_title">선택한 코스가 없어요</string>
+    <string name="course_none_body">코스를 고르면 실시간 지도와 거리 기반 완주 보상이 열려요.</string>
+    <string name="course_pick">코스 선택</string>
+    <string name="course_change">코스 변경</string>
+    <string name="course_make_hint">러닝을 마치면 방금 달린 GPS 경로를 코스로 등록하고 공유할 수 있어요.</string>
+    <string name="course_make_none">아직 기록된 러닝 경로가 없어요. 먼저 GPS를 켜고 한 번 달려보세요!</string>
+    <string name="course_make_last">마지막 러닝 · %1$s km</string>
+    <string name="course_name_hint">코스 이름</string>
+    <string name="course_area_hint">지역 (예: 여의도)</string>
+    <string name="course_register">등록</string>
+    <string name="course_share_toggle">코스 게시판에 공유</string>
+    <string name="course_shared_badge">공유됨</string>
+    <string name="course_share">공유하기</string>
+    <string name="course_unshare">공유 해제</string>
+    <string name="course_runs">%1$d회 달림</string>
+    <string name="course_by">by %1$s</string>
+    <string name="notif_course_complete">%1$s 완주! +%2$s SUP 받았어요</string>
 </resources>

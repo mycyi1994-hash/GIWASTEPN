@@ -13,7 +13,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -51,7 +50,6 @@ import androidx.compose.ui.unit.sp
 import com.giwa.strideup.R
 import com.giwa.strideup.core.ServiceLocator
 import com.giwa.strideup.ui.components.AllSneakerImages
-import com.giwa.strideup.ui.components.fadedEdges
 import com.giwa.strideup.ui.components.HexEmblem
 import com.giwa.strideup.ui.components.Wordmark
 import com.giwa.strideup.ui.theme.Night
@@ -103,6 +101,7 @@ fun SplashScreen(onReady: () -> Unit) {
         withTimeoutOrNull(3_000) {
             ServiceLocator.crewRepository.ensureSeeded()
             ServiceLocator.communityRepository.ensureSeeded()
+            ServiceLocator.courseRepository.ensureSeeded()
             ServiceLocator.notificationRepository.seedWelcome()
         }
 
@@ -171,16 +170,12 @@ fun SplashScreen(onReady: () -> Unit) {
                         center = center,
                     )
                 }
-                // 테두리 없이 가장자리를 녹여 스피드 라인 배경 위에 자연스럽게 띄운다.
-                // fillMaxWidth를 붙이면 최소 폭이 고정돼 aspectRatio가 자리보다 큰
-                // 크기로 측정될 수 있다(짧은 화면·가로 모드에서 위아래로 넘침).
-                // Box 자식의 느슨한 제약 그대로 두면 항상 자리 안에 내접한다.
+                // 이미지에 알파 페더가 구워져 있어 테두리 없이 그대로 얹으면
+                // 스피드 라인 배경 위에 자연스럽게 뜬다. Fit이라 자리를 넘지 않는다.
                 Image(
                     painter = painterResource(heroImage),
                     contentDescription = null,
-                    modifier = Modifier
-                        .aspectRatio(4f / 3f)
-                        .fadedEdges(0.2f),
+                    modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Fit,
                 )
             }

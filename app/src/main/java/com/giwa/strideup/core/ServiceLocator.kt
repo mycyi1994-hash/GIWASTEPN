@@ -6,6 +6,7 @@ import com.giwa.strideup.data.local.AppDatabase
 import com.giwa.strideup.data.prefs.UserPrefs
 import com.giwa.strideup.data.repo.BoostRepository
 import com.giwa.strideup.data.repo.CommunityRepository
+import com.giwa.strideup.data.repo.CourseRepository
 import com.giwa.strideup.data.repo.CrewRepository
 import com.giwa.strideup.data.repo.EventRepository
 import com.giwa.strideup.data.repo.NotificationRepository
@@ -36,6 +37,8 @@ object ServiceLocator {
     lateinit var crewRepository: CrewRepository
         private set
     lateinit var communityRepository: CommunityRepository
+        private set
+    lateinit var courseRepository: CourseRepository
         private set
     lateinit var eventRepository: EventRepository
         private set
@@ -82,6 +85,11 @@ object ServiceLocator {
             commentDao = database.commentDao(),
             rewardRepository = rewardRepository,
             appContext = app,
+        )
+        courseRepository = CourseRepository(
+            dao = database.courseDao(),
+            prefs = userPrefs,
+            rewardRepository = rewardRepository,
         )
         eventRepository = EventRepository(database.claimedEventDao(), rewardRepository)
         notificationRepository = NotificationRepository(database.notificationDao(), rewardRepository)

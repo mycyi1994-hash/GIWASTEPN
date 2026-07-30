@@ -6,10 +6,12 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.giwa.strideup.core.ServiceLocator
 import com.giwa.strideup.data.repo.BoostRepository
+import com.giwa.strideup.data.repo.CourseRepository
 import com.giwa.strideup.data.repo.RewardRepository
 import com.giwa.strideup.data.repo.SneakerRepository
 import com.giwa.strideup.data.repo.StepRepository
 import com.giwa.strideup.domain.BoostType
+import com.giwa.strideup.domain.RunCourse
 import com.giwa.strideup.domain.Sneaker
 import com.giwa.strideup.service.RunLap
 import com.giwa.strideup.service.WalkSessionService
@@ -24,7 +26,12 @@ class WalkViewModel(
     rewardRepository: RewardRepository,
     sneakerRepository: SneakerRepository,
     boostRepository: BoostRepository,
+    courseRepository: CourseRepository,
 ) : ViewModel() {
+
+    /** 지금 달리기로 고른 코스 — 지도 카드와 완주 보상 표시에 쓴다 */
+    val selectedCourse: StateFlow<RunCourse?> = courseRepository.selectedCourse
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val session: StateFlow<WalkSessionState> = WalkSessionService.state
 
@@ -79,6 +86,7 @@ class WalkViewModel(
                     ServiceLocator.rewardRepository,
                     ServiceLocator.sneakerRepository,
                     ServiceLocator.boostRepository,
+                    ServiceLocator.courseRepository,
                 )
             }
         }

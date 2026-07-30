@@ -830,4 +830,34 @@ StepUp と走り出そう。</string>
     <string name="run_lap">ラップ</string>
     <string name="run_finish">ラン終了</string>
     <string name="run_pace_chart">ペース</string>
+
+    <!-- Running courses -->
+    <string name="courses_title">ランニングコース</string>
+    <string name="courses_select">コース選択</string>
+    <string name="courses_make">コース作成</string>
+    <string name="courses_board">コース掲示板</string>
+    <string name="courses_empty">まだコースがありません。走って作るか、掲示板をのぞいてみましょう。</string>
+    <string name="courses_board_empty">まだ共有コースがありません。最初のコースを共有しましょう！</string>
+    <string name="course_selected">選択中</string>
+    <string name="course_today">今日のチャレンジ</string>
+    <string name="course_reward_value">+%1$s SUP</string>
+    <string name="course_per_km">1kmあたり %1$s SUP · 最大 %2$s</string>
+    <string name="course_to_finish">完走まで</string>
+    <string name="course_none_title">コース未選択</string>
+    <string name="course_none_body">コースを選ぶとライブマップと距離に応じた完走報酬が使えます。</string>
+    <string name="course_pick">コースを選ぶ</string>
+    <string name="course_change">コース変更</string>
+    <string name="course_make_hint">ランを終えると、そのGPS軌跡をコースとして登録・共有できます。</string>
+    <string name="course_make_none">まだ記録された軌跡がありません。GPSをオンにして走ってみましょう！</string>
+    <string name="course_make_last">前回のラン · %1$s km</string>
+    <string name="course_name_hint">コース名</string>
+    <string name="course_area_hint">エリア（例：漢江）</string>
+    <string name="course_register">登録</string>
+    <string name="course_share_toggle">コース掲示板に共有</string>
+    <string name="course_shared_badge">共有中</string>
+    <string name="course_share">共有する</string>
+    <string name="course_unshare">共有解除</string>
+    <string name="course_runs">%1$d回走破</string>
+    <string name="course_by">by %1$s</string>
+    <string name="notif_course_complete">%1$s 完走！+%2$s SUP 獲得</string>
 </resources>

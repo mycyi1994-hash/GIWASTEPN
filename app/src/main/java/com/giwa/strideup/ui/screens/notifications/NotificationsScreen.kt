@@ -22,6 +22,7 @@ import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material.icons.filled.PersonOff
 import androidx.compose.material.icons.filled.Redeem
@@ -329,6 +330,7 @@ private fun iconFor(type: String): ImageVector = when (type) {
     NotificationType.PARTY_INVITE -> Icons.Filled.Bolt
     NotificationType.EVENT_REWARD -> Icons.Filled.Redeem
     NotificationType.COMMENT_REPLY -> Icons.AutoMirrored.Filled.Reply
+    NotificationType.COURSE_COMPLETE -> Icons.Filled.Flag
     else -> Icons.Filled.Notifications
 }
 
@@ -374,6 +376,9 @@ private fun messageFor(entity: NotificationEntity): String {
 
         NotificationType.COMMENT_REPLY ->
             stringResource(R.string.notif_comment_reply, entity.argText)
+
+        NotificationType.COURSE_COMPLETE ->
+            stringResource(R.string.notif_course_complete, entity.argText, amount)
 
         NotificationType.CREW_INVITE ->
             stringResource(R.string.notif_crew_invite, entity.argText)

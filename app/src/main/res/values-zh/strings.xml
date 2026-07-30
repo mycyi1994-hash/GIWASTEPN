@@ -829,4 +829,34 @@
     <string name="run_lap">记圈</string>
     <string name="run_finish">结束跑步</string>
     <string name="run_pace_chart">配速</string>
+
+    <!-- Running courses -->
+    <string name="courses_title">跑步路线</string>
+    <string name="courses_select">选择路线</string>
+    <string name="courses_make">创建路线</string>
+    <string name="courses_board">路线分享区</string>
+    <string name="courses_empty">还没有路线——先跑一次来创建，或去分享区看看。</string>
+    <string name="courses_board_empty">还没有人分享路线。来分享你的第一条吧！</string>
+    <string name="course_selected">已选择</string>
+    <string name="course_today">今日挑战</string>
+    <string name="course_reward_value">+%1$s SUP</string>
+    <string name="course_per_km">每公里 %1$s SUP · 上限 %2$s</string>
+    <string name="course_to_finish">距完成</string>
+    <string name="course_none_title">尚未选择路线</string>
+    <string name="course_none_body">选择路线即可解锁实时地图和按距离发放的完赛奖励。</string>
+    <string name="course_pick">选择路线</string>
+    <string name="course_change">更换路线</string>
+    <string name="course_make_hint">跑完一次后，你的 GPS 轨迹就能注册成路线并分享。</string>
+    <string name="course_make_none">还没有记录的轨迹。先开着 GPS 跑一次吧！</string>
+    <string name="course_make_last">上次跑步 · %1$s km</string>
+    <string name="course_name_hint">路线名称</string>
+    <string name="course_area_hint">区域（如：汝矣岛）</string>
+    <string name="course_register">注册</string>
+    <string name="course_share_toggle">分享到路线区</string>
+    <string name="course_shared_badge">已分享</string>
+    <string name="course_share">分享</string>
+    <string name="course_unshare">取消分享</string>
+    <string name="course_runs">%1$d 次完成</string>
+    <string name="course_by">by %1$s</string>
+    <string name="notif_course_complete">完成路线 %1$s！获得 +%2$s SUP</string>
 </resources>

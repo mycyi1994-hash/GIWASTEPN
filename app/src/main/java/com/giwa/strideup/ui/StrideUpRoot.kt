@@ -89,6 +89,7 @@ import com.giwa.strideup.ui.screens.settings.NotificationSettingsScreen
 import com.giwa.strideup.ui.screens.settings.PrivacyScreen
 import com.giwa.strideup.ui.screens.settings.SupportScreen
 import com.giwa.strideup.ui.screens.splash.SplashScreen
+import com.giwa.strideup.ui.screens.walk.CourseHubScreen
 import com.giwa.strideup.ui.screens.walk.RunScreen
 import com.giwa.strideup.ui.theme.Carbon
 import com.giwa.strideup.ui.theme.Night
@@ -124,6 +125,7 @@ object Routes {
     const val CREW_BOARD = "crew/board/{crewId}"
     const val POST_COMPOSE = "post/compose/{crewId}"
     const val FLASH_DETAIL = "flash/{postId}"
+    const val COURSES = "courses"
 
     fun sneaker(id: Long) = "sneaker/$id"
     fun lobby(crewId: String) = "lobby/$crewId"
@@ -252,7 +254,15 @@ private fun MainScaffold(startTour: Boolean = false) {
                 )
             }
 
-            composable(Routes.RUN) { RunScreen(onBack = { navController.popBackStack() }) }
+            composable(Routes.RUN) {
+                RunScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenCourses = { navController.navigate(Routes.COURSES) },
+                )
+            }
+            composable(Routes.COURSES) {
+                CourseHubScreen(onBack = { navController.popBackStack() })
+            }
             composable(Routes.WALLET) { WalletScreen(onBack = { navController.popBackStack() }) }
             composable(Routes.NOTIFICATIONS) {
                 NotificationsScreen(

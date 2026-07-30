@@ -831,4 +831,34 @@ Start running with StepUp.</string>
     <string name="run_lap">Lap</string>
     <string name="run_finish">Finish run</string>
     <string name="run_pace_chart">Pace</string>
+
+    <!-- Running courses -->
+    <string name="courses_title">Running courses</string>
+    <string name="courses_select">Pick a course</string>
+    <string name="courses_make">Create course</string>
+    <string name="courses_board">Course board</string>
+    <string name="courses_empty">No courses yet — record a run to create one, or check the board.</string>
+    <string name="courses_board_empty">Nothing shared yet. Share your course first!</string>
+    <string name="course_selected">Selected</string>
+    <string name="course_today">TODAY\'S CHALLENGE</string>
+    <string name="course_reward_value">+%1$s SUP</string>
+    <string name="course_per_km">%1$s SUP per km · up to %2$s</string>
+    <string name="course_to_finish">To finish</string>
+    <string name="course_none_title">No course selected</string>
+    <string name="course_none_body">Pick a course to unlock the live map and a distance-based finish reward.</string>
+    <string name="course_pick">Pick a course</string>
+    <string name="course_change">Change course</string>
+    <string name="course_make_hint">Finish a run and its GPS track becomes a course you can register and share.</string>
+    <string name="course_make_none">No recorded track yet. Go for a run first — with GPS on!</string>
+    <string name="course_make_last">Last run · %1$s km</string>
+    <string name="course_name_hint">Course name</string>
+    <string name="course_area_hint">Area (e.g. Yeouido)</string>
+    <string name="course_register">Register</string>
+    <string name="course_share_toggle">Share to course board</string>
+    <string name="course_shared_badge">Shared</string>
+    <string name="course_share">Share</string>
+    <string name="course_unshare">Unshare</string>
+    <string name="course_runs">%1$d runs</string>
+    <string name="course_by">by %1$s</string>
+    <string name="notif_course_complete">Course complete: %1$s! +%2$s SUP</string>
 </resources>

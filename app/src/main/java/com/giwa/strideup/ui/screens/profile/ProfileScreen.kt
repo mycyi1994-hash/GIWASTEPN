@@ -289,7 +289,7 @@ private fun ProfileHeader(
             Box {
                 LevelAvatar(
                     level = state.runner.level,
-                    size = 72.dp,
+                    size = 62.dp,
                     contentDescription = stringResource(R.string.cd_profile),
                     avatarId = state.avatarId,
                     customBitmap = rememberCustomAvatar(state.avatarRev),
@@ -321,10 +321,14 @@ private fun ProfileHeader(
                     style = MaterialTheme.typography.bodySmall,
                     color = Silver,
                 )
+                // 좁은 화면에서도 한 줄로 읽히게 — 줄바꿈을 막고 넘치면 줄임표
                 Text(
                     text = stringResource(R.string.greeting_runner),
                     style = MaterialTheme.typography.headlineSmall,
                     color = Snow,
+                    maxLines = 1,
+                    softWrap = false,
+                    overflow = TextOverflow.Ellipsis,
                 )
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -337,6 +341,9 @@ private fun ProfileHeader(
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.SemiBold,
                         color = Volt,
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
                 if (state.runnerUid.isNotBlank()) {
@@ -352,12 +359,21 @@ private fun ProfileHeader(
                             fontWeight = FontWeight.SemiBold,
                             letterSpacing = 0.8.sp,
                             color = Slate,
+                            maxLines = 1,
+                            softWrap = false,
                         )
                     }
                 }
             }
-            TokenCard(balance = state.balance, onClick = onOpenWallet)
         }
+
+        // 토큰 카드는 아래 한 줄을 통째로 쓴다 — 인사말 칸을 좁혀 글자가
+        // 세로로 접히던 문제를 없앤다.
+        TokenCard(
+            balance = state.balance,
+            onClick = onOpenWallet,
+            modifier = Modifier.fillMaxWidth(),
+        )
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,

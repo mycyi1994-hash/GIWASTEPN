@@ -131,6 +131,28 @@ data class PostEntity(
 )
 
 /**
+ * 러닝 코스. 좌표는 "lat,lng;lat,lng;…" 한 문자열로 눌러 담는다.
+ */
+@Entity(tableName = "courses")
+data class CourseEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val name: String,
+    val area: String,
+    val distanceKm: Double,
+    val elevationM: Int,
+    /** 인코딩된 GPS 경로 */
+    val track: String,
+    val author: String,
+    val mine: Boolean,
+    /** 코스 게시판에 공유했는지 */
+    val shared: Boolean,
+    val likes: Int,
+    val liked: Boolean,
+    val runCount: Int,
+    val createdAt: Long,
+)
+
+/**
  * 게시글 댓글. parentId가 0이면 최상위 댓글, 아니면 그 댓글에 달린 답글이다.
  */
 @Entity(tableName = "comments")
@@ -175,6 +197,7 @@ object NotificationType {
     const val PARTY_FINISHED = "PARTY_FINISHED"
     const val EVENT_CLAIMED = "EVENT_CLAIMED"
     const val PARTY_MEMBER_LEFT = "PARTY_MEMBER_LEFT"
+    const val COURSE_COMPLETE = "COURSE_COMPLETE"
 
     // ── 액션형 ──
     /** 크루 초대 — 수락하면 해당 크루에 가입 (argExtra = crewId) */

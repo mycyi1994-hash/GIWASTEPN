@@ -37,6 +37,7 @@ class UserPrefs(private val context: Context) {
         val LOGIN_METHOD = stringPreferencesKey("login_method")
         val GUIDE_SEEN = intPreferencesKey("guide_seen")
         val LANGUAGE = stringPreferencesKey("language")
+        val SELECTED_COURSE = longPreferencesKey("selected_course")
     }
 
     val dailyGoal: Flow<Int> = context.dataStore.data.map { it[Keys.DAILY_GOAL] ?: DEFAULT_GOAL }
@@ -75,6 +76,15 @@ class UserPrefs(private val context: Context) {
     }
 
     suspend fun languageNow(): String = context.dataStore.data.first()[Keys.LANGUAGE] ?: ""
+
+    /** 선택한 러닝 코스 id. -1이면 선택 없음 */
+    val selectedCourseId: Flow<Long> = context.dataStore.data.map { it[Keys.SELECTED_COURSE] ?: -1L }
+
+    suspend fun setSelectedCourse(id: Long) {
+        context.dataStore.edit { it[Keys.SELECTED_COURSE] = id }
+    }
+
+    suspend fun selectedCourseNow(): Long = context.dataStore.data.first()[Keys.SELECTED_COURSE] ?: -1L
 
     /** 온보딩 가이드를 끝까지 봤는지 */
     val guideSeen: Flow<Boolean> = context.dataStore.data.map { (it[Keys.GUIDE_SEEN] ?: 0) == 1 }

@@ -22,6 +22,10 @@ object StepPermissions {
         ) {
             needed += Manifest.permission.POST_NOTIFICATIONS
         }
+        // GPS 코스 기록 — 거부해도 러닝 자체는 걸음 센서로 계속 된다
+        if (!granted(context, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            needed += Manifest.permission.ACCESS_FINE_LOCATION
+        }
         return needed.toTypedArray()
     }
 

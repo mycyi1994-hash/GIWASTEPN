@@ -71,11 +71,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.giwa.strideup.BuildConfig
 import com.giwa.strideup.R
+import com.giwa.strideup.domain.CourseRewards
+import com.giwa.strideup.domain.GeoPoint
 import com.giwa.strideup.domain.RewardEconomy
+import com.giwa.strideup.domain.RunCourse
 import com.giwa.strideup.service.RunLap
 import com.giwa.strideup.service.WalkSessionService
 import com.giwa.strideup.ui.StepPermissions
 import com.giwa.strideup.ui.components.BarMeter
+import com.giwa.strideup.ui.components.CourseTrackMap
 import com.giwa.strideup.ui.components.DarkIconButton
 import com.giwa.strideup.ui.components.EnergyMeter
 import com.giwa.strideup.ui.components.GhostButton
@@ -112,6 +116,7 @@ private data class LapSegment(
 @Composable
 fun RunScreen(
     onBack: () -> Unit = {},
+    onOpenCourses: () -> Unit = {},
     viewModel: WalkViewModel = viewModel(factory = WalkViewModel.Factory),
 ) {
     val session by viewModel.session.collectAsStateWithLifecycle()
@@ -121,6 +126,7 @@ fun RunScreen(
     val xpBoosted by viewModel.xpBoosted.collectAsStateWithLifecycle()
     val balance by viewModel.balance.collectAsStateWithLifecycle()
     val laps by viewModel.laps.collectAsStateWithLifecycle()
+    val course by viewModel.selectedCourse.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     // 목표 거리(km) — 프로세스에 살아서 화면을 나갔다 와도, 회전해도 유지된다
@@ -221,116 +227,15 @@ fun RunScreen(
         }
 
         item {
-            GlowCard(contentPadding = PaddingValues(0.dp), spacing = 0.dp) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(190.dp),
-                ) {
-                    RouteMap(Modifier.fillMaxSize())
-                    Row(
-                        modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .padding(12.dp)
-                            .background(Night.copy(alpha = 0.60f), RoundedCornerShape(50))
-                            .border(1.dp, Edge, RoundedCornerShape(50))
-                            .padding(horizontal = 10.dp, vertical = 5.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(5.dp),
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.GpsFixed,
-                            contentDescription = null,
-                            tint = Volt,
-                            modifier = Modifier.size(12.dp),
-                        )
-                        Text(
-                            text = "GPS",
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.sp,
-                            color = Snow,
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(12.dp)
-                            .size(34.dp)
-                            .background(Night.copy(alpha = 0.60f), CircleShape)
-                            .border(1.dp, Edge, CircleShape),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = "N",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Black,
-                            color = Volt,
-                        )
-                    }
-                    Column(
-                        modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .padding(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(3.dp),
-                    ) {
-                        Text(
-                            text = stringResource(R.string.run_course_name),
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = Snow,
-                        )
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            Text(
-                                text = "%.1f km".format(goalKm),
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Volt,
-                            )
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = stringResource(R.string.run_course_info),
-                                    fontSize = 11.sp,
-                                    color = Silver,
-                                )
-                                Icon(
-                                    imageVector = Icons.Filled.ChevronRight,
-                                    contentDescription = null,
-                                    tint = Silver,
-                                    modifier = Modifier.size(14.dp),
-                                )
-                            }
-                        }
-                    }
-                    Column(
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(14.dp),
-                        horizontalAlignment = Alignment.End,
-                        verticalArrangement = Arrangement.spacedBy(2.dp),
-                    ) {
-                        Text(
-                            text = stringResource(R.string.run_elevation),
-                            fontSize = 9.sp,
-                            color = Slate,
-                        )
-                        Text(
-                            text = "%d m".format(elevationM),
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Snow,
-                        )
-                        ElevationSparkline(
-                            modifier = Modifier
-                                .width(110.dp)
-                                .height(30.dp),
-                        )
-                    }
-                }
-            }
+            CourseChallengeCard(
+                course = course,
+                sessionKm = distanceKm,
+                liveTrack = session.track,
+                gpsFix = session.gpsFix,
+                elevationM = elevationM,
+                goalKm = goalKm,
+                onOpenCourses = onOpenCourses,
+            )
         }
 
         item {
@@ -1161,5 +1066,263 @@ private fun formatDuration(totalSec: Long): String {
         "%d:%02d:%02d".format(hours, minutes, seconds)
     } else {
         "%02d:%02d".format(minutes, seconds)
+    }
+}
+
+
+/**
+ * 오늘의 챌린지 카드 — 선택한 코스의 실제 GPS 트랙을 네온 지도로 보여준다.
+ *
+ * 러닝 중에는 내가 실제로 그리고 있는 GPS 경로를 함께 얹고,
+ * 완주 진행도(코스 거리 대비 세션 거리)와 거리 정량 보상을 표시한다.
+ * 코스를 고르지 않았으면 아트 지도와 코스 선택 버튼을 보여준다.
+ */
+@Composable
+private fun CourseChallengeCard(
+    course: RunCourse?,
+    sessionKm: Double,
+    liveTrack: List<GeoPoint>,
+    gpsFix: Boolean,
+    elevationM: Int,
+    goalKm: Double,
+    onOpenCourses: () -> Unit,
+) {
+    GlowCard(contentPadding = PaddingValues(0.dp), spacing = 0.dp) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp),
+        ) {
+            if (course != null && course.hasTrack) {
+                val points = remember(course.id) { course.normalized() }
+                val progress = if (course.distanceKm > 0) {
+                    (sessionKm / course.distanceKm).toFloat().coerceIn(0f, 1f)
+                } else {
+                    0f
+                }
+                CourseTrackMap(
+                    points = points,
+                    seed = course.id.toInt(),
+                    progress = progress.takeIf { sessionKm > 0.005 },
+                    modifier = Modifier.fillMaxSize(),
+                )
+            } else {
+                RouteMap(Modifier.fillMaxSize())
+            }
+
+            // 오늘의 챌린지 + GPS 상태
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(7.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .background(Volt.copy(alpha = 0.14f), RoundedCornerShape(50))
+                        .border(1.dp, Volt.copy(alpha = 0.5f), RoundedCornerShape(50))
+                        .padding(horizontal = 9.dp, vertical = 4.dp),
+                ) {
+                    Text(
+                        text = stringResource(R.string.course_today),
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 0.6.sp,
+                        color = Volt,
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .background(Night.copy(alpha = 0.60f), RoundedCornerShape(50))
+                        .border(1.dp, Edge, RoundedCornerShape(50))
+                        .padding(horizontal = 9.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.GpsFixed,
+                        contentDescription = null,
+                        tint = if (gpsFix) Volt else Slate,
+                        modifier = Modifier.size(11.dp),
+                    )
+                    Text(
+                        text = "GPS",
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp,
+                        color = if (gpsFix) Snow else Slate,
+                    )
+                }
+            }
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(12.dp)
+                    .size(32.dp)
+                    .background(Night.copy(alpha = 0.60f), CircleShape)
+                    .border(1.dp, Edge, CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(text = "N", fontSize = 12.sp, fontWeight = FontWeight.Black, color = Volt)
+            }
+
+            // 코스 이름 · 거리 · 코스 변경
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(14.dp),
+                verticalArrangement = Arrangement.spacedBy(3.dp),
+            ) {
+                Text(
+                    text = course?.name ?: stringResource(R.string.course_none_title),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Snow,
+                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(
+                        text = "%.2f km".format(course?.distanceKm ?: goalKm),
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Volt,
+                    )
+                    Row(
+                        modifier = Modifier.quietClickable(onOpenCourses),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = stringResource(
+                                if (course != null) R.string.course_change else R.string.course_pick,
+                            ),
+                            fontSize = 11.sp,
+                            color = Silver,
+                        )
+                        Icon(
+                            imageVector = Icons.Filled.ChevronRight,
+                            contentDescription = null,
+                            tint = Silver,
+                            modifier = Modifier.size(14.dp),
+                        )
+                    }
+                }
+            }
+
+            // 고도(데모)
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(14.dp),
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.run_elevation),
+                    fontSize = 9.sp,
+                    color = Slate,
+                )
+                Text(
+                    text = "%d m".format(elevationM),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Snow,
+                )
+                ElevationSparkline(
+                    modifier = Modifier
+                        .width(110.dp)
+                        .height(30.dp),
+                )
+            }
+        }
+
+        // 완주 보상 줄 — 코스가 있을 때만
+        if (course != null) {
+            val progress = if (course.distanceKm > 0) {
+                (sessionKm / course.distanceKm).coerceIn(0.0, 1.0).toFloat()
+            } else {
+                0f
+            }
+            val remaining = (course.distanceKm - sessionKm).coerceAtLeast(0.0)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp, vertical = 13.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(
+                        text = stringResource(R.string.course_to_finish),
+                        fontSize = 11.sp,
+                        color = Silver,
+                    )
+                    Text(
+                        text = "%.2f km".format(remaining),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Black,
+                        color = Snow,
+                    )
+                    Spacer(Modifier.weight(1f))
+                    HexEmblem(size = 15.dp, glow = false)
+                    Text(
+                        text = stringResource(
+                            R.string.course_reward_value,
+                            "%.1f".format(course.reward),
+                        ),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Black,
+                        color = Volt,
+                    )
+                }
+                BarMeter(fraction = progress, height = 7.dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    listOf("25%", "50%", "75%").forEachIndexed { index, label ->
+                        Text(
+                            text = label,
+                            fontSize = 8.5.sp,
+                            color = if (progress >= (index + 1) * 0.25f) Volt else Slate,
+                        )
+                    }
+                    Text(
+                        text = stringResource(
+                            R.string.course_per_km,
+                            "%.0f".format(CourseRewards.SUP_PER_KM),
+                            "%.0f".format(CourseRewards.MAX_REWARD),
+                        ),
+                        fontSize = 8.5.sp,
+                        color = Slate,
+                    )
+                }
+            }
+        } else {
+            // 코스 미선택 — 고르러 가기
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp, vertical = 13.dp),
+                verticalArrangement = Arrangement.spacedBy(9.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.course_none_body),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Silver,
+                )
+                VoltButton(
+                    text = stringResource(R.string.course_pick),
+                    onClick = onOpenCourses,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
     }
 }

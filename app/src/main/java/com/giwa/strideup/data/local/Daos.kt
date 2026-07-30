@@ -208,6 +208,31 @@ interface PostDao {
 }
 
 @Dao
+interface CourseDao {
+
+    @Insert
+    suspend fun insert(entity: CourseEntity): Long
+
+    @Insert
+    suspend fun insertAll(entities: List<CourseEntity>)
+
+    @Update
+    suspend fun update(entity: CourseEntity)
+
+    @Query("DELETE FROM courses WHERE id = :id AND mine = 1")
+    suspend fun deleteMine(id: Long)
+
+    @Query("SELECT * FROM courses ORDER BY mine DESC, createdAt DESC")
+    fun observeAll(): Flow<List<CourseEntity>>
+
+    @Query("SELECT * FROM courses WHERE id = :id")
+    suspend fun byId(id: Long): CourseEntity?
+
+    @Query("SELECT COUNT(*) FROM courses")
+    suspend fun count(): Int
+}
+
+@Dao
 interface CommentDao {
 
     @Insert

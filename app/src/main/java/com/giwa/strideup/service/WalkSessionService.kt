@@ -1,12 +1,18 @@
 package com.giwa.strideup.service
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
+import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
@@ -15,7 +21,10 @@ import com.giwa.strideup.MainActivity
 import com.giwa.strideup.R
 import com.giwa.strideup.core.ServiceLocator
 import com.giwa.strideup.data.local.WalkSessionEntity
+import com.giwa.strideup.domain.GeoPoint
 import com.giwa.strideup.domain.RewardEconomy
+import com.giwa.strideup.domain.haversineMeters
+import com.giwa.strideup.domain.simplify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -53,6 +62,10 @@ data class WalkSessionState(
      * 러닝 중 화면을 나갔다 돌아와도 랩이 사라지거나 꼬이지 않는다.
      */
     val laps: List<RunLap> = emptyList(),
+    /** GPS로 기록한 이번 세션의 실제 경로 */
+    val track: List<GeoPoint> = emptyList(),
+    /** 최근에 GPS 좌표를 받았는지 (지도 카드 GPS 배지) */
+    val gpsFix: Boolean = false,
 )
 
 /**
@@ -65,6 +78,61 @@ class WalkSessionService : Service() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private var stepJob: Job? = null
     private var timerJob: Job? = null
+    private var locationManager: LocationManager? = null
+
+    /**
+     * GPS 리스너 — 8m 이상 움직였을 때만 경로에 점을 추가해
+     * 제자리 노이즈로 트랙이 지저분해지는 것을 막는다.
+     */
+    private val locationListener = object : LocationListener {
+        override fun onLocationChanged(location: Location) {
+            val current = _state.value
+            if (!current.isActive || current.isPaused) return
+            val p = GeoPoint(location.latitude, location.longitude)
+            val track = current.track
+            if (track.isEmpty() || haversineMeters(track.last(), p) >= 8.0) {
+                _state.value = current.copy(track = track + p, gpsFix = true)
+            } else if (!current.gpsFix) {
+                _state.value = current.copy(gpsFix = true)
+            }
+        }
+
+        // API 29 이하에서는 아래 셋이 추상 메서드라 반드시 구현해야 한다
+        @Deprecated("Deprecated in Java")
+        override fun onStatusChanged(provider: String?, status: Int, extras: android.os.Bundle?) = Unit
+        override fun onProviderEnabled(provider: String) = Unit
+        override fun onProviderDisabled(provider: String) = Unit
+    }
+
+    private fun hasLocationPermission(): Boolean =
+        ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+            PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+            PackageManager.PERMISSION_GRANTED
+
+    private fun startLocation() {
+        if (!hasLocationPermission()) return
+        val lm = getSystemService(LOCATION_SERVICE) as LocationManager
+        locationManager = lm
+        try {
+            if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                lm.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER, 2_500L, 6f, locationListener, mainLooper,
+                )
+            } else if (lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                lm.requestLocationUpdates(
+                    LocationManager.NETWORK_PROVIDER, 4_000L, 10f, locationListener, mainLooper,
+                )
+            }
+        } catch (_: SecurityException) {
+            // 권한이 그 사이 회수됐다면 GPS 없이 진행한다
+        }
+    }
+
+    private fun stopLocation() {
+        locationManager?.removeUpdates(locationListener)
+        locationManager = null
+    }
 
     /** 세션 걸음 집계 기준점. 첫 실측값 방출로 초기화된다(null = 아직 미정). */
     private var lastTodaySteps: Int? = null
@@ -85,11 +153,18 @@ class WalkSessionService : Service() {
     private fun startSession(partySize: Int) {
         if (_state.value.isActive) return
         createChannel()
+        // 위치 권한이 있을 때만 location 타입을 함께 선언한다 —
+        // 권한 없이 선언하면 API 34+에서 시작 자체가 거부된다.
+        val fgsType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE && hasLocationPermission()) {
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH or ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
+        } else {
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH
+        }
         ServiceCompat.startForeground(
             this,
             NOTIFICATION_ID,
             buildNotification(0),
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH,
+            fgsType,
         )
         _state.value = WalkSessionState(
             isActive = true,
@@ -99,6 +174,7 @@ class WalkSessionService : Service() {
 
         // 일별 기록/목표 보너스 수집기까지 함께 보장한다 (중복 호출에 안전).
         ServiceLocator.stepRepository.startTracking()
+        startLocation()
         val tracker = ServiceLocator.stepTracker
         lastTodaySteps = null
 
@@ -159,6 +235,7 @@ class WalkSessionService : Service() {
         settling = true
         stepJob?.cancel()
         timerJob?.cancel()
+        stopLocation()
         scope.launch {
             // 파티런이면 정산 시점의 실제 인원을 쓴다 — 러닝 중 거리 이탈로 빠진 인원 반영.
             val settleSize = if (session.partySize > 1) {
@@ -178,6 +255,16 @@ class WalkSessionService : Service() {
                     pointsEarned = reward.points,
                 )
             )
+            // 코스 완주 정산 — 거리 1km당 정량 SUP. 코스 미선택이면 조용히 지나간다.
+            runCatching {
+                ServiceLocator.courseRepository.grantCompletionIfFinished(
+                    RewardEconomy.distanceMeters(session.steps) / 1000,
+                )
+            }
+            // 방금 달린 트랙을 남겨 "코스 만들기"의 재료로 쓴다
+            if (session.track.size >= 2) {
+                lastTrack.value = session.track.simplify()
+            }
             _state.value = WalkSessionState(
                 lastRewardPoints = reward.points,
                 lastRewardedSteps = reward.rewardedSteps,
@@ -195,6 +282,7 @@ class WalkSessionService : Service() {
     }
 
     override fun onDestroy() {
+        stopLocation()
         scope.cancel()
         super.onDestroy()
     }
@@ -240,6 +328,9 @@ class WalkSessionService : Service() {
 
         /** 러닝 목표 거리(km). 화면이 아니라 프로세스에 살아서 화면을 오가도 유지된다. */
         val goalKm = MutableStateFlow(5.0)
+
+        /** 마지막 세션의 GPS 트랙 — "코스 만들기"의 재료 */
+        val lastTrack = MutableStateFlow<List<GeoPoint>>(emptyList())
 
         /** 수동 랩 — 마지막 랩에서 50m 이상 나아갔을 때만 추가한다. */
         fun recordManualLap() {
