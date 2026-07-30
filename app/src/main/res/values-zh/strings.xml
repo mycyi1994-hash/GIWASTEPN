@@ -767,4 +767,66 @@
     <string name="stat_pace">配速 /km</string>
     <string name="stat_speed">速度 km/h</string>
     <string name="stat_cadence">步频 spm</string>
+
+    <!-- Common -->
+    <string name="common_more">更多</string>
+
+    <!-- Items redesign -->
+    <string name="items_combo">%1$d / %2$d 组合</string>
+
+    <!-- Flash run detail -->
+    <string name="flash_recruiting">招募中</string>
+    <string name="flash_full_badge">已满员</string>
+    <string name="flash_closed_badge">已结束</string>
+    <string name="flash_host">发起人</string>
+    <string name="flash_place">集合地点</string>
+    <string name="flash_time">集合时间</string>
+    <string name="flash_pace">配速</string>
+    <string name="flash_est_distance">预计距离</string>
+    <string name="flash_members">参与者</string>
+    <string name="flash_view_members">查看成员</string>
+    <string name="flash_chat">队伍聊天</string>
+    <string name="flash_chat_latest">最新消息</string>
+    <string name="flash_enter_chat">进入聊天室</string>
+    <string name="flash_join_cta">加入队伍</string>
+    <string name="flash_joined_cta">已加入 · 点按取消</string>
+    <string name="pace_easy">轻松</string>
+    <string name="pace_normal">适中</string>
+    <string name="pace_fast">快速</string>
+
+    <!-- Profile redesign -->
+    <string name="profile_my_records">我的记录</string>
+    <string name="profile_total_calories">累计卡路里</string>
+    <string name="profile_total_time">总运动时间</string>
+    <string name="profile_earth">你已走完地球周长的 %1$s%% 🌍</string>
+    <string name="profile_streak_title">连续活动</string>
+    <string name="profile_streak_great">连续记录太棒了！🔥</string>
+    <string name="profile_recent_summary">近期活动摘要</string>
+    <string name="profile_week_runs">本周</string>
+    <string name="profile_times_unit">%1$d 次</string>
+    <string name="profile_longest_distance">最长距离</string>
+    <string name="profile_longest_time">最长时间</string>
+    <string name="profile_avg_pace">平均配速</string>
+    <string name="profile_badges">跑者徽章</string>
+    <string name="profile_edit_profile">编辑资料</string>
+    <string name="profile_set_goal">目标设置</string>
+
+    <!-- Live run -->
+    <string name="run_live">LIVE RUN</string>
+    <string name="run_course_name">江边夜跑路线</string>
+    <string name="run_course_info">路线信息</string>
+    <string name="run_elevation">累计爬升</string>
+    <string name="run_total_time">总时间</string>
+    <string name="run_goal_label">目标 %1$s km</string>
+    <string name="run_remaining">剩余距离</string>
+    <string name="run_eta">预计完成时间</string>
+    <string name="run_goal_dialog_title">目标距离</string>
+    <string name="stat_hr">心率</string>
+    <string name="hr_zone_recovery">恢复</string>
+    <string name="hr_zone_aerobic">有氧</string>
+    <string name="hr_zone_anaerobic">无氧</string>
+    <string name="run_lap_split">分段配速</string>
+    <string name="run_lap">记圈</string>
+    <string name="run_finish">结束跑步</string>
+    <string name="run_pace_chart">配速</string>
 </resources>

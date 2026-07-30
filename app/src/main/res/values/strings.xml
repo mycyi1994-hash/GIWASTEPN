@@ -769,4 +769,66 @@ Start running with StepUp.</string>
     <string name="stat_pace">Pace /km</string>
     <string name="stat_speed">Speed km/h</string>
     <string name="stat_cadence">Cadence spm</string>
+
+    <!-- Common -->
+    <string name="common_more">More</string>
+
+    <!-- Items redesign -->
+    <string name="items_combo">%1$d / %2$d combos</string>
+
+    <!-- Flash run detail -->
+    <string name="flash_recruiting">Recruiting</string>
+    <string name="flash_full_badge">Full</string>
+    <string name="flash_closed_badge">Ended</string>
+    <string name="flash_host">Host</string>
+    <string name="flash_place">Meeting point</string>
+    <string name="flash_time">Meet-up time</string>
+    <string name="flash_pace">Pace</string>
+    <string name="flash_est_distance">Est. distance</string>
+    <string name="flash_members">Participants</string>
+    <string name="flash_view_members">View members</string>
+    <string name="flash_chat">Party chat</string>
+    <string name="flash_chat_latest">Latest messages</string>
+    <string name="flash_enter_chat">Enter chat</string>
+    <string name="flash_join_cta">Join the party</string>
+    <string name="flash_joined_cta">Joined · tap to cancel</string>
+    <string name="pace_easy">EASY</string>
+    <string name="pace_normal">NORMAL</string>
+    <string name="pace_fast">FAST</string>
+
+    <!-- Profile redesign -->
+    <string name="profile_my_records">My records</string>
+    <string name="profile_total_calories">Total calories</string>
+    <string name="profile_total_time">Total workout time</string>
+    <string name="profile_earth">You\'ve walked %1$s%% of the way around the Earth 🌍</string>
+    <string name="profile_streak_title">Streak</string>
+    <string name="profile_streak_great">Your streak looks great! 🔥</string>
+    <string name="profile_recent_summary">Recent activity</string>
+    <string name="profile_week_runs">This week</string>
+    <string name="profile_times_unit">%1$d runs</string>
+    <string name="profile_longest_distance">Longest distance</string>
+    <string name="profile_longest_time">Longest session</string>
+    <string name="profile_avg_pace">Average pace</string>
+    <string name="profile_badges">Runner badges</string>
+    <string name="profile_edit_profile">Edit profile</string>
+    <string name="profile_set_goal">Set goal</string>
+
+    <!-- Live run -->
+    <string name="run_live">LIVE RUN</string>
+    <string name="run_course_name">Riverside Night Course</string>
+    <string name="run_course_info">Course info</string>
+    <string name="run_elevation">Elevation gain</string>
+    <string name="run_total_time">Total time</string>
+    <string name="run_goal_label">Goal %1$s km</string>
+    <string name="run_remaining">Remaining</string>
+    <string name="run_eta">Est. finish</string>
+    <string name="run_goal_dialog_title">Goal distance</string>
+    <string name="stat_hr">Heart rate</string>
+    <string name="hr_zone_recovery">Recovery</string>
+    <string name="hr_zone_aerobic">Aerobic</string>
+    <string name="hr_zone_anaerobic">Anaerobic</string>
+    <string name="run_lap_split">Lap split</string>
+    <string name="run_lap">Lap</string>
+    <string name="run_finish">Finish run</string>
+    <string name="run_pace_chart">Pace</string>
 </resources>

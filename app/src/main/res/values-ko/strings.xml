@@ -767,4 +767,66 @@ StepUp과 함께 달려보세요.</string>
     <string name="stat_pace">페이스 /km</string>
     <string name="stat_speed">속도 km/h</string>
     <string name="stat_cadence">케이던스 spm</string>
+
+    <!-- Common -->
+    <string name="common_more">더보기</string>
+
+    <!-- Items redesign -->
+    <string name="items_combo">%1$d / %2$d 조합</string>
+
+    <!-- Flash run detail -->
+    <string name="flash_recruiting">모집중</string>
+    <string name="flash_full_badge">정원 마감</string>
+    <string name="flash_closed_badge">종료됨</string>
+    <string name="flash_host">호스트</string>
+    <string name="flash_place">집결 장소</string>
+    <string name="flash_time">집결 시간</string>
+    <string name="flash_pace">페이스</string>
+    <string name="flash_est_distance">예상 거리</string>
+    <string name="flash_members">참여자</string>
+    <string name="flash_view_members">멤버 보기</string>
+    <string name="flash_chat">파티 채팅</string>
+    <string name="flash_chat_latest">최신 메시지</string>
+    <string name="flash_enter_chat">채팅방 입장</string>
+    <string name="flash_join_cta">파티 참여하기</string>
+    <string name="flash_joined_cta">참가 중 · 눌러서 취소</string>
+    <string name="pace_easy">이지</string>
+    <string name="pace_normal">보통</string>
+    <string name="pace_fast">빠름</string>
+
+    <!-- Profile redesign -->
+    <string name="profile_my_records">나의 기록</string>
+    <string name="profile_total_calories">누적 칼로리</string>
+    <string name="profile_total_time">총 운동 시간</string>
+    <string name="profile_earth">지구 둘레의 %1$s%%를 걸었어요 🌍</string>
+    <string name="profile_streak_title">연속 활동</string>
+    <string name="profile_streak_great">연속 기록이 멋져요! 🔥</string>
+    <string name="profile_recent_summary">최근 활동 요약</string>
+    <string name="profile_week_runs">이번 주</string>
+    <string name="profile_times_unit">%1$d회</string>
+    <string name="profile_longest_distance">가장 긴 거리</string>
+    <string name="profile_longest_time">가장 긴 시간</string>
+    <string name="profile_avg_pace">평균 페이스</string>
+    <string name="profile_badges">러너 배지</string>
+    <string name="profile_edit_profile">프로필 편집</string>
+    <string name="profile_set_goal">목표 설정</string>
+
+    <!-- Live run -->
+    <string name="run_live">LIVE RUN</string>
+    <string name="run_course_name">한강 야간 코스</string>
+    <string name="run_course_info">코스 정보</string>
+    <string name="run_elevation">누적 상승</string>
+    <string name="run_total_time">총 시간</string>
+    <string name="run_goal_label">목표 %1$s km</string>
+    <string name="run_remaining">남은 거리</string>
+    <string name="run_eta">예상 완료 시간</string>
+    <string name="run_goal_dialog_title">목표 거리</string>
+    <string name="stat_hr">심박수</string>
+    <string name="hr_zone_recovery">회복</string>
+    <string name="hr_zone_aerobic">유산소</string>
+    <string name="hr_zone_anaerobic">무산소</string>
+    <string name="run_lap_split">랩 스플릿</string>
+    <string name="run_lap">랩 기록</string>
+    <string name="run_finish">러닝 종료</string>
+    <string name="run_pace_chart">페이스</string>
 </resources>

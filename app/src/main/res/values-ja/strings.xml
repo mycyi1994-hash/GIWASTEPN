@@ -768,4 +768,66 @@ StepUp と走り出そう。</string>
     <string name="stat_pace">ペース /km</string>
     <string name="stat_speed">速度 km/h</string>
     <string name="stat_cadence">ケイデンス spm</string>
+
+    <!-- Common -->
+    <string name="common_more">もっと見る</string>
+
+    <!-- Items redesign -->
+    <string name="items_combo">%1$d / %2$d コンボ</string>
+
+    <!-- Flash run detail -->
+    <string name="flash_recruiting">募集中</string>
+    <string name="flash_full_badge">満員</string>
+    <string name="flash_closed_badge">終了</string>
+    <string name="flash_host">ホスト</string>
+    <string name="flash_place">集合場所</string>
+    <string name="flash_time">集合時間</string>
+    <string name="flash_pace">ペース</string>
+    <string name="flash_est_distance">予想距離</string>
+    <string name="flash_members">参加者</string>
+    <string name="flash_view_members">メンバーを見る</string>
+    <string name="flash_chat">パーティーチャット</string>
+    <string name="flash_chat_latest">最新メッセージ</string>
+    <string name="flash_enter_chat">チャットに入る</string>
+    <string name="flash_join_cta">パーティーに参加</string>
+    <string name="flash_joined_cta">参加中 · タップで取消</string>
+    <string name="pace_easy">イージー</string>
+    <string name="pace_normal">ふつう</string>
+    <string name="pace_fast">速い</string>
+
+    <!-- Profile redesign -->
+    <string name="profile_my_records">マイ記録</string>
+    <string name="profile_total_calories">累計カロリー</string>
+    <string name="profile_total_time">総運動時間</string>
+    <string name="profile_earth">地球一周の %1$s%% を歩きました 🌍</string>
+    <string name="profile_streak_title">連続活動</string>
+    <string name="profile_streak_great">連続記録がすばらしい！🔥</string>
+    <string name="profile_recent_summary">最近のアクティビティ</string>
+    <string name="profile_week_runs">今週</string>
+    <string name="profile_times_unit">%1$d回</string>
+    <string name="profile_longest_distance">最長距離</string>
+    <string name="profile_longest_time">最長時間</string>
+    <string name="profile_avg_pace">平均ペース</string>
+    <string name="profile_badges">ランナーバッジ</string>
+    <string name="profile_edit_profile">プロフィール編集</string>
+    <string name="profile_set_goal">目標設定</string>
+
+    <!-- Live run -->
+    <string name="run_live">LIVE RUN</string>
+    <string name="run_course_name">リバーサイド夜間コース</string>
+    <string name="run_course_info">コース情報</string>
+    <string name="run_elevation">獲得標高</string>
+    <string name="run_total_time">総時間</string>
+    <string name="run_goal_label">目標 %1$s km</string>
+    <string name="run_remaining">残り距離</string>
+    <string name="run_eta">予想完了時間</string>
+    <string name="run_goal_dialog_title">目標距離</string>
+    <string name="stat_hr">心拍数</string>
+    <string name="hr_zone_recovery">回復</string>
+    <string name="hr_zone_aerobic">有酸素</string>
+    <string name="hr_zone_anaerobic">無酸素</string>
+    <string name="run_lap_split">ラップスプリット</string>
+    <string name="run_lap">ラップ</string>
+    <string name="run_finish">ラン終了</string>
+    <string name="run_pace_chart">ペース</string>
 </resources>
