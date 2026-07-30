@@ -16,6 +16,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -359,61 +362,140 @@ fun EquippedSneakerCard(
     GlowCard(
         modifier = modifier.quietClickable(onClick),
         accent = true,
-        contentPadding = PaddingValues(18.dp),
-        spacing = 12.dp,
+        contentPadding = PaddingValues(16.dp),
+        spacing = 11.dp,
     ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(13.dp),
+        ) {
+            // 왼쪽 절반 — 이미지 위에 등급·착용 배지를 겹친다
+            Box(modifier = Modifier.weight(0.92f)) {
+                SneakerFrame(
+                    sneaker = sneaker,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f),
+                    animate = true,
+                )
+                RarityChip(
+                    sneaker.rarity,
+                    small = true,
+                    modifier = Modifier.align(Alignment.TopStart),
+                )
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .clip(RoundedCornerShape(50))
+                        .background(Volt)
+                        .padding(horizontal = 8.dp, vertical = 3.dp),
+                ) {
+                    Text(
+                        text = stringResource(R.string.items_equipped),
+                        color = Night,
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Black,
+                    )
+                }
+            }
+
+            // 오른쪽 — 이름·레벨·스탯
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(7.dp),
+                ) {
+                    Text(
+                        text = sneaker.fullLabel(),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Snow,
+                        modifier = Modifier.weight(1f, fill = false),
+                    )
+                    FactionChip(sneaker.faction, small = true)
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(CarbonHigh)
+                            .padding(horizontal = 9.dp, vertical = 4.dp),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.level_chip, sneaker.level),
+                            color = Snow,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                    Text(
+                        text = "+%.1f%%".format(sneaker.boostPercent),
+                        color = Volt,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Black,
+                    )
+                }
+                BarMeter(
+                    fraction = (sneaker.level.toFloat() / sneaker.rarity.maxLevel).coerceIn(0f, 1f),
+                    height = 5.dp,
+                )
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    SneakerStatColumn(
+                        label = stringResource(R.string.stat_boost),
+                        value = "+%.1f%%".format(sneaker.boostPercent),
+                        modifier = Modifier.weight(1f),
+                    )
+                    VerticalHairline(height = 30.dp)
+                    SneakerStatColumn(
+                        label = stringResource(R.string.stat_luck),
+                        value = "%.2f".format(sneaker.luck),
+                        modifier = Modifier.weight(1f),
+                    )
+                    VerticalHairline(height = 30.dp)
+                    SneakerStatColumn(
+                        label = stringResource(R.string.stat_comfort),
+                        value = "%.2f".format(sneaker.comfort),
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+        }
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                Text(
-                    text = sneaker.fullLabel(),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Snow,
-                )
-                FactionChip(sneaker.faction, small = true)
-            }
-            Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                RarityChip(sneaker.rarity)
-                Text(
-                    text = stringResource(R.string.sneaker_mint_no, sneaker.mintNumber),
-                    fontSize = 10.sp,
-                    color = Slate,
-                )
-            }
-        }
-
-        SneakerFrame(
-            sneaker = sneaker,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(170.dp),
-            corner = 16.dp,
-            animate = true,
-        )
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(9.dp),
-        ) {
-            SneakerMiniStat(
-                label = stringResource(R.string.stat_boost),
-                value = "+%.1f%%".format(sneaker.boostPercent),
-                modifier = Modifier.weight(1f),
+            Text(
+                text = stringResource(R.string.sneaker_mint_no, sneaker.mintNumber),
+                fontSize = 10.sp,
+                color = Slate,
             )
-            SneakerMiniStat(
-                label = stringResource(R.string.stat_luck),
-                value = "%.2f".format(sneaker.luck),
-                modifier = Modifier.weight(1f),
-            )
-            SneakerMiniStat(
-                label = stringResource(R.string.stat_comfort),
-                value = "%.2f".format(sneaker.comfort),
-                modifier = Modifier.weight(1f),
+            Icon(
+                Icons.Filled.ChevronRight,
+                contentDescription = null,
+                tint = Slate,
+                modifier = Modifier.size(16.dp),
             )
         }
+    }
+}
+
+@Composable
+private fun SneakerStatColumn(label: String, value: String, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Text(label, color = Slate, fontSize = 9.5.sp)
+        Text(value, color = Snow, fontSize = 12.5.sp, fontWeight = FontWeight.Bold)
     }
 }
 

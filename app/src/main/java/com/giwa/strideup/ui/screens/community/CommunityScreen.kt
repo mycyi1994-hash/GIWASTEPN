@@ -86,6 +86,7 @@ fun CommunityScreen(
     onOpenCrew: (String) -> Unit = {},
     onCreateCrew: () -> Unit = {},
     onWritePost: (String) -> Unit = {},
+    onOpenFlash: (Long) -> Unit = {},
     viewModel: CommunityViewModel = viewModel(factory = CommunityViewModel.Factory),
 ) {
     val tab by viewModel.tab.collectAsStateWithLifecycle()
@@ -148,6 +149,7 @@ fun CommunityScreen(
                 viewModel = viewModel,
                 onOpenRanking = onOpenRanking,
                 onWritePost = { onWritePost("") },
+                onOpenFlash = onOpenFlash,
             )
 
             CommunityTab.CREW -> CrewTab(
@@ -169,6 +171,7 @@ private fun BoardTab(
     viewModel: CommunityViewModel,
     onOpenRanking: () -> Unit,
     onWritePost: () -> Unit,
+    onOpenFlash: (Long) -> Unit,
 ) {
     val posts by viewModel.boardPosts.collectAsStateWithLifecycle()
     val filter by viewModel.categoryFilter.collectAsStateWithLifecycle()
@@ -241,6 +244,7 @@ private fun BoardTab(
                         onLike = { viewModel.toggleLike(it) },
                         onComment = { viewModel.openComments(it) },
                         onDelete = { viewModel.deletePost(it) },
+                        onOpen = onOpenFlash,
                     )
                 }
             }
@@ -276,6 +280,7 @@ private fun BoardTab(
                         onLike = { viewModel.toggleLike(post.id) },
                         onComment = { viewModel.openComments(post.id) },
                         onDelete = { viewModel.deletePost(post.id) },
+                        onOpen = { onOpenFlash(post.id) },
                     )
                 } else {
                     TextPostCard(
@@ -338,6 +343,7 @@ private fun FlashRunWindow(
     onLike: (Long) -> Unit,
     onComment: (Long) -> Unit,
     onDelete: (Long) -> Unit,
+    onOpen: (Long) -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -359,6 +365,7 @@ private fun FlashRunWindow(
                     onLike = { onLike(post.id) },
                     onComment = { onComment(post.id) },
                     onDelete = { onDelete(post.id) },
+                    onOpen = { onOpen(post.id) },
                 )
             }
         }

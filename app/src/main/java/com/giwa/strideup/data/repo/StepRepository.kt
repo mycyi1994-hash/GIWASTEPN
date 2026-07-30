@@ -38,6 +38,9 @@ class StepRepository(
     fun recentSessions(limit: Int = 20): Flow<List<WalkSessionEntity>> =
         walkSessionDao.observeRecent(limit)
 
+    /** 세션 누적 운동 시간(초) — 프로필 '총 운동 시간' 표기용 */
+    fun observeTotalDurationSec(): Flow<Long> = walkSessionDao.observeDurationSince(0L)
+
     /** ACTIVITY_RECOGNITION 권한 허용 후 호출. 중복 호출해도 안전하다. */
     fun startTracking() {
         tracker.start()

@@ -68,6 +68,7 @@ import com.giwa.strideup.ui.guide.GuideOverlay
 import com.giwa.strideup.ui.guide.GuideTour
 import com.giwa.strideup.ui.screens.community.CommunityScreen
 import com.giwa.strideup.ui.screens.community.CrewBoardScreen
+import com.giwa.strideup.ui.screens.community.FlashRunDetailScreen
 import com.giwa.strideup.ui.screens.community.CrewCreateScreen
 import com.giwa.strideup.ui.screens.community.PartyLobbyScreen
 import com.giwa.strideup.ui.screens.community.PostComposeScreen
@@ -122,6 +123,7 @@ object Routes {
     const val CREW_CREATE = "crew/create"
     const val CREW_BOARD = "crew/board/{crewId}"
     const val POST_COMPOSE = "post/compose/{crewId}"
+    const val FLASH_DETAIL = "flash/{postId}"
 
     fun sneaker(id: Long) = "sneaker/$id"
     fun lobby(crewId: String) = "lobby/$crewId"
@@ -129,6 +131,8 @@ object Routes {
 
     /** crewId가 비어 있으면 전체 게시판에 쓰는 글 */
     fun postCompose(crewId: String) = "post/compose/${crewId.ifBlank { NO_CREW }}"
+
+    fun flashDetail(postId: Long) = "flash/$postId"
 
     const val NO_CREW = "_"
 }
@@ -221,6 +225,7 @@ private fun MainScaffold(startTour: Boolean = false) {
                     onOpenCrew = { crewId -> navController.navigate(Routes.crewBoard(crewId)) },
                     onCreateCrew = { navController.navigate(Routes.CREW_CREATE) },
                     onWritePost = { crewId -> navController.navigate(Routes.postCompose(crewId)) },
+                    onOpenFlash = { postId -> navController.navigate(Routes.flashDetail(postId)) },
                 )
             }
             composable(Screen.Items.route) {
@@ -316,6 +321,16 @@ private fun MainScaffold(startTour: Boolean = false) {
                     onBack = { navController.popBackStack() },
                     onOpenLobby = { crewId -> navController.navigate(Routes.lobby(crewId)) },
                     onWritePost = { crewId -> navController.navigate(Routes.postCompose(crewId)) },
+                    onOpenFlash = { postId -> navController.navigate(Routes.flashDetail(postId)) },
+                )
+            }
+            composable(
+                route = Routes.FLASH_DETAIL,
+                arguments = listOf(navArgument("postId") { type = NavType.LongType }),
+            ) { entry ->
+                FlashRunDetailScreen(
+                    postId = entry.arguments?.getLong("postId") ?: 0L,
+                    onBack = { navController.popBackStack() },
                 )
             }
             composable(

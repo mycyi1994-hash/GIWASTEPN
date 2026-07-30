@@ -56,6 +56,7 @@ fun CrewBoardScreen(
     onBack: () -> Unit = {},
     onOpenLobby: (String) -> Unit = {},
     onWritePost: (String) -> Unit = {},
+    onOpenFlash: (Long) -> Unit = {},
     viewModel: CommunityViewModel = viewModel(factory = CommunityViewModel.Factory),
 ) {
     val crews by viewModel.crews.collectAsStateWithLifecycle()
@@ -195,6 +196,7 @@ fun CrewBoardScreen(
                         onLike = { viewModel.toggleLike(post.id) },
                         onComment = { viewModel.openComments(post.id) },
                         onDelete = { viewModel.deletePost(post.id) },
+                        onOpen = { onOpenFlash(post.id) },
                     )
                 } else {
                     TextPostCard(

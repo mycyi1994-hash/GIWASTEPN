@@ -1,6 +1,7 @@
 package com.giwa.strideup.ui.screens.items
 
 import android.widget.Toast
+import androidx.compose.foundation.border
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,11 +18,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Air
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -156,6 +161,87 @@ fun ItemsScreen(
             }
         }
 
+        // ── 속성별 도감 진행도 — 탭하면 그 속성만 필터링 ─────────
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Faction.entries.forEach { faction ->
+                    FactionProgressCell(
+                        faction = faction,
+                        owned = factions[faction] ?: 0,
+                        total = VARIANTS_PER_FACTION,
+                        selected = factionFilter == faction.id,
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                            factionFilter = if (factionFilter == faction.id) null else faction.id
+                        },
+                    )
+                }
+            }
+        }
+
+        // ── 필터: 등급 · 속성 ───────────────────────────────
+        item {
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                item {
+                    PillChip(
+                        text = stringResource(R.string.post_cat_all),
+                        selected = rarityFilter == null && factionFilter == null,
+                        onClick = {
+                            rarityFilter = null
+                            factionFilter = null
+                        },
+                    )
+                }
+                items(Rarity.entries.size) { i ->
+                    val r = Rarity.entries[i]
+                    PillChip(
+                        text = r.label(),
+                        selected = rarityFilter == r.id,
+                        onClick = { rarityFilter = if (rarityFilter == r.id) null else r.id },
+                    )
+                }
+                items(Faction.entries.size) { i ->
+                    val f = Faction.entries[i]
+                    PillChip(
+                        text = f.label(),
+                        selected = factionFilter == f.id,
+                        onClick = { factionFilter = if (factionFilter == f.id) null else f.id },
+                    )
+                }
+            }
+        }
+
+        // ── 컬렉션 헤더 — "N / 44 조합" ───────────────────────
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(R.string.items_vault),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Snow,
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = stringResource(R.string.items_combo, progress.first, progress.second),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Slate,
+                    )
+                    Icon(
+                        Icons.Filled.ChevronRight,
+                        contentDescription = null,
+                        tint = Slate,
+                        modifier = Modifier.size(15.dp),
+                    )
+                }
+            }
+        }
+
         // ── 착용 중인 스니커즈 ──────────────────────────────
         equipped?.let { sneaker ->
             item {
@@ -248,79 +334,6 @@ fun ItemsScreen(
             }
         }
 
-        // ── 컬렉션 ──────────────────────────────────────────
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = stringResource(R.string.items_vault),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Snow,
-                )
-                Text(
-                    text = stringResource(
-                        R.string.items_collection_progress,
-                        progress.first,
-                        progress.second,
-                    ),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Slate,
-                )
-            }
-        }
-
-        // ── 속성별 도감 진행도 ──────────────────────────────
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Faction.entries.forEach { faction ->
-                    FactionProgressCell(
-                        faction = faction,
-                        owned = factions[faction] ?: 0,
-                        total = VARIANTS_PER_FACTION,
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-            }
-        }
-
-        // ── 필터: 등급 · 속성 ───────────────────────────────
-        item {
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                item {
-                    PillChip(
-                        text = stringResource(R.string.post_cat_all),
-                        selected = rarityFilter == null && factionFilter == null,
-                        onClick = {
-                            rarityFilter = null
-                            factionFilter = null
-                        },
-                    )
-                }
-                items(Rarity.entries.size) { i ->
-                    val r = Rarity.entries[i]
-                    PillChip(
-                        text = r.label(),
-                        selected = rarityFilter == r.id,
-                        onClick = { rarityFilter = if (rarityFilter == r.id) null else r.id },
-                    )
-                }
-                items(Faction.entries.size) { i ->
-                    val f = Faction.entries[i]
-                    PillChip(
-                        text = f.label(),
-                        selected = factionFilter == f.id,
-                        onClick = { factionFilter = if (factionFilter == f.id) null else f.id },
-                    )
-                }
-            }
-        }
-
         // ── 컬렉션 — 한 줄, 옆으로 밀어서 넘긴다 ───────────────
         item {
             val filtered = groups.filter { g ->
@@ -395,16 +408,25 @@ fun ItemsScreen(
             }
         }
 
-        // ── 부스트 상점 ─────────────────────────────────────
-        item { SectionHeader(title = stringResource(R.string.items_boosts)) }
+        // ── 부스트 상점 — 3개 카드 한 줄 ─────────────────────
+        item {
+            SectionHeader(
+                title = stringResource(R.string.items_boosts),
+                actionText = stringResource(R.string.common_more),
+            )
+        }
 
         item {
-            GlowCard(contentPadding = PaddingValues(16.dp), spacing = 11.dp) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
                 BoostType.entries.forEach { type ->
-                    BoostRow(
+                    BoostCard(
                         type = type,
                         affordable = balance >= type.cost,
                         onBuy = { viewModel.buyBoost(type) },
+                        modifier = Modifier.weight(1f),
                     )
                 }
             }
@@ -486,32 +508,66 @@ fun ItemsScreen(
     }
 }
 
-/** 속성 하나의 도감 진행도 — 포스터의 4속성 컬렉션을 한 줄로 요약한다. */
+/** 속성 아이콘 */
+private fun factionIcon(faction: Faction) = when (faction) {
+    Faction.FIRE -> Icons.Filled.LocalFireDepartment
+    Faction.WATER -> Icons.Filled.WaterDrop
+    Faction.LIGHTNING -> Icons.Filled.Bolt
+    Faction.WIND -> Icons.Filled.Air
+}
+
+/**
+ * 속성 하나의 도감 진행도 카드.
+ * 탭하면 그 속성만 보는 필터가 되고, 선택 중에는 볼트 테두리가 붙는다.
+ */
 @Composable
 private fun FactionProgressCell(
     faction: Faction,
     owned: Int,
     total: Int,
+    selected: Boolean,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
 ) {
     val c = faction.tint()
+    val shape = RoundedCornerShape(20.dp)
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(c.copy(alpha = 0.09f))
-            .padding(vertical = 10.dp, horizontal = 8.dp),
+            .clip(shape)
+            .background(c.copy(alpha = if (selected) 0.13f else 0.07f))
+            .border(
+                width = 1.dp,
+                color = if (selected) Volt else c.copy(alpha = 0.25f),
+                shape = shape,
+            )
+            .quietClickable(onClick)
+            .padding(vertical = 12.dp, horizontal = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(5.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
+        Box(
+            modifier = Modifier
+                .size(34.dp)
+                .clip(CircleShape)
+                .background(c.copy(alpha = 0.16f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = factionIcon(faction),
+                contentDescription = faction.label(),
+                tint = c,
+                modifier = Modifier.size(18.dp),
+            )
+        }
         Text(
             text = faction.label(),
             color = c,
-            fontSize = 9.sp,
+            fontSize = 10.sp,
             fontWeight = FontWeight.Black,
-            letterSpacing = 0.8.sp,
+            letterSpacing = 0.6.sp,
         )
         Text(
-            text = "$owned/$total",
+            text = "$owned / $total",
             color = Snow,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
@@ -612,33 +668,54 @@ private fun CopiesDialog(
 }
 
 @Composable
-private fun BoostRow(type: BoostType, affordable: Boolean, onBuy: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
+private fun BoostCard(
+    type: BoostType,
+    affordable: Boolean,
+    onBuy: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(22.dp))
             .background(CarbonHigh.copy(alpha = 0.6f))
-            .padding(13.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+            .padding(horizontal = 10.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(9.dp),
     ) {
-        IconSquare(icon = boostIcon(type), size = 40.dp)
-        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(
-                text = stringResource(boostTitle(type)),
-                style = MaterialTheme.typography.titleSmall,
-                color = Snow,
-            )
-            Text(
-                text = stringResource(boostDesc(type)),
-                fontSize = 11.sp,
-                color = Silver,
+        // 볼트 링 안의 아이콘 — 목업의 원형 아이콘
+        Box(
+            modifier = Modifier
+                .size(54.dp)
+                .clip(CircleShape)
+                .border(1.5.dp, Volt.copy(alpha = 0.7f), CircleShape),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = boostIcon(type),
+                contentDescription = null,
+                tint = Volt,
+                modifier = Modifier.size(24.dp),
             )
         }
+        Text(
+            text = stringResource(boostTitle(type)),
+            style = MaterialTheme.typography.titleSmall,
+            color = Snow,
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            text = stringResource(boostDesc(type)),
+            fontSize = 10.sp,
+            color = Silver,
+            textAlign = TextAlign.Center,
+            lineHeight = 14.sp,
+            minLines = 2,
+        )
         GhostButton(
             text = stringResource(R.string.price_sup, "%,.0f".format(type.cost)),
             onClick = onBuy,
             enabled = affordable,
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }

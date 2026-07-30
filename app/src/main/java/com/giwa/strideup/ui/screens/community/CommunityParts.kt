@@ -156,10 +156,13 @@ fun FlashRunCard(
     onLike: () -> Unit,
     onComment: () -> Unit,
     onDelete: (() -> Unit)? = null,
+    onOpen: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val hasPlace = post.place.isNotBlank()
     GlowCard(
+        // 카드 어디를 눌러도 상세로 — 참가/좋아요/장소 등 안쪽 클릭이 우선한다
+        modifier = Modifier.quietClickable(onOpen),
         contentPadding = PaddingValues(15.dp),
         spacing = 10.dp,
         accent = post.joined,
