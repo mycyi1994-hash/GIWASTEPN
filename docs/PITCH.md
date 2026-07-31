@@ -7,7 +7,7 @@
 
 [English](#slide-1--title) · [한국어 ↓](#한국어)
 
-**[⬇️ Install the APK](https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk)** · [Repository](https://github.com/mycyi1994-hash/GIWASTEPN) · [One-Pager](ONEPAGER.md) · [Tokenomics](TOKENOMICS.md) · [Team](TEAM.md)
+**[⬇️ Install the APK](https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk)** · [Repository](https://github.com/mycyi1994-hash/GIWASTEPN) · [One-Pager](ONEPAGER.md) · [Tokenomics](TOKENOMICS.md)
 
 </div>
 
@@ -251,13 +251,16 @@ before the users are counted.
 
 **Traditional-finance veterans moving into crypto. Five people, Seoul.**
 
-| | | |
+| Role | Background | Owns |
 |---|---|---|
-| **Hoon Il Kim** | CEO | SNU · Prop trader 2008–2018 (DS, DAOL) · Head of Asset Management |
-| **Eun A Lim** | CIO | Prop trader 2006–2018 (MERITZ, HANA, DAOL) · Macro senior trader · Head of CTA Solutions |
-| **Ki Wan Kim** | Systems | Samsung Electronics · System trader 2010–2018 (MIRAE, DAOL, YUANTA) · Investment advisory 2018–2022 |
-| **Young Il Choi** | Community | Crypto KOL — Korean market audience & campaigns |
-| **Beom Ju Kim** | Markets | Trader, Starbeta |
+| **CEO** | Proprietary trader 2008–2018, securities & investment · Head of Asset Management | Reward-economy parameters |
+| **CIO** | Proprietary trader 2006–2018, asset management · Macro senior trader · Head of CTA Solutions | Emission schedule, treasury |
+| **Systems** | Electronics engineering · System trader 2010–2018 · Investment advisory 2018–2022 | Run proof, attester, anti-abuse |
+| **Community** | Crypto KOL — Korean market audience & campaigns | Crews, growth, creator channels |
+| **Markets** | Active crypto trading desk | On-chain liquidity |
+
+> Names, affiliations and full CVs are supplied separately with the application
+> (question 3), not published in this repository.
 
 **Why it matters:** most M2E economies were designed by product people, not by
 people who price risk. Ours was designed by traders. That is why the ceiling is
@@ -532,13 +535,16 @@ rate(d) = min(1, B(d) / Σ claimScore(d))
 
 **전통금융 베테랑들의 크립토 진출. 5인, 서울.**
 
-| | | |
+| 역할 | 경력 | 담당 |
 |---|---|---|
-| **김훈일** | CEO | 서울대 · 자기자본 트레이더 2008~2018 (DS, DAOL) · 자산운용 총괄 |
-| **임은아** | CIO | 자기자본 트레이더 2006~2018 (MERITZ, HANA, DAOL) · 매크로 시니어 트레이더 · CTA 솔루션 총괄 |
-| **김기완** | 시스템 | 삼성전자 · 시스템 트레이더 2010~2018 (MIRAE, DAOL, YUANTA) · 투자자문업 2018~2022 |
-| **최영일** | 커뮤니티 | 크립토 KOL — 국내 시장 오디언스·캠페인 |
-| **김범주** | 마켓 | Starbeta 트레이더 |
+| **CEO** | 증권·투자 자기자본 트레이더 2008~2018 · 자산운용 총괄 | 리워드 이코노미 파라미터 |
+| **CIO** | 자산운용 자기자본 트레이더 2006~2018 · 매크로 시니어 트레이더 · CTA 솔루션 총괄 | 발행 스케줄, 트레저리 |
+| **시스템** | 전자 엔지니어링 · 시스템 트레이더 2010~2018 · 투자자문업 2018~2022 | 러닝 증명, 어테스터, 어뷰징 방지 |
+| **커뮤니티** | 크립토 KOL — 국내 시장 오디언스·캠페인 | 크루, 그로스, 크리에이터 채널 |
+| **마켓** | 크립토 트레이딩 데스크 | 온체인 유동성 |
+
+> 실명·소속·상세 이력은 이 저장소에 올리지 않고, 지원서 3번 문항에 **별도
+> 파일로** 제출합니다.
 
 **왜 중요한가:** 대부분의 M2E 이코노미는 리스크를 가격 매기는 사람이 아니라
 제품 하는 사람이 설계했습니다. 우리 것은 트레이더가 설계했습니다. 그래서 상한이

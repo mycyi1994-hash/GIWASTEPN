@@ -11,7 +11,7 @@ Walk or run in the real world → earn SUP → collect and upgrade sneaker NFTs.
 
 [English](#1-what-it-is) · [한국어 ↓](#한국어)
 
-**[⬇️ Install the APK](https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk)** · [Repository](https://github.com/mycyi1994-hash/GIWASTEPN) · [Tokenomics](TOKENOMICS.md) · [Pitch Deck](PITCH.md) · [Team](TEAM.md)
+**[⬇️ Install the APK](https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk)** · [Repository](https://github.com/mycyi1994-hash/GIWASTEPN) · [Tokenomics](TOKENOMICS.md) · [Pitch Deck](PITCH.md)
 
 </div>
 
@@ -162,7 +162,7 @@ live in the app.
 
 `v1.12.1` · 안드로이드 · Kotlin + Jetpack Compose · **지금 설치 가능한 APK**
 
-**[⬇️ APK 설치](https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk)** · [저장소](https://github.com/mycyi1994-hash/GIWASTEPN) · [토크노믹스](TOKENOMICS.md) · [피치덱](PITCH.md) · [팀](TEAM.md)
+**[⬇️ APK 설치](https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk)** · [저장소](https://github.com/mycyi1994-hash/GIWASTEPN) · [토크노믹스](TOKENOMICS.md) · [피치덱](PITCH.md)
 
 ---
 

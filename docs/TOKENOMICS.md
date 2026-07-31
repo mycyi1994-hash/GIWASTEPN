@@ -7,7 +7,7 @@ Version 1.0 · Aligned with app build v1.12.1
 
 [English](#1-summary) · [한국어 ↓](#한국어)
 
-[One-Pager](ONEPAGER.md) · [Pitch Deck](PITCH.md) · [Team](TEAM.md)
+[One-Pager](ONEPAGER.md) · [Pitch Deck](PITCH.md)
 
 </div>
 

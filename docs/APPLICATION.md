@@ -43,26 +43,32 @@
 # [3/12] Team Introduction
 **팀 소개** · shareable file link (이름·역할·국적·경력·강점)
 
-### 🇬🇧 영어판 (478자 / 500)
+> ⚠️ **`<TEAM_FILE_URL>` 을 직접 만드신 팀 소개 파일 링크로 바꾸세요.**
+> 실명과 경력은 **저장소에 올리지 않습니다** — 공개 저장소라 검색엔진에
+> 걸리고, 본인 동의 없이 남의 이력이 공개되는 문제가 됩니다.
+> 구글 드라이브·노션 등에 올려 **링크를 아는 사람만 보기**로 두시면 됩니다.
+> (GASOK 폼이 요구하는 건 "shareable file link"이지 GitHub가 아닙니다.)
+
+### 🇬🇧 영어판 (472자 / 500 · 링크 60자 가정)
 
 ```
 Team introduction (name, role, nationality, experience, core strengths):
-https://github.com/mycyi1994-hash/GIWASTEPN/blob/claude/work-history-pjm57c/docs/TEAM.md
+<TEAM_FILE_URL>
 
 Five traders from Korean securities and asset-management firms — proprietary trading, macro strategy, CTA solutions, systematic execution. All Korean nationals, based in Seoul.
 
-The document maps each member to the product surface they own, and includes a section on the gaps we are short on, not only what we have.
+The document maps each member to the product surface they own, and states the gaps we are short on, not only what we have: a mobile engineer to hire, no external contract audit yet, no backend.
 ```
 
-### 🇰🇷 한국어판 (393자 / 500)
+### 🇰🇷 한국어판 (392자 / 500 · 링크 60자 가정)
 
 ```
 팀 소개(이름, 역할, 국적, 경력, 핵심 강점):
-https://github.com/mycyi1994-hash/GIWASTEPN/blob/claude/work-history-pjm57c/docs/TEAM.md
+<TEAM_FILE_URL>
 
 국내 증권·자산운용사에서 자기자본 트레이딩, 매크로 전략, CTA 솔루션, 시스템 집행을 각자 10~20년 해 온 5인입니다. 전원 대한민국 국적이며 서울에 거점을 두고 있습니다.
 
-문서는 영문·한국어를 병기했고, 구성원 각자가 책임지는 제품 영역을 표로 대응시켰습니다. 리워드 이코노미 파라미터, 발행 스케줄, 러닝 증명과 어뷰징 방지, 커뮤니티 그로스, 온체인 유동성 순입니다. 가진 것뿐 아니라 부족한 부분(모바일 엔지니어 충원, 컨트랙트 외부 감사, 백엔드 부재)도 따로 밝혔습니다.
+문서에 구성원 각자가 책임지는 제품 영역을 표로 대응시켰습니다. 리워드 이코노미 파라미터, 발행 스케줄, 러닝 증명과 어뷰징 방지, 커뮤니티 그로스, 온체인 유동성 순입니다. 가진 것뿐 아니라 부족한 부분(모바일 엔지니어 충원, 컨트랙트 외부 감사, 백엔드 부재)도 따로 밝혔습니다.
 ```
 
 ---
@@ -236,7 +242,7 @@ https://github.com/mycyi1994-hash/GIWASTEPN/blob/claude/work-history-pjm57c/docs
 
 | 문항 | 문서 |
 |---|---|
-| 3/12 | [`docs/TEAM.md`](TEAM.md) |
+| 3/12 | **별도 파일** (저장소 외부) — 실명·이력은 공개하지 않습니다 |
 | 7/12 | [`docs/PITCH.md`](PITCH.md) |
 | 8/12 | [`docs/DEMO.md`](DEMO.md) (촬영 대본) · [APK](https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk) |
 | 9/12 | [`contracts/`](../contracts/) · [`contracts/README.md`](../contracts/README.md) (배포 6단계) |

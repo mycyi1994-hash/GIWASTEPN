@@ -104,7 +104,7 @@ GitHub은 권한 없는 사람에게 "권한 없음" 대신 일부러 404를 보
 
 | 문항 | 어떤 답 | 비고 |
 |---|---|---|
-| **3/12** Team Introduction | `TEAM.md` 링크 | |
+| **3/12** Team Introduction | **직접 만든 팀 소개 파일 링크** (구글 드라이브 등) | 실명은 저장소에 안 올립니다 |
 | **4/12** Motivation for Applying | 지원 동기 본문 | 영어 499자 |
 | **7/12** Pitch Deck | `PITCH.md` 링크 | |
 | **8/12** Project Link | APK 링크 (+영상) | **영상 없으면 그 줄만 지우세요** |
