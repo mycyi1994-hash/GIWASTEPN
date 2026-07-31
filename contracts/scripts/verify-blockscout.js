@@ -74,7 +74,21 @@ async function submit(explorer, address, { json, compiler, contractName, constru
 
   const res = await fetch(
     `${explorer}/api/v2/smart-contracts/${address}/verification/via/standard-input`,
-    { method: "POST", body: form, headers: { accept: "application/json" } },
+    {
+      method: "POST",
+      body: form,
+      headers: {
+        accept: "application/json",
+        // 브라우저처럼 보이게 한다. Cloudflare 봇 차단이 원인이라면 이것만으로
+        // 통과하고, 크기 제한이 원인이라면 아무 차이가 없다 — 어느 쪽인지
+        // 가려내는 데도 쓰인다.
+        "user-agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+        "accept-language": "en-US,en;q=0.9",
+        origin: explorer,
+        referer: `${explorer}/address/${address}/contract-verification`,
+      },
+    },
   );
 
   const text = await res.text();
@@ -82,9 +96,98 @@ async function submit(explorer, address, { json, compiler, contractName, constru
   try {
     body = JSON.parse(text);
   } catch {
-    body = { raw: text.slice(0, 300) };
+    body = { raw: text };
   }
-  return { ok: res.ok, status: res.status, body };
+  return { ok: res.ok, status: res.status, body, text };
+}
+
+/**
+ * 두 번째 경로 — 소스를 **파일 여러 개로 쪼개서** 보낸다.
+ *
+ * 표준 JSON 입력은 아무리 줄여도 덩어리 하나가 180KB다. 앞단이 **파트 하나의
+ * 크기**를 제한하는 것이라면, 같은 내용을 22개 파일로 나눠 보내면 통과한다
+ * (가장 큰 파일이 35KB). 총량 제한이라면 이것도 막힌다 — 어느 쪽인지 시도해
+ * 봐야 안다.
+ *
+ * 컴파일 설정은 표준 JSON에 들어 있던 값을 그대로 꺼내 쓴다. 하나라도
+ * 어긋나면 바이트코드가 달라져 검증이 실패한다.
+ */
+async function submitMultiPart(explorer, address, { input, compiler, contractName, constructorArgs }) {
+  const settings = input.settings ?? {};
+  const form = new FormData();
+  form.append("compiler_version", compiler);
+  form.append("evm_version", settings.evmVersion ?? "default");
+  form.append("is_optimization_enabled", String(Boolean(settings.optimizer?.enabled)));
+  if (settings.optimizer?.enabled) {
+    form.append("optimization_runs", String(settings.optimizer.runs ?? 200));
+  }
+  form.append("autodetect_constructor_args", "false");
+  form.append("constructor_args", constructorArgs ? `0x${constructorArgs}` : "");
+  if (contractName) form.append("contract_name", contractName);
+
+  Object.entries(input.sources).forEach(([sourceName, { content }], i) => {
+    form.append(
+      `files[${i}]`,
+      new Blob([content], { type: "text/plain" }),
+      sourceName,
+    );
+  });
+
+  const res = await fetch(
+    `${explorer}/api/v2/smart-contracts/${address}/verification/via/multi-part`,
+    {
+      method: "POST",
+      body: form,
+      headers: {
+        accept: "application/json",
+        "user-agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+        origin: explorer,
+        referer: `${explorer}/address/${address}/contract-verification`,
+      },
+    },
+  );
+
+  const text = await res.text();
+  let body;
+  try {
+    body = JSON.parse(text);
+  } catch {
+    body = { raw: text };
+  }
+  return { ok: res.ok, status: res.status, body, text };
+}
+
+/**
+ * 실패 이유를 한 줄로 요약한다.
+ *
+ * Cloudflare가 막으면 본문이 통째로 HTML이라, 앞부분만 잘라 보여줘 봐야
+ * `<!DOCTYPE html>` 밖에 안 보인다. 정작 필요한 것은 **HTTP 상태 코드**와
+ * **Cloudflare 오류 번호**다. 그 둘이 원인을 갈라 준다.
+ *
+ *   413        → 요청이 너무 크다. 소스를 줄이거나 다른 경로로 가야 한다.
+ *   403 / 1020 → 방화벽 규칙. 브라우저에서는 되는데 스크립트라서 막힌 것.
+ *   1015       → 레이트 리밋. 기다리면 된다.
+ *   5xx        → 익스플로러 쪽 장애. 우리가 할 게 없다.
+ */
+function explainFailure({ status, body, text }) {
+  if (body && !body.raw) {
+    const message = body.message || body.errors || body;
+    return `HTTP ${status} · ${JSON.stringify(message).slice(0, 200)}`;
+  }
+
+  const html = text || "";
+  const title = html.match(/<title>([^<]*)<\/title>/i)?.[1]?.trim();
+  const cfCode = html.match(/error code:\s*(\d+)/i)?.[1] ||
+    html.match(/Error\s+(1\d{3})\b/)?.[1];
+  const rayId = html.match(/Ray ID:\s*<[^>]*>([0-9a-f]+)/i)?.[1];
+
+  const parts = [`HTTP ${status}`];
+  if (title) parts.push(title);
+  if (cfCode) parts.push(`Cloudflare ${cfCode}`);
+  if (rayId) parts.push(`Ray ${rayId}`);
+  parts.push("HTML 응답 (Cloudflare가 막음)");
+  return parts.join(" · ");
 }
 
 async function verifyOne({ explorer, name, contract, buildInfo }) {
@@ -105,17 +208,30 @@ async function verifyOne({ explorer, name, contract, buildInfo }) {
     ? hre.ethers.AbiCoder.defaultAbiCoder().encode(types, contract.args).slice(2)
     : "";
 
-  // 이름 형태를 바꿔가며 시도한다. 셋 다 실패해야 진짜 실패다.
-  const attempts = [`${sourceName}:${name}`, name, null];
   const compiler = compilerVersion(buildInfo);
+  const common = { json, input, compiler, constructorArgs };
 
-  for (const contractName of attempts) {
-    const label = contractName ?? "(이름 생략, 바이트코드로 자동 탐지)";
-    const res = await submit(explorer, contract.address, {
-      json,
-      compiler,
-      contractName,
-      constructorArgs,
+  // 경로를 순서대로 시도한다. 앞의 것이 나은 이유는 표준 JSON 입력이
+  // 컴파일 설정을 통째로 담고 있어 어긋날 여지가 없기 때문이다.
+  // 파일 하나가 커서 막히면 여러 파일로 쪼개 보내는 쪽으로 넘어간다.
+  const routes = [
+    { via: "standard-input", send: submit, contractName: `${sourceName}:${name}` },
+    { via: "standard-input", send: submit, contractName: name },
+    { via: "standard-input", send: submit, contractName: null },
+    { via: "multi-part", send: submitMultiPart, contractName: `${sourceName}:${name}` },
+    { via: "multi-part", send: submitMultiPart, contractName: name },
+  ];
+
+  let blockedOn = null;
+
+  for (const route of routes) {
+    // 같은 방식이 Cloudflare 벽에 부딪혔으면 이름만 바꿔 다시 보낼 이유가 없다.
+    if (blockedOn === route.via) continue;
+
+    const label = `${route.via} · ${route.contractName ?? "이름 자동 탐지"}`;
+    const res = await route.send(explorer, contract.address, {
+      ...common,
+      contractName: route.contractName,
     });
 
     if (res.ok) {
@@ -132,14 +248,16 @@ async function verifyOne({ explorer, name, contract, buildInfo }) {
       return false;
     }
 
-    const reason = res.body?.message || res.body?.errors || res.body?.raw || `HTTP ${res.status}`;
-    console.log(`  ✗ ${label} → ${JSON.stringify(reason).slice(0, 200)}`);
+    console.log(`  ✗ ${label} → ${explainFailure(res)}`);
 
     // 이미 검증된 상태라고 답하는 경우도 있다
-    if (/already verified/i.test(JSON.stringify(res.body))) {
+    if (/already verified/i.test(res.text || "")) {
       console.log("  ✓ 이미 검증돼 있습니다");
       return true;
     }
+
+    // HTML이 돌아왔다면 앞단이 막은 것이다. 이름을 바꿔 봐야 같은 벽이다.
+    if (res.body?.raw) blockedOn = route.via;
   }
   return false;
 }
