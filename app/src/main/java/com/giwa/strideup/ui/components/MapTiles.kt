@@ -2,6 +2,7 @@ package com.giwa.strideup.ui.components
 
 import android.content.Context
 import android.graphics.BitmapFactory
+import android.os.SystemClock
 import android.util.LruCache
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -93,7 +94,7 @@ object MapTiles {
         memory.get(k)?.let { return it }
         val failedAt = failed[k]
         if (failedAt != null) {
-            if (failedAt == PERMANENT || System.currentTimeMillis() - failedAt < FAILURE_TTL_MS) return null
+            if (failedAt == PERMANENT || SystemClock.elapsedRealtime() - failedAt < FAILURE_TTL_MS) return null
             failed.remove(k)
         }
 
@@ -111,7 +112,7 @@ object MapTiles {
             val fetched = runCatching { download(zoom, x, y) }.getOrNull()
             if (fetched == null || fetched.bytes == null) {
                 // 404·403은 다시 받아도 없다. 타임아웃·5xx는 잠시 뒤 다시 시도한다.
-                failed[k] = if (fetched?.permanent == true) PERMANENT else System.currentTimeMillis()
+                failed[k] = if (fetched?.permanent == true) PERMANENT else SystemClock.elapsedRealtime()
                 return@withContext null
             }
             val bytes = fetched.bytes

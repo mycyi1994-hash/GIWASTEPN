@@ -97,9 +97,20 @@ class StepTracker(
         val (savedDay, savedBaseline) = prefs.baseline()
         val baseline = when {
             savedDay != today -> {
-                // 첫 실행이거나 날짜가 바뀐 경우: 지금 누적값부터 오늘 걸음을 센다.
-                prefs.setBaseline(today, cumulative)
-                cumulative
+                // 날짜가 바뀐 경우. 여기서 기준점을 그냥 지금 누적값으로 잡으면
+                // **앱을 열기 전에 걸은 오늘 걸음이 통째로 사라진다** — 아침에
+                // 5천 보를 걷고 점심에 앱을 열면 0보로 시작한다.
+                //
+                // 센서 누적값은 마지막 측정 이후의 걸음을 그대로 들고 있으므로,
+                // 그 차이를 오늘로 넘겨준다. 다만 두 가지로 묶는다.
+                //  - 어제 측정한 경우에만 넘긴다. 며칠 만에 열었다면 그 사이
+                //    걸음이 전부 오늘로 쏟아지므로 그냥 새로 센다.
+                //  - [CARRY_OVER_CAP]으로 막는다. 넘어오는 몫에는 어제 저녁
+                //    걸음이 섞여 있어, 하루치를 넘게 얹어줄 이유가 없다.
+                val carried = carryOver(savedDay, savedBaseline, today, cumulative)
+                val newBaseline = cumulative - carried
+                prefs.setBaseline(today, newBaseline)
+                newBaseline
             }
             cumulative < savedBaseline -> {
                 // 재부팅으로 센서 누적값이 초기화된 경우:
@@ -114,5 +125,28 @@ class StepTracker(
         val sensorSteps = (cumulative - baseline).toInt().coerceAtLeast(0)
         _todaySteps.value = sensorSteps + simulatedSteps
         hasReading = true
+    }
+
+    /**
+     * 날짜가 바뀔 때 오늘로 넘겨줄 걸음 수.
+     *
+     * 어제 마지막으로 본 누적값은 `어제 기준점 + 어제 저장된 걸음`으로 되살릴 수
+     * 있다. 지금 누적값에서 그걸 빼면 "마지막 측정 이후 걸은 수"가 나온다.
+     */
+    private suspend fun carryOver(
+        savedDay: Long,
+        savedBaseline: Long,
+        today: Long,
+        cumulative: Long,
+    ): Long {
+        if (savedDay != today - 1 || savedBaseline < 0) return 0L
+        val lastSeen = savedBaseline + todayPersistedSteps(savedDay).coerceAtLeast(0)
+        if (cumulative < lastSeen) return 0L
+        return (cumulative - lastSeen).coerceAtMost(CARRY_OVER_CAP)
+    }
+
+    private companion object {
+        /** 자정을 넘겨 넘겨받을 수 있는 걸음 상한 — 활동적인 하루치 */
+        const val CARRY_OVER_CAP = 12_000L
     }
 }
