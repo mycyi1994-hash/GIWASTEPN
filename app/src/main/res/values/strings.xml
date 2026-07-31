@@ -20,6 +20,8 @@
     <string name="common_close">Close</string>
     <string name="common_cancel">Cancel</string>
     <string name="common_confirm">Confirm</string>
+    <string name="common_yes">Yes</string>
+    <string name="common_no">No</string>
     <string name="common_none">None yet</string>
 
     <!-- Splash -->
@@ -860,5 +862,9 @@ Start running with StepUp.</string>
     <string name="course_unshare">Unshare</string>
     <string name="course_runs">%1$d runs</string>
     <string name="course_by">by %1$s</string>
+    <string name="course_apply_title">Apply this course?</string>
+    <string name="course_apply_body">%1$s · %2$s km\nFinish it and you earn %3$s SUP.</string>
+    <string name="course_clear_title">Clear this course?</string>
+    <string name="course_clear_body">%1$s will no longer be your active course.</string>
     <string name="notif_course_complete">Course complete: %1$s! +%2$s SUP</string>
 </resources>

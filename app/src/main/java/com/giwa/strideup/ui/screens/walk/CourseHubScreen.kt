@@ -24,11 +24,13 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Route
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -61,6 +63,7 @@ import com.giwa.strideup.ui.components.VoltButton
 import com.giwa.strideup.ui.components.quietClickable
 import com.giwa.strideup.ui.screens.community.LabeledField
 import com.giwa.strideup.ui.screens.community.SegmentedTabs
+import com.giwa.strideup.ui.theme.Carbon
 import com.giwa.strideup.ui.theme.CarbonHigh
 import com.giwa.strideup.ui.theme.Edge
 import com.giwa.strideup.ui.theme.Night
@@ -85,104 +88,164 @@ fun CourseHubScreen(
     val lastTrack by WalkSessionService.lastTrack.collectAsStateWithLifecycle()
     var tab by rememberSaveable { mutableStateOf(0) }
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 10.dp, bottom = 26.dp),
-        verticalArrangement = Arrangement.spacedBy(13.dp),
-    ) {
-        item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                DarkIconButton(
-                    icon = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.cd_back),
-                    onClick = onBack,
-                )
-                Column {
-                    Eyebrow(text = stringResource(R.string.run_live))
-                    Text(
-                        text = stringResource(R.string.courses_title),
-                        fontSize = 21.sp,
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = (-0.5).sp,
-                        color = Snow,
+    // 코스를 누르면 바로 적용하지 않고 확인부터 받는다. id로만 들고 있어서
+    // 목록이 갱신되면 내용도 따라가고, 그 코스가 지워지면 창이 저절로 닫힌다.
+    var pendingId by rememberSaveable { mutableStateOf(-1L) }
+    val pending = courses.firstOrNull { it.id == pendingId }
+
+    Box(Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 10.dp, bottom = 26.dp),
+            verticalArrangement = Arrangement.spacedBy(13.dp),
+        ) {
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    DarkIconButton(
+                        icon = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.cd_back),
+                        onClick = onBack,
                     )
+                    Column {
+                        Eyebrow(text = stringResource(R.string.run_live))
+                        Text(
+                            text = stringResource(R.string.courses_title),
+                            fontSize = 21.sp,
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = (-0.5).sp,
+                            color = Snow,
+                        )
+                    }
+                }
+            }
+
+            item {
+                SegmentedTabs(
+                    labels = listOf(
+                        stringResource(R.string.courses_select),
+                        stringResource(R.string.courses_make),
+                        stringResource(R.string.courses_board),
+                    ),
+                    selected = tab,
+                    onSelect = { tab = it },
+                )
+            }
+
+            when (tab) {
+                // ── 코스 선택 — 달릴 수 있는 모든 코스 ─────────────
+                0 -> {
+                    val list = courses
+                    if (list.isEmpty()) {
+                        item { EmptyCard(stringResource(R.string.courses_empty)) }
+                    } else {
+                        items(list.size, key = { list[it].id }) { index ->
+                            val course = list[index]
+                            CourseCard(
+                                course = course,
+                                selected = course.id == selectedId,
+                                onSelect = { pendingId = course.id },
+                                onLike = { viewModel.toggleLike(course.id) },
+                                onShareToggle = if (course.mine) {
+                                    { viewModel.setShared(course.id, !course.shared) }
+                                } else {
+                                    null
+                                },
+                                onDelete = if (course.mine) {
+                                    { viewModel.delete(course.id) }
+                                } else {
+                                    null
+                                },
+                            )
+                        }
+                    }
+                }
+
+                // ── 코스 만들기 — 마지막 러닝 GPS 트랙을 등록 ───────
+                1 -> {
+                    item { CourseMaker(lastTrack = lastTrack, onCreate = { name, area, shared ->
+                        viewModel.create(name, area, lastTrack, shared)
+                        tab = 0
+                    }) }
+                }
+
+                // ── 코스 게시판 — 러너들이 공유한 코스 ─────────────
+                else -> {
+                    val shared = courses.filter { it.shared }
+                    if (shared.isEmpty()) {
+                        item { EmptyCard(stringResource(R.string.courses_board_empty)) }
+                    } else {
+                        items(shared.size, key = { shared[it].id }) { index ->
+                            val course = shared[index]
+                            CourseCard(
+                                course = course,
+                                selected = course.id == selectedId,
+                                onSelect = { pendingId = course.id },
+                                onLike = { viewModel.toggleLike(course.id) },
+                                showAuthor = true,
+                            )
+                        }
+                    }
                 }
             }
         }
 
-        item {
-            SegmentedTabs(
-                labels = listOf(
-                    stringResource(R.string.courses_select),
-                    stringResource(R.string.courses_make),
-                    stringResource(R.string.courses_board),
-                ),
-                selected = tab,
-                onSelect = { tab = it },
+        if (pending != null) {
+            val clearing = pending.id == selectedId
+            AlertDialog(
+                onDismissRequest = { pendingId = -1L },
+                containerColor = Carbon,
+                titleContentColor = Snow,
+                textContentColor = Silver,
+                title = {
+                    Text(
+                        text = stringResource(
+                            if (clearing) R.string.course_clear_title else R.string.course_apply_title,
+                        ),
+                        fontWeight = FontWeight.Black,
+                    )
+                },
+                text = {
+                    Text(
+                        text = if (clearing) {
+                            stringResource(R.string.course_clear_body, pending.name)
+                        } else {
+                            stringResource(
+                                R.string.course_apply_body,
+                                pending.name,
+                                "%.2f".format(pending.distanceKm),
+                                "%.1f".format(pending.reward),
+                            )
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        lineHeight = 20.sp,
+                    )
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            viewModel.select(pending.id)
+                            pendingId = -1L
+                        },
+                    ) {
+                        Text(
+                            text = stringResource(R.string.common_yes),
+                            color = Volt,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { pendingId = -1L }) {
+                        Text(text = stringResource(R.string.common_no), color = Silver)
+                    }
+                },
             )
-        }
-
-        when (tab) {
-            // ── 코스 선택 — 달릴 수 있는 모든 코스 ─────────────
-            0 -> {
-                val list = courses
-                if (list.isEmpty()) {
-                    item { EmptyCard(stringResource(R.string.courses_empty)) }
-                } else {
-                    items(list.size, key = { list[it].id }) { index ->
-                        val course = list[index]
-                        CourseCard(
-                            course = course,
-                            selected = course.id == selectedId,
-                            onSelect = { viewModel.select(course.id) },
-                            onLike = { viewModel.toggleLike(course.id) },
-                            onShareToggle = if (course.mine) {
-                                { viewModel.setShared(course.id, !course.shared) }
-                            } else {
-                                null
-                            },
-                            onDelete = if (course.mine) {
-                                { viewModel.delete(course.id) }
-                            } else {
-                                null
-                            },
-                        )
-                    }
-                }
-            }
-
-            // ── 코스 만들기 — 마지막 러닝 GPS 트랙을 등록 ───────
-            1 -> {
-                item { CourseMaker(lastTrack = lastTrack, onCreate = { name, area, shared ->
-                    viewModel.create(name, area, lastTrack, shared)
-                    tab = 0
-                }) }
-            }
-
-            // ── 코스 게시판 — 러너들이 공유한 코스 ─────────────
-            else -> {
-                val shared = courses.filter { it.shared }
-                if (shared.isEmpty()) {
-                    item { EmptyCard(stringResource(R.string.courses_board_empty)) }
-                } else {
-                    items(shared.size, key = { shared[it].id }) { index ->
-                        val course = shared[index]
-                        CourseCard(
-                            course = course,
-                            selected = course.id == selectedId,
-                            onSelect = { viewModel.select(course.id) },
-                            onLike = { viewModel.toggleLike(course.id) },
-                            showAuthor = true,
-                        )
-                    }
-                }
-            }
         }
     }
 }
@@ -211,6 +274,7 @@ private fun CourseCard(
         spacing = 10.dp,
     ) {
         Row(
+            modifier = Modifier.quietClickable(onSelect),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {

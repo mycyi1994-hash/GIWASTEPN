@@ -19,6 +19,8 @@
     <string name="common_close">閉じる</string>
     <string name="common_cancel">キャンセル</string>
     <string name="common_confirm">決定</string>
+    <string name="common_yes">はい</string>
+    <string name="common_no">いいえ</string>
     <string name="common_none">まだありません</string>
 
     <!-- Splash -->
@@ -859,5 +861,9 @@ StepUp と走り出そう。</string>
     <string name="course_unshare">共有解除</string>
     <string name="course_runs">%1$d回走破</string>
     <string name="course_by">by %1$s</string>
+    <string name="course_apply_title">このコースを適用しますか？</string>
+    <string name="course_apply_body">%1$s · %2$s km\n完走すると %3$s SUP を獲得できます。</string>
+    <string name="course_clear_title">コースの適用を解除しますか？</string>
+    <string name="course_clear_body">%1$s は現在のコースではなくなります。</string>
     <string name="notif_course_complete">%1$s 完走！+%2$s SUP 獲得</string>
 </resources>

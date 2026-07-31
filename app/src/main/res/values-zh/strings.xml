@@ -18,6 +18,8 @@
     <string name="common_close">关闭</string>
     <string name="common_cancel">取消</string>
     <string name="common_confirm">确认</string>
+    <string name="common_yes">是</string>
+    <string name="common_no">否</string>
     <string name="common_none">还没有</string>
 
     <!-- Splash -->
@@ -858,5 +860,9 @@
     <string name="course_unshare">取消分享</string>
     <string name="course_runs">%1$d 次完成</string>
     <string name="course_by">by %1$s</string>
+    <string name="course_apply_title">要应用该路线吗？</string>
+    <string name="course_apply_body">%1$s · %2$s km\n完成后可获得 %3$s SUP。</string>
+    <string name="course_clear_title">要取消应用该路线吗？</string>
+    <string name="course_clear_body">%1$s 将不再是当前路线。</string>
     <string name="notif_course_complete">完成路线 %1$s！获得 +%2$s SUP</string>
 </resources>

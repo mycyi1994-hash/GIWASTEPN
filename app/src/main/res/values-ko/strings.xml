@@ -18,6 +18,8 @@
     <string name="common_close">닫기</string>
     <string name="common_cancel">취소</string>
     <string name="common_confirm">확인</string>
+    <string name="common_yes">예</string>
+    <string name="common_no">아니요</string>
     <string name="common_none">아직 없어요</string>
 
     <!-- Splash -->
@@ -858,5 +860,9 @@ StepUp과 함께 달려보세요.</string>
     <string name="course_unshare">공유 해제</string>
     <string name="course_runs">%1$d회 달림</string>
     <string name="course_by">by %1$s</string>
+    <string name="course_apply_title">이 코스를 적용할까요?</string>
+    <string name="course_apply_body">%1$s · %2$s km\n완주하면 %3$s SUP를 받아요.</string>
+    <string name="course_clear_title">코스 적용을 해제할까요?</string>
+    <string name="course_clear_body">%1$s이(가) 더 이상 적용 코스가 아니게 돼요.</string>
     <string name="notif_course_complete">%1$s 완주! +%2$s SUP 받았어요</string>
 </resources>
