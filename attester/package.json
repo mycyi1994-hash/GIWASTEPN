@@ -1,0 +1,18 @@
+{
+  "name": "stepup-attester",
+  "version": "1.0.0",
+  "private": true,
+  "description": "StepUp 러닝 증명 어테스터 — 세션을 검사하고 EIP-712로 서명해 RewardDistributor가 받을 청구서를 만든다",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "node --test \"test/*.test.js\""
+  },
+  "dependencies": {
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.90.0"
+  }
+}

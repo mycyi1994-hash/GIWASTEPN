@@ -1,0 +1,12 @@
+name = "stepup-attester"
+main = "src/index.js"
+compatibility_date = "2026-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# 배포 후 실제 주소로 바꾼다 (npm run deploy:giwa 가 출력해 준다)
+[vars]
+DISTRIBUTOR_ADDRESS = "0x0000000000000000000000000000000000000000"
+
+# 서명 키는 vars 가 아니라 Secret 으로 넣는다:
+#   npx wrangler secret put ATTESTER_PRIVATE_KEY
+# Secret 은 대시보드에서도 다시 볼 수 없고, 저장소에도 남지 않는다.
