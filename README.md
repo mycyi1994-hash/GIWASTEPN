@@ -13,7 +13,9 @@ Walk or run in the real world, earn **SUP**, and grow a collection of sneaker NF
 [![Compose](https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4)](#)
 [![Chain](https://img.shields.io/badge/chain-GIWA-C3FF3E)](#)
 
-**[⬇️ Download the APK](#-download--try-it)** · [Screenshots](#-screenshots) · [Token economy](#-token-economy-sup) · [Build from source](#-build-from-source) · [한국어 문서 ↓](#한국어)
+**[⬇️ Download the APK](#-download--try-it)** · [Screenshots](#-screenshots) · [Build from source](#-build-from-source) · [한국어 문서 ↓](#한국어)
+
+📄 **[One-Pager](docs/ONEPAGER.md)** · 💰 **[Tokenomics](docs/TOKENOMICS.md)**
 
 </div>
 
@@ -203,6 +205,9 @@ economy is driven by how much people move, not by how much they staked. Sinks
 (minting, upgrades, boosts) are priced against that emission rate so SUP has a
 reason to leave circulation.
 
+📖 Full model — supply schedule, per-persona balance tables, anti-abuse, and the
+open questions we have *not* solved: **[docs/TOKENOMICS.md](docs/TOKENOMICS.md)**
+
 ---
 
 ## ⛓️ GIWA integration plan
@@ -347,7 +352,9 @@ fingerprint matches this keystore.
 **[GIWA](https://giwa.io) 체인 기반 Move-to-Earn(M2E) 러닝 앱.**
 실제로 걷고 달린 만큼 **SUP**를 적립하고, 스니커즈 NFT를 모읍니다.
 
-**[⬇️ APK 내려받기](#-apk-내려받기)** · [스크린샷](#-스크린샷) · [토큰 이코노미](#-토큰-이코노미-sup) · [소스 빌드](#-소스에서-빌드하기)
+**[⬇️ APK 내려받기](#-apk-내려받기)** · [스크린샷](#-스크린샷) · [소스 빌드](#-소스에서-빌드하기)
+
+📄 **[원페이저](docs/ONEPAGER.md)** · 💰 **[토크노믹스](docs/TOKENOMICS.md)**
 
 ---
 
@@ -533,6 +540,9 @@ APK를 다시 빌드해 [`apk-dist`](../../tree/apk-dist) 브랜치에 강제 �
 적립합니다 — 즉 이코노미를 움직이는 것은 예치 규모가 아니라 사람들이 실제로
 얼마나 움직였는가입니다. 소각처(민팅·강화·부스트)는 이 배출량에 맞춰 가격을
 잡아, SUP가 유통에서 빠져나갈 이유를 만듭니다.
+
+📖 전체 모델 — 공급 스케줄, 페르소나별 밸런스 표, 어뷰징 방지, 그리고 아직
+**해결하지 못한** 과제들: **[docs/TOKENOMICS.md](docs/TOKENOMICS.md)**
 
 ---
 
