@@ -54,7 +54,7 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: StrideUp-debug-apk
+          name: StepUp-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
 
       # 컨테이너/사용자가 git으로 바로 받아갈 수 있도록 APK를 배포 전용 브랜치에 커밋한다.
@@ -64,19 +64,30 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p /tmp/dist
+          cp app/build/outputs/apk/debug/app-debug.apk /tmp/dist/StepUp-debug.apk
+          # 예전 링크(StrideUp-debug.apk)를 공유한 곳이 있어 같은 파일을 옛 이름으로도 남긴다
           cp app/build/outputs/apk/debug/app-debug.apk /tmp/dist/StrideUp-debug.apk
+          VERSION=$(grep -oP 'versionName\s*=\s*"\K[^"]+' "${GITHUB_WORKSPACE}/app/build.gradle.kts" | head -1 || true)
+          VERSION=${VERSION:-unknown}
           cd /tmp/dist
           {
-            echo "# StrideUp APK 배포 브랜치"
+            echo "# StepUp APK 배포 브랜치"
             echo
-            echo "CI가 빌드한 디버그 APK가 커밋됩니다."
+            echo "CI가 빌드한 디버그 APK가 커밋됩니다. 최신 빌드 직접 링크:"
             echo
+            echo '```'
+            echo "https://github.com/${GITHUB_REPOSITORY}/raw/apk-dist/StepUp-debug.apk"
+            echo '```'
+            echo
+            echo "- 버전: ${VERSION}"
             echo "- 원본 커밋: ${GITHUB_SHA}"
             echo "- 빌드 시각(UTC): $(date -u '+%Y-%m-%d %H:%M:%S')"
+            echo
+            echo "\`StrideUp-debug.apk\`는 예전 이름으로 남겨둔 동일한 파일입니다."
           } > README.md
           git init -b apk-dist
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "StrideUp debug APK (${GITHUB_SHA:0:7})"
+          git commit -m "StepUp debug APK ${VERSION} (${GITHUB_SHA:0:7})"
           git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" apk-dist
