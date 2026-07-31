@@ -231,15 +231,16 @@ before the users are counted.
 | | Today | Next |
 |---|---|---|
 | Client | **Shipped, installable** | — |
+| Contracts | **Written, 43 tests passing** | Deploy + verify on GIWA Sepolia |
 | SUP | Local ledger (Room) | ERC-20 on GIWA |
 | NFT | 44 designs, mint/upgrade/equip working | ERC-721 |
 | Settlement | On-device `RewardEconomy` | `RewardDistributor` |
 | Wallet | Ledger + withdrawal UX in place | Connect + withdraw |
 
-> **No on-chain component is deployed yet, and we are not claiming otherwise.**
-> What we are claiming: the client already emits exactly the per-session record a
-> distributor contract consumes. The missing pieces are the contracts and the
-> attester — not the app.
+> **Nothing is deployed yet, and we are not claiming otherwise.** The four
+> contracts are written and tested; the client already emits exactly the
+> per-session record they consume. What is missing is a testnet deployment and
+> the attester service.
 
 *Visual: two-column status table, "Today" column mostly green.*
 
@@ -511,14 +512,15 @@ rate(d) = min(1, B(d) / Σ claimScore(d))
 | | 현재 | 다음 |
 |---|---|---|
 | 클라이언트 | **완성, 설치 가능** | — |
+| 컨트랙트 | **작성 완료, 테스트 43개 통과** | GIWA Sepolia 배포·검증 |
 | SUP | 로컬 원장(Room) | GIWA의 ERC-20 |
 | NFT | 44종, 민팅·강화·착용 동작 | ERC-721 |
 | 정산 | 기기 내 `RewardEconomy` | `RewardDistributor` |
 | 지갑 | 원장 + 출금 UX 구현됨 | 연결 + 출금 |
 
-> **온체인 구성요소는 아직 하나도 배포되지 않았고, 그렇지 않은 척하지 않습니다.**
-> 우리가 주장하는 것은, 클라이언트가 분배 컨트랙트가 소비할 세션별 레코드를 이미
-> 그대로 생성한다는 것입니다. 빠진 것은 컨트랙트와 어테스터이지 앱이 아닙니다.
+> **아직 배포된 것은 없고, 그렇지 않은 척하지 않습니다.** 컨트랙트 4종은 작성과
+> 테스트를 마쳤고, 클라이언트는 그것들이 소비할 세션 레코드를 이미 그대로
+> 생성합니다. 빠진 것은 테스트넷 배포와 어테스터 서비스입니다.
 
 *비주얼: 2단 현황 표, "현재" 열이 대부분 초록.*
 

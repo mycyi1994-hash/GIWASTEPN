@@ -1,0 +1,15 @@
+node_modules/
+artifacts/
+cache/
+typechain-types/
+coverage/
+coverage.json
+
+# 개인키가 들어가는 파일 — 절대 커밋 금지
+.env
+.env.*
+!.env.example
+
+# 로컬 테스트 배포 기록 (실제 네트워크 배포 기록은 커밋한다)
+deployments/hardhat.json
+deployments/localhost.json

@@ -1,0 +1,21 @@
+{
+  "name": "stepup-contracts",
+  "version": "1.0.0",
+  "private": true,
+  "description": "StepUp on-chain contracts for the GIWA chain — SUPToken, SneakerNFT, RewardDistributor, CourseRegistry",
+  "scripts": {
+    "build": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:giwa": "hardhat run scripts/deploy.js --network giwaSepolia",
+    "verify:giwa": "hardhat run scripts/verify.js --network giwaSepolia"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "dotenv": "^16.4.7",
+    "hardhat": "^2.22.17",
+    "solc": "^0.8.28"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.1.0"
+  }
+}

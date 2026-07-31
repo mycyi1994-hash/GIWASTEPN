@@ -104,17 +104,19 @@ Full model, balance tables per persona, supply schedule and open questions:
 | Courses | Room, shared in-app | `CourseRegistry` — publicly verifiable authorship |
 | Wallet | Ledger + withdrawal UX in place | GIWA wallet connect + withdraw |
 
-**No on-chain component is deployed yet, and we are not claiming otherwise.**
-What we are claiming is that the client already emits exactly the per-session
-`(steps, distance, boost, payout)` record a distributor contract consumes — the
-missing pieces are the contracts and the attester, not the app.
+**The contracts are written and tested; nothing is deployed yet, and we are not
+claiming otherwise.** [`contracts/`](../contracts/) holds all four in Solidity
+0.8.28 with **43 passing tests** that assert the on-chain constants match the
+client's — including that the boost ceiling really is 1780 bps and that the
+reward pool has no owner withdrawal path. What remains is a testnet deployment
+and the attester service, not the app and not the contract code.
 
 ## 8. Roadmap
 
 | Milestone | Scope |
 |---|---|
 | **M1 — done** | Full client: run tracking, courses, NFTs, community, i18n, CI, installable APK |
-| **M2 — next** | `SUPToken`, `SneakerNFT`, `RewardDistributor`, `CourseRegistry` on **GIWA testnet**, verified source |
+| **M2 — in progress** | Contracts written + 43 tests passing. Next: deploy and source-verify on **GIWA Sepolia** (chain 91342) |
 | **M3** | Wallet connect + on-chain claim in the app; attester service with cadence/GPS plausibility checks |
 | **M4** | Backend for community, ranking and course sharing (currently local + seeded) |
 | **M5** | NFT marketplace (trade / rent), Health Connect, decentralised attestation |
@@ -246,17 +248,18 @@ StepUp은 **완결된 컨슈머 러닝 앱**입니다 — GPS 코스 기록, 랩
 | 코스 | Room 저장, 앱 내 공유 | `CourseRegistry` — 작성자 공개 검증 |
 | 지갑 | 원장 + 출금 UX 구현됨 | GIWA 지갑 연결 + 출금 |
 
-**온체인 구성요소는 아직 하나도 배포되지 않았고, 그렇지 않은 척하지 않습니다.**
-우리가 주장하는 것은, 클라이언트가 분배 컨트랙트가 소비할 세션별
-`(걸음, 거리, 부스트, 지급액)` 레코드를 **이미 그대로 생성하고 있다**는 것입니다.
-빠진 것은 컨트랙트와 어테스터이지 앱이 아닙니다.
+**컨트랙트는 작성·테스트를 마쳤고, 아직 배포되지 않았습니다. 그렇지 않은 척하지
+않습니다.** [`contracts/`](../contracts/)에 4종이 Solidity 0.8.28로 들어 있고,
+온체인 상수가 앱과 일치하는지 확인하는 **테스트 43개가 통과**합니다 — 부스트
+천장이 실제로 1780 bps인지, 리워드 풀에 소유자 인출 경로가 없는지까지 포함합니다.
+남은 것은 테스트넷 배포와 어테스터 서비스이지, 앱도 컨트랙트 코드도 아닙니다.
 
 ## 8. 로드맵
 
 | 마일스톤 | 범위 |
 |---|---|
 | **M1 — 완료** | 전체 클라이언트: 러닝 측정, 코스, NFT, 커뮤니티, 다국어, CI, 설치 가능한 APK |
-| **M2 — 다음** | `SUPToken`, `SneakerNFT`, `RewardDistributor`, `CourseRegistry`를 **GIWA 테스트넷**에 배포·소스 검증 |
+| **M2 — 진행 중** | 컨트랙트 작성 + 테스트 43개 통과. 다음: **GIWA Sepolia**(체인 91342)에 배포·소스 검증 |
 | **M3** | 앱 내 지갑 연결 + 온체인 청구. 케이던스·GPS 타당성 검사를 갖춘 어테스터 서비스 |
 | **M4** | 커뮤니티·랭킹·코스 공유 백엔드 (현재는 로컬 + 시드 데이터) |
 | **M5** | NFT 마켓(거래/임대), Health Connect, 어테스테이션 탈중앙화 |

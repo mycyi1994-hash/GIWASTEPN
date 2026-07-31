@@ -15,7 +15,7 @@ Walk or run in the real world, earn **SUP**, and grow a collection of sneaker NF
 
 **[⬇️ Download the APK](#-download--try-it)** · [Screenshots](#-screenshots) · [Build from source](#-build-from-source) · [한국어 문서 ↓](#한국어)
 
-📄 **[One-Pager](docs/ONEPAGER.md)** · 💰 **[Tokenomics](docs/TOKENOMICS.md)** · 🎤 **[Pitch Deck](docs/PITCH.md)** · 👥 **[Team](docs/TEAM.md)**
+📄 **[One-Pager](docs/ONEPAGER.md)** · 💰 **[Tokenomics](docs/TOKENOMICS.md)** · 🎤 **[Pitch Deck](docs/PITCH.md)** · 👥 **[Team](docs/TEAM.md)** · ⛓️ **[Contracts](contracts/)**
 
 </div>
 
@@ -212,7 +212,10 @@ open questions we have *not* solved: **[docs/TOKENOMICS.md](docs/TOKENOMICS.md)*
 
 ## ⛓️ GIWA integration plan
 
-Being precise about what exists today, because reviewers deserve that:
+Being precise about what exists today, because reviewers deserve that.
+The contracts are written and unit-tested in [`contracts/`](contracts/) —
+Solidity 0.8.28, OpenZeppelin 5.x, **43 passing tests** — and target
+**GIWA Sepolia** (chain ID 91342). None of them is deployed yet.
 
 | Layer | Today | Next |
 |---|---|---|
@@ -225,6 +228,27 @@ Being precise about what exists today, because reviewers deserve that:
 The reward math, the ledger schema, and the wallet UX were all built to be
 settled on-chain — the client already produces exactly the per-session
 `(steps, distance, boost, payout)` record a distributor contract needs.
+
+---
+
+## ⛓️ Contracts
+
+Solidity 0.8.28 · OpenZeppelin 5.x · Hardhat · **43 passing tests** ·
+target chain **GIWA Sepolia (91342)** · not yet deployed
+
+| Contract | Standard | What it guarantees |
+|---|---|---|
+| `SUPToken` | ERC-20 | 1,000,000,000 SUP minted once. **No mint function exists**, so supply can only fall. |
+| `SneakerNFT` | ERC-721 | The boost ceiling is `1780 bps` — a `constant`, not a parameter. Stats on-chain, so earning power is verifiable rather than asserted. |
+| `RewardDistributor` | — | The attester decides who gets paid; the contract decides how much may exist. Every claim is charged against a halving daily budget, so a compromised signer cannot inflate the token. **No withdraw, sweep or rescue** — SUP leaves only via `claim`, only to a runner. |
+| `CourseRegistry` | — | Course authorship is public and permissionless. `rewardFor(distanceM)` is pure: `km × 1.0 SUP`, capped at 42. |
+
+```bash
+cd contracts && npm install && npm test
+```
+
+Deployment is a six-step walkthrough (wallet → faucet → deploy → verify) in
+**[contracts/README.md](contracts/README.md)**.
 
 ---
 
@@ -325,7 +349,8 @@ fingerprint matches this keystore.
 - [x] Community boards, crews, party runs, ranking, comments and replies
 - [x] Course system — create, select, share, distance-scaled completion rewards
 - [x] Localization — Korean / English / Chinese / Japanese, in-app language setting
-- [ ] **GIWA testnet contracts** — `SUPToken` (ERC-20), `SneakerNFT` (ERC-721), `RewardDistributor`, `CourseRegistry`
+- [x] **Contracts written and tested** — `SUPToken` (ERC-20), `SneakerNFT` (ERC-721), `RewardDistributor`, `CourseRegistry` — see [`contracts/`](contracts/)
+- [ ] **Deploy and source-verify on GIWA Sepolia** (chain ID 91342)
 - [ ] **Wallet connect + on-chain SUP withdrawal**
 - [ ] Backend for community, ranking and course sharing (currently local + seeded)
 - [ ] Sneaker NFT marketplace (trade / rent)
@@ -354,7 +379,7 @@ fingerprint matches this keystore.
 
 **[⬇️ APK 내려받기](#-apk-내려받기)** · [스크린샷](#-스크린샷) · [소스 빌드](#-소스에서-빌드하기)
 
-📄 **[원페이저](docs/ONEPAGER.md)** · 💰 **[토크노믹스](docs/TOKENOMICS.md)** · 🎤 **[피치덱](docs/PITCH.md)** · 👥 **[팀](docs/TEAM.md)**
+📄 **[원페이저](docs/ONEPAGER.md)** · 💰 **[토크노믹스](docs/TOKENOMICS.md)** · 🎤 **[피치덱](docs/PITCH.md)** · 👥 **[팀](docs/TEAM.md)** · ⛓️ **[컨트랙트](contracts/)**
 
 ---
 
@@ -549,7 +574,9 @@ APK를 다시 빌드해 [`apk-dist`](../../tree/apk-dist) 브랜치에 강제 �
 ## ⛓️ GIWA 연동 계획
 
 심사자에게는 정확한 정보가 필요하므로, 지금 있는 것과 다음에 만들 것을 나눠
-적습니다.
+적습니다. 컨트랙트는 [`contracts/`](contracts/)에 작성·단위 테스트까지 되어
+있습니다 — Solidity 0.8.28, OpenZeppelin 5.x, **테스트 43개 통과** —
+대상 체인은 **GIWA Sepolia**(체인 ID 91342)입니다. 아직 배포된 것은 없습니다.
 
 | 레이어 | 현재 | 다음 |
 |---|---|---|
@@ -562,6 +589,27 @@ APK를 다시 빌드해 [`apk-dist`](../../tree/apk-dist) 브랜치에 강제 �
 리워드 계산, 원장 스키마, 지갑 UX 모두 온체인 정산을 전제로 만들었습니다.
 클라이언트는 이미 분배 컨트랙트가 필요로 하는 세션별
 `(걸음, 거리, 부스트, 지급액)` 레코드를 그대로 생성하고 있습니다.
+
+---
+
+## ⛓️ 컨트랙트
+
+Solidity 0.8.28 · OpenZeppelin 5.x · Hardhat · **테스트 43개 통과** ·
+대상 체인 **GIWA Sepolia (91342)** · 배포 전
+
+| 컨트랙트 | 표준 | 보장하는 것 |
+|---|---|---|
+| `SUPToken` | ERC-20 | 10억 SUP를 한 번만 발행. **발행 함수가 존재하지 않아** 공급은 줄어들기만 합니다. |
+| `SneakerNFT` | ERC-721 | 부스트 천장이 `1780 bps` — 파라미터가 아니라 `constant`입니다. 스탯이 온체인이라 적립 능력을 주장이 아니라 검증할 수 있습니다. |
+| `RewardDistributor` | — | 누구에게 줄지는 어테스터가, 얼마나 존재할 수 있는지는 컨트랙트가 정합니다. 모든 청구가 반감하는 일일 예산에서 차감되므로 서명 키가 털려도 토큰은 인플레이션되지 않습니다. **withdraw·sweep·rescue 없음** — SUP는 `claim`으로 러너에게만 나갑니다. |
+| `CourseRegistry` | — | 코스 작성은 누구나, 기록은 공개. `rewardFor(distanceM)`은 순수 함수 — `km × 1.0 SUP`, 최대 42. |
+
+```bash
+cd contracts && npm install && npm test
+```
+
+지갑 → 파우셋 → 배포 → 검증까지 6단계 안내는
+**[contracts/README.md](contracts/README.md)** 에 있습니다.
 
 ---
 
@@ -639,7 +687,8 @@ CI는 매 빌드마다 APK의 SHA-256 인증서 지문이 이 키스토어와 �
 - [x] 커뮤니티 게시판·크루·파티런·랭킹·댓글/대댓글
 - [x] 코스 시스템 — 만들기·선택·공유, 거리별 정량 완주 보상
 - [x] 다국어 — 한국어/영어/중국어/일본어, 앱 내 언어 설정
-- [ ] **GIWA 테스트넷 컨트랙트** — `SUPToken`(ERC-20), `SneakerNFT`(ERC-721), `RewardDistributor`, `CourseRegistry`
+- [x] **컨트랙트 작성·테스트 완료** — `SUPToken`(ERC-20), `SneakerNFT`(ERC-721), `RewardDistributor`, `CourseRegistry` — [`contracts/`](contracts/)
+- [ ] **GIWA Sepolia 배포 및 소스 검증** (체인 ID 91342)
 - [ ] **지갑 연결 + 온체인 SUP 출금**
 - [ ] 커뮤니티·랭킹·코스 공유 백엔드 (현재는 로컬 + 시드 데이터)
 - [ ] 스니커즈 NFT 마켓 (거래 / 임대)

@@ -275,6 +275,9 @@ proves too steep, **without** raising the 1B cap.
 
 ### 7.3 Contracts
 
+Written and unit-tested in [`contracts/`](../contracts/) — Solidity 0.8.28,
+OpenZeppelin 5.x, 43 passing tests. Not yet deployed.
+
 | Contract | Standard | Responsibility |
 |---|---|---|
 | `SUPToken` | ERC-20 | Fixed 1B supply, no mint after deploy, burn-from-holder for on-chain sinks |
@@ -620,6 +623,9 @@ rate(d)  = min(1, B(d) / Σ claimScore(d))
 연장할 수 있게 하기 위한 것이며, **10억 하드캡을 올리지는 않습니다.**
 
 ### 7.3 컨트랙트
+
+[`contracts/`](../contracts/)에 작성·단위 테스트까지 되어 있습니다 — Solidity
+0.8.28, OpenZeppelin 5.x, 테스트 43개 통과. 아직 배포 전입니다.
 
 | 컨트랙트 | 표준 | 역할 |
 |---|---|---|
