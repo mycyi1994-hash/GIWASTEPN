@@ -391,7 +391,7 @@ fingerprint matches this keystore.
 
 **[⬇️ APK 내려받기](#-apk-내려받기)** · [스크린샷](#-스크린샷) · [소스 빌드](#-소스에서-빌드하기)
 
-📄 **[원페이저](docs/ONEPAGER.md)** · 💰 **[토크노믹스](docs/TOKENOMICS.md)** · 🎤 **[피치덱 PDF](docs/StepUp-PitchDeck.pdf)** · ⛓️ **[컨트랙트](contracts/)** · 🎬 **[데모 대본](docs/DEMO.md)** · 📝 **[지원서 완본](docs/APPLICATION.md)** · ✅ **[할 일 가이드](docs/TODO-USER.md)** · 🌐 **[랜딩 페이지](web/)** · 🔏 **[어테스터](attester/)**
+📄 **[원페이저](docs/ONEPAGER.md)** · 💰 **[토크노믹스](docs/TOKENOMICS.md)** · 🎤 **[피치덱 PDF](docs/StepUp-PitchDeck-KO.pdf)** · ⛓️ **[컨트랙트](contracts/)** · 🎬 **[데모 대본](docs/DEMO.md)** · 📝 **[지원서 완본](docs/APPLICATION.md)** · ✅ **[할 일 가이드](docs/TODO-USER.md)** · 🌐 **[랜딩 페이지](web/)** · 🔏 **[어테스터](attester/)**
 
 ---
 

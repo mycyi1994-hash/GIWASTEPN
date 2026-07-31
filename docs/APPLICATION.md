@@ -123,8 +123,12 @@ https://github.com/mycyi1994-hash/GIWASTEPN/raw/claude/work-history-pjm57c/docs/
 영문·한국어 마크다운 원본: github.com/mycyi1994-hash/GIWASTEPN/blob/claude/work-history-pjm57c/docs/PITCH.md
 ```
 
-> PDF는 `docs/StepUp-PitchDeck.pdf` 에 있고, 만든 소스는 `docs/pitch-deck.html` 입니다.
-> 내용을 고치면 그 HTML을 고친 뒤 크로미움으로 다시 뽑으면 됩니다.
+> **한국어판도 있습니다** — `docs/StepUp-PitchDeck-KO.pdf`
+> (국내 심사자에게 보내실 때 쓰세요. 링크만 바꾸면 됩니다.)
+>
+> 소스는 `docs/pitch-deck.html` (영문) · `docs/pitch-deck-ko.html` (국문) 입니다.
+> 다시 뽑으려면 **Pretendard 폰트가 설치돼 있어야 합니다** — 없으면 한글이
+> 중국어 대체 글꼴로 나옵니다.
 
 ---
 
