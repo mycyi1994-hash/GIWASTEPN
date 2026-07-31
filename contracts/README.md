@@ -67,6 +67,32 @@ npm test          # 테스트 43개
 GIWA 메인넷(Chain ID 9134)은 준비 중입니다. RPC가 공개되면 `.env`의
 `GIWA_MAINNET_RPC`만 채우면 `--network giwa`가 그대로 동작합니다.
 
+### Step 0 — 저장소를 **올바른 브랜치로** 받기
+
+> ⚠️ **`git clone` 만 치면 안 됩니다.** 저장소 기본 브랜치는 아직 옛 버전이라
+> `contracts/` 폴더가 들어 있지 않습니다. 그대로 받으면 다음 단계에서
+> "지정된 경로를 찾을 수 없습니다" 가 납니다. 반드시 `-b` 로 브랜치를 지정하세요.
+
+**Windows (명령 프롬프트)**
+
+```bat
+cd C:\stepup
+git clone -b claude/work-history-pjm57c https://github.com/mycyi1994-hash/GIWASTEPN.git work
+cd C:\stepup\work\contracts
+dir
+```
+
+**macOS · Linux**
+
+```bash
+git clone -b claude/work-history-pjm57c https://github.com/mycyi1994-hash/GIWASTEPN.git work
+cd work/contracts
+ls
+```
+
+`contracts` `scripts` `test` `hardhat.config.js` `package.json` 이 보이면 성공입니다.
+안 보이면 브랜치가 잘못 받아진 것이니 여기서 멈추고 다시 받으세요.
+
 ### Step 1 — 배포 전용 지갑 만들기
 
 **기존 지갑을 쓰지 마세요.** 테스트넷 배포용 지갑을 새로 만듭니다.
@@ -86,7 +112,7 @@ GIWA 메인넷(Chain ID 9134)은 준비 중입니다. RPC가 공개되면 `.env`
 **Windows (명령 프롬프트)**
 
 ```bat
-cd C:\stepup\GIWASTEPN\contracts
+cd C:\stepup\work\contracts
 copy .env.example .env
 notepad .env
 ```
@@ -94,7 +120,7 @@ notepad .env
 **macOS · Linux**
 
 ```bash
-cd contracts
+cd work/contracts
 cp .env.example .env
 ```
 

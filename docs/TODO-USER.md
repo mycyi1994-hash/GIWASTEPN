@@ -136,9 +136,26 @@ GitHub은 권한 없는 사람에게 "권한 없음" 대신 일부러 404를 보
 
 ### 6-2. `.env` 만들기
 
+> ⚠️ **`-b` 를 빼먹으면 안 됩니다.** 저장소 기본 브랜치는 아직 옛 버전이라
+> `contracts/` 폴더가 없습니다. 그냥 `git clone` 하면 다음 줄에서
+> "지정된 경로를 찾을 수 없습니다" 가 납니다.
+> (0단계에서 기본 브랜치를 바꾸면 이 주의사항은 없어집니다.)
+
+**Windows (명령 프롬프트)**
+
+```bat
+cd C:\stepup
+git clone -b claude/work-history-pjm57c https://github.com/mycyi1994-hash/GIWASTEPN.git work
+cd C:\stepup\work\contracts
+copy .env.example .env
+notepad .env
+```
+
+**macOS · Linux**
+
 ```bash
-git clone https://github.com/mycyi1994-hash/GIWASTEPN.git
-cd GIWASTEPN/contracts
+git clone -b claude/work-history-pjm57c https://github.com/mycyi1994-hash/GIWASTEPN.git work
+cd work/contracts
 cp .env.example .env
 ```
 
