@@ -21,6 +21,7 @@ import com.giwa.strideup.MainActivity
 import com.giwa.strideup.R
 import com.giwa.strideup.core.ServiceLocator
 import com.giwa.strideup.data.local.WalkSessionEntity
+import com.giwa.strideup.domain.Faction
 import com.giwa.strideup.domain.GeoPoint
 import com.giwa.strideup.domain.RewardEconomy
 import com.giwa.strideup.domain.RunIntegrity
@@ -336,7 +337,8 @@ class WalkSessionService : Service() {
                     } else {
                         RewardEconomy.distanceMeters(creditedSteps) / 1000
                     }
-                    val faction = ServiceLocator.database.sneakerDao().equippedNow()?.faction
+                    val faction = ServiceLocator.database.sneakerDao().equippedNow()
+                        ?.factionId?.let { Faction.of(it) }
                     if (km > 0.0 && faction != null) prefs.addFactionKm(faction, km)
                 }
             }
