@@ -15,7 +15,7 @@ Walk or run in the real world, earn **SUP**, and grow a collection of sneaker NF
 
 **[⬇️ Download the APK](#-download--try-it)** · [Screenshots](#-screenshots) · [Build from source](#-build-from-source) · [한국어 문서 ↓](#한국어)
 
-📄 **[One-Pager](docs/ONEPAGER.md)** · 💰 **[Tokenomics](docs/TOKENOMICS.md)** · 🎤 **[Pitch Deck](docs/PITCH.md)** · 👥 **[Team](docs/TEAM.md)** · ⛓️ **[Contracts](contracts/)** · 🎬 **[Demo script](docs/DEMO.md)**
+📄 **[One-Pager](docs/ONEPAGER.md)** · 💰 **[Tokenomics](docs/TOKENOMICS.md)** · 🎤 **[Pitch Deck](docs/PITCH.md)** · 👥 **[Team](docs/TEAM.md)** · ⛓️ **[Contracts](contracts/)** · 🎬 **[Demo script](docs/DEMO.md)** · 📝 **[Application sheet](docs/APPLICATION.md)**
 
 </div>
 
@@ -379,7 +379,7 @@ fingerprint matches this keystore.
 
 **[⬇️ APK 내려받기](#-apk-내려받기)** · [스크린샷](#-스크린샷) · [소스 빌드](#-소스에서-빌드하기)
 
-📄 **[원페이저](docs/ONEPAGER.md)** · 💰 **[토크노믹스](docs/TOKENOMICS.md)** · 🎤 **[피치덱](docs/PITCH.md)** · 👥 **[팀](docs/TEAM.md)** · ⛓️ **[컨트랙트](contracts/)** · 🎬 **[데모 대본](docs/DEMO.md)**
+📄 **[원페이저](docs/ONEPAGER.md)** · 💰 **[토크노믹스](docs/TOKENOMICS.md)** · 🎤 **[피치덱](docs/PITCH.md)** · 👥 **[팀](docs/TEAM.md)** · ⛓️ **[컨트랙트](contracts/)** · 🎬 **[데모 대본](docs/DEMO.md)** · 📝 **[지원서 완본](docs/APPLICATION.md)**
 
 ---
 
