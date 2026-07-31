@@ -18,6 +18,7 @@
 const fs = require("fs");
 const path = require("path");
 const hre = require("hardhat");
+const { minimalInput, compilerVersion } = require("./lib/minimal-input.js");
 
 async function main() {
   const net = hre.network.name;
@@ -35,10 +36,13 @@ async function main() {
   fs.mkdirSync(outDir, { recursive: true });
 
   const solc = hre.config.solidity.compilers[0];
+  const firstName = Object.keys(record.contracts)[0];
+  const anyBuildInfo = await hre.artifacts.getBuildInfo(`contracts/${firstName}.sol:${firstName}`);
+
   console.log("─".repeat(64));
   console.log("익스플로러 수동 검증에 넣을 값");
   console.log("─".repeat(64));
-  console.log(`컴파일러      v${solc.version}`);
+  console.log(`컴파일러      ${anyBuildInfo ? compilerVersion(anyBuildInfo) : `v${solc.version}`}`);
   console.log(`최적화        ${solc.settings.optimizer.enabled ? "Yes" : "No"} / runs ${solc.settings.optimizer.runs}`);
   console.log(`EVM 버전      ${solc.settings.evmVersion}`);
   console.log("");
@@ -51,8 +55,12 @@ async function main() {
       continue;
     }
 
+    // 이 컨트랙트에 실제로 필요한 소스만 남긴다. 통째로 넣으면 프로젝트 전체
+    // 43개(278KB)가 들어가는데, 익스플로러가 큰 파일에서 자주 막힌다.
+    const { input, kept, total } = minimalInput(buildInfo, `contracts/${name}.sol`);
     const jsonPath = path.join(outDir, `${name}.standard-input.json`);
-    fs.writeFileSync(jsonPath, `${JSON.stringify(buildInfo.input, null, 2)}\n`);
+    const serialized = `${JSON.stringify(input, null, 2)}\n`;
+    fs.writeFileSync(jsonPath, serialized);
 
     // 생성자 인자를 ABI로 인코딩한다. 익스플로러 폼이 0x 없는 hex를 받는다.
     const artifact = await hre.artifacts.readArtifact(fqn);
@@ -66,7 +74,8 @@ async function main() {
     console.log(`  주소          ${c.address}`);
     console.log(`  검증 페이지   ${explorer}/address/${c.address}/contract-verification`);
     console.log(`  JSON 파일     ${path.relative(process.cwd(), jsonPath)}`);
-    console.log(`  생성자 인자   ${encoded || "(없음)"}`);
+    console.log(`                소스 ${kept}/${total}개, ${(serialized.length / 1024).toFixed(0)}KB`);
+    console.log(`  생성자 인자   ${encoded ? `0x${encoded}` : "(없음)"}`);
     console.log("");
   }
 

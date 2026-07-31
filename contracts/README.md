@@ -200,28 +200,56 @@ CourseRegistry     https://sepolia-explorer.giwa.io/address/0x…#code
 GIWA 익스플로러는 Blockscout이라 **API 키가 필요 없습니다.** 이미 검증된
 컨트랙트는 건너뛰므로 재실행해도 안전합니다.
 
-#### `Unexpected token '<', "<!DOCTYPE "...` 가 나오면
+#### 왜 `hardhat verify` 를 안 쓰는가
 
-익스플로러가 JSON 대신 HTML 오류 페이지를 돌려준 것입니다. **컨트랙트가 잘못된
-것이 아닙니다** — Blockscout이 큰 페이로드나 연속 요청에서 종종 이럽니다.
+처음에는 썼습니다. 그리고 셋 중 셋이 이 자리에서 막혔습니다.
 
-1. **그냥 한 번 더 실행하세요.** 스크립트가 간격을 벌려가며 세 번까지 자동으로
-   다시 보내고, 마지막에는 hardhat이 뭐라 하든 **익스플로러에 직접 물어서**
-   최종 상태(`✓`/`✗`)를 찍습니다.
-2. 몇 번을 해도 같은 컨트랙트에서 막히면 **웹 화면에서 직접 올립니다.**
+```
+Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+```
 
-   ```bash
-   npm run standard-json:giwa
-   ```
+익스플로러가 JSON 대신 HTML 오류 페이지를 돌려준 것입니다. 원인을 좁혀 보니
+**페이로드 크기**였습니다. `hardhat-verify` 는 Etherscan 호환 `/api` 에 표준
+JSON 입력을 **폼 필드에 문자열로** 넣어 보내는데, Blockscout 앞단이 그 크기를
+거절합니다.
 
-   컨트랙트별 **Standard JSON Input** 파일과 **ABI 인코딩된 생성자 인자**를
-   `verification/` 에 뽑아 주고, 각 컨트랙트의 검증 페이지 주소를 함께
-   출력합니다. 그 화면에서 `Solidity (Standard JSON Input)` 을 고르고 파일과
-   인자를 넣으면 끝입니다.
+| 컨트랙트 | 필요한 소스 | 크기 | 폼 전송 |
+|---|--:|--:|:--:|
+| `CourseRegistry` | 3 / 43 | 13 KB | ✅ |
+| `SUPToken` | 22 / 43 | 181 KB | ❌ |
+| `RewardDistributor` | 22 / 43 | 185 KB | ❌ |
+| `SneakerNFT` | 32 / 43 | 231 KB | ❌ |
+
+작은 것 하나만 통과한 이유가 이겁니다. **재시도로는 풀리지 않습니다** — 크기는
+기다린다고 줄지 않습니다.
+
+그래서 `npm run verify:giwa` 는 익스플로러 웹 화면이 실제로 쓰는 v2 엔드포인트에
+**multipart 파일 첨부**로 보냅니다. 파일은 폼 필드와 달리 크기 제한이 사실상
+없습니다. 덤으로 두 가지를 더 합니다.
+
+- **필요한 소스만 골라 보냅니다.** solc가 만든 AST의 `ImportDirective` 를 따라
+  의존성 폐포를 구합니다. import 문을 문자열로 파싱하지 않으니 remapping이나
+  상대경로에서 틀릴 일이 없습니다. 43개 → 3~32개.
+- **실패하면 서버 응답 본문을 그대로 보여줍니다.** 파싱하다 터져서 원인을 못
+  보는 일이 없게.
+
+옛 경로가 필요하면 `npm run verify:hardhat` 으로 남겨 뒀습니다.
+
+#### 그래도 안 되면 — 웹 화면에서 직접
+
+```bash
+npm run standard-json:giwa
+```
+
+컨트랙트별 **Standard JSON Input** 파일과 **ABI 인코딩된 생성자 인자**를
+`verification/` 에 뽑아 주고, 각 컨트랙트의 검증 페이지 주소와 넣어야 할
+컴파일러 버전을 함께 출력합니다. 그 화면에서 `Solidity (Standard JSON Input)` 을
+고르고 파일과 인자를 넣으면 끝입니다.
 
 > **Sourcify는 꺼져 있습니다.** Sourcify가 GIWA 체인 ID를 아직 모르는데,
 > 켜 두면 Blockscout 검증이 통과한 뒤 Sourcify 단계에서 터져 **성공한 검증이
-> 실패로 보고됩니다.** 실제로 그 증상을 겪고 껐습니다.
+> 실패로 보고됩니다.** 실제로 `CourseRegistry` 가 그렇게 나왔습니다 —
+> 로그에 `Successfully verified` 와 `실패` 가 나란히 찍혔습니다.
 
 ### Step 6 — 배포 기록 커밋
 
