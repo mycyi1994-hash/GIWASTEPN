@@ -11,7 +11,7 @@ Walk or run in the real world → earn SUP → collect and upgrade sneaker NFTs.
 
 [English](#1-what-it-is) · [한국어 ↓](#한국어)
 
-**[⬇️ Install the APK](https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk)** · [Repository](https://github.com/mycyi1994-hash/GIWASTEPN) · [Tokenomics](TOKENOMICS.md) · [Pitch Deck](PITCH.md)
+**[⬇️ Install the APK](https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk)** · [Repository](https://github.com/mycyi1994-hash/GIWASTEPN) · [Architecture](ARCHITECTURE.md) · [Tokenomics](TOKENOMICS.md) · [Pitch Deck](PITCH.md)
 
 </div>
 
@@ -72,14 +72,18 @@ swapped; the distance a person has covered is theirs and never resets.
 | **Geo** | Haversine distance, track simplification, `cos(latitude)`-corrected normalization, rendered as a neon course map on Canvas |
 | **Persistence** | Room 2.6.1 (KSP) — daily records, sessions, reward ledger, community, courses · DataStore for settings |
 | **Economy** | `domain/RewardEconomy.kt`, pure functions, **unit-tested** in CI |
-| **i18n** | 648 strings × ko / en / zh / ja, `localeConfig` in-app language override |
+| **i18n** | 665 strings × ko / en / zh / ja, `localeConfig` in-app language override |
 | **CI/CD** | GitHub Actions — unit tests → `assembleDebug` → **APK signature fingerprint verification** → publish to `apk-dist` on every push |
 
-**Scale:** 76 Kotlin source files · 648 localized strings · 44 NFT designs ·
+**Scale:** 81 Kotlin source files · 665 localized strings · 44 NFT designs ·
 100 achievements · 60 runner levels · Room schema v6.
 
 **Verifiable now:** clone the repo, run `./gradlew :app:testDebugUnitTest`, or
 install the APK from the link above on any Android 8.0+ phone.
+
+**Full detail:** system diagram, the sensor-to-SUP pipeline, anti-cheat
+thresholds, the EIP-712 claim flow and the trust model are in
+**[ARCHITECTURE.md](ARCHITECTURE.md)**.
 
 ## 6. Token economy in five lines
 
@@ -162,7 +166,7 @@ live in the app.
 
 `v1.12.1` · 안드로이드 · Kotlin + Jetpack Compose · **지금 설치 가능한 APK**
 
-**[⬇️ APK 설치](https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk)** · [저장소](https://github.com/mycyi1994-hash/GIWASTEPN) · [토크노믹스](TOKENOMICS.md) · [피치덱](PITCH.md)
+**[⬇️ APK 설치](https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk)** · [저장소](https://github.com/mycyi1994-hash/GIWASTEPN) · [기술 아키텍처](ARCHITECTURE.md) · [토크노믹스](TOKENOMICS.md) · [피치덱](PITCH.md)
 
 ---
 
@@ -221,14 +225,18 @@ StepUp은 **완결된 컨슈머 러닝 앱**입니다 — GPS 코스 기록, 랩
 | **지오** | 하버사인 거리, 경로 솎기, `cos(위도)` 보정 정규화, Canvas 네온 코스맵 렌더링 |
 | **저장소** | Room 2.6.1 (KSP) — 일별 기록·세션·리워드 원장·커뮤니티·코스 · 설정은 DataStore |
 | **이코노미** | `domain/RewardEconomy.kt`, 순수 함수, CI에서 **단위 테스트** |
-| **다국어** | 문자열 648개 × ko / en / zh / ja, `localeConfig` 앱 내 언어 설정 |
+| **다국어** | 문자열 665개 × ko / en / zh / ja, `localeConfig` 앱 내 언어 설정 |
 | **CI/CD** | GitHub Actions — 단위 테스트 → `assembleDebug` → **APK 서명 지문 검증** → 푸시마다 `apk-dist` 배포 |
 
-**규모:** Kotlin 76개 파일 · 현지화 문자열 648개 · NFT 44종 · 업적 100종 ·
+**규모:** Kotlin 81개 파일 · 현지화 문자열 665개 · NFT 44종 · 업적 100종 ·
 러너 레벨 60단계 · Room 스키마 v6.
 
 **지금 검증 가능:** 저장소를 클론해 `./gradlew :app:testDebugUnitTest`를
 돌리거나, 위 링크의 APK를 Android 8.0 이상 기기에 설치해 보세요.
+
+**자세한 내용:** 시스템 구성도, 센서에서 SUP까지의 파이프라인, 부정 방지 임계값,
+EIP-712 청구 흐름, 신뢰 모델은 **[ARCHITECTURE.md](ARCHITECTURE.md)**에
+있습니다.
 
 ## 6. 다섯 줄로 보는 토큰 이코노미
 

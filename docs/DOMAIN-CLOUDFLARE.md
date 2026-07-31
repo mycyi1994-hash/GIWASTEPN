@@ -155,7 +155,7 @@ Working MVP: https://stepup.run
 
 Install the APK from that page and try it yourself. StepUp is a Move-to-Earn
 running app: GPS course tracking with laps and speed verification, 44 sneaker
-NFTs, crews and party runs, in 4 languages. 76 Kotlin files, 60+ screens,
+NFTs, crews and party runs, in 4 languages. 81 Kotlin files, 60+ screens,
 CI-built APK on every push.
 
 Demo video (2m30s): <VIDEO_URL>

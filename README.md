@@ -15,7 +15,7 @@ Walk or run in the real world, earn **SUP**, and grow a collection of sneaker NF
 
 **[⬇️ Download the APK](#-download--try-it)** · [Screenshots](#-screenshots) · [Build from source](#-build-from-source) · [한국어 문서 ↓](#한국어)
 
-📄 **[One-Pager](docs/ONEPAGER.md)** · 💰 **[Tokenomics](docs/TOKENOMICS.md)** · 🎤 **[Pitch Deck](docs/PITCH.md)** · ⛓️ **[Contracts](contracts/)** · 🎬 **[Demo script](docs/DEMO.md)** · 📝 **[Application sheet](docs/APPLICATION.md)** · ✅ **[TODO](docs/TODO-USER.md)** · 🌐 **[Landing page](web/)** · 🔏 **[Attester](attester/)**
+📄 **[One-Pager](docs/ONEPAGER.md)** · 🏗️ **[Architecture](docs/ARCHITECTURE.md)** · 💰 **[Tokenomics](docs/TOKENOMICS.md)** · 🎤 **[Pitch Deck](docs/PITCH.md)** · ⛓️ **[Contracts](contracts/)** · 🎬 **[Demo script](docs/DEMO.md)** · 📝 **[Application sheet](docs/APPLICATION.md)** · ✅ **[TODO](docs/TODO-USER.md)** · 🌐 **[Landing page](web/)** · 🔏 **[Attester](attester/)**
 
 </div>
 
@@ -36,7 +36,7 @@ that behaviour to a token economy that GIWA can settle.
 | **Platform** | Native Android (Kotlin + Jetpack Compose) |
 | **Chain** | GIWA (target settlement layer for SUP and sneaker NFTs) |
 | **Status** | Working app, installable APK, **60+ screens shipped**. On-chain settlement is the next milestone — see the [roadmap](#-roadmap). |
-| **Scale today** | 76 Kotlin source files · 648 localized strings × 4 languages · 44 sneaker NFT designs · 100 achievements · 60 runner levels |
+| **Scale today** | 81 Kotlin source files · 665 localized strings × 4 languages · 44 sneaker NFT designs · 100 achievements · 60 runner levels |
 
 ### The problem
 
@@ -177,7 +177,7 @@ actually covered.
 
 ### Localization
 
-Korean · English · 简体中文 · 日本語 — **648 strings**, fully translated.
+Korean · English · 简体中文 · 日本語 — **665 strings**, fully translated.
 Follows the system language by default, and on Android 13+ the in-app
 **language setting** (`localeConfig`) can override it per-app. Every user-facing
 string is localized; only proper nouns (StepUp, SUP, GIWA) stay fixed.
@@ -391,7 +391,7 @@ fingerprint matches this keystore.
 
 **[⬇️ APK 내려받기](#-apk-내려받기)** · [스크린샷](#-스크린샷) · [소스 빌드](#-소스에서-빌드하기)
 
-📄 **[원페이저](docs/ONEPAGER.md)** · 💰 **[토크노믹스](docs/TOKENOMICS.md)** · 🎤 **[피치덱](docs/PITCH.md)** · ⛓️ **[컨트랙트](contracts/)** · 🎬 **[데모 대본](docs/DEMO.md)** · 📝 **[지원서 완본](docs/APPLICATION.md)** · ✅ **[할 일 가이드](docs/TODO-USER.md)** · 🌐 **[랜딩 페이지](web/)** · 🔏 **[어테스터](attester/)**
+📄 **[원페이저](docs/ONEPAGER.md)** · 🏗️ **[기술 아키텍처](docs/ARCHITECTURE.md)** · 💰 **[토크노믹스](docs/TOKENOMICS.md)** · 🎤 **[피치덱](docs/PITCH.md)** · ⛓️ **[컨트랙트](contracts/)** · 🎬 **[데모 대본](docs/DEMO.md)** · 📝 **[지원서 완본](docs/APPLICATION.md)** · ✅ **[할 일 가이드](docs/TODO-USER.md)** · 🌐 **[랜딩 페이지](web/)** · 🔏 **[어테스터](attester/)**
 
 ---
 
@@ -410,7 +410,7 @@ StepUp은 매일의 걷기와 달리기를 온체인 리워드 루프로 바꿉�
 | **플랫폼** | 네이티브 안드로이드 (Kotlin + Jetpack Compose) |
 | **체인** | GIWA (SUP·스니커즈 NFT의 정산 레이어) |
 | **현재 상태** | 동작하는 앱, 설치 가능한 APK, **60개 이상 화면 완성**. 온체인 정산이 다음 마일스톤입니다 — [로드맵](#-로드맵) 참고 |
-| **규모** | Kotlin 76개 파일 · 문자열 648개 × 4개 언어 · 스니커즈 NFT 44종 · 업적 100종 · 러너 레벨 60단계 |
+| **규모** | Kotlin 81개 파일 · 문자열 665개 × 4개 언어 · 스니커즈 NFT 44종 · 업적 100종 · 러너 레벨 60단계 |
 
 ### 문제
 
@@ -551,7 +551,7 @@ APK를 다시 빌드해 [`apk-dist`](../../tree/apk-dist) 브랜치에 강제 �
 
 ### 다국어
 
-한국어 · English · 简体中文 · 日本語 — **문자열 648개** 전부 번역했습니다.
+한국어 · English · 简体中文 · 日本語 — **문자열 665개** 전부 번역했습니다.
 기본은 시스템 언어를 따르고, Android 13+에서는 앱 내 **언어 설정**
 (`localeConfig`)으로 앱만 따로 바꿀 수 있습니다. 고유명사(StepUp, SUP, GIWA)를
 제외한 모든 노출 문자열이 현지화되어 있습니다.

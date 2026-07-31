@@ -36,7 +36,7 @@
 | **7/12** Pitch Deck | 472자 (94%) | 380자 (76%) |
 | **8/12** Project Link | 490자 (98%) | 434자 (87%) |
 | **9/12** GIWA Testnet Verified Smart Contract Link | 492자 (98%) | 412자 (82%) |
-| **10/12** Docs or One-Pager Link | 499자 (100%) | 393자 (79%) |
+| **10/12** 기술 문서 / 원페이저 링크 | 498자 (100%) | 385자 (77%) |
 
 ---
 
@@ -153,7 +153,7 @@ https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk
 데모 영상(2분 30초): <VIDEO_URL>
 
 직접 설치해 보실 수 있습니다. StepUp은 Move-to-Earn 러닝 앱으로, 랩이 있는 GPS
-코스 측정, 44종 스니커즈 NFT, 크루와 파티런을 4개 언어로 제공합니다. Kotlin 76개
+코스 측정, 44종 스니커즈 NFT, 크루와 파티런을 4개 언어로 제공합니다. Kotlin 81개
 파일, 60개 이상 화면, 푸시마다 CI가 APK를 빌드합니다. 에너지 게이트와 +17.8%
 부스트 상한으로 배출을 구조적으로 묶었습니다.
 
@@ -202,10 +202,43 @@ CourseRegistry  0x6c815DF0d8a5CA7CA0487D1AC2f96c0fEC588542
 
 ---
 
-# [10/12] Docs or One-Pager Link
-**문서 / 원페이저 링크** · shareable link · 500자
+# [10/12] 기술 문서 또는 원페이저 링크
+**Docs or One-Pager Link** · shareable link · 500자
+· *제품 아키텍처와 기술 구현을 설명하는 GitBook / 백서 / 원페이저*
 
-### 🇬🇧 영어판 (499자 / 500)
+> 📌 **문항이 요구하는 건 "제품 아키텍처와 기술 구현"입니다.** 그래서
+> [`docs/ARCHITECTURE.md`](ARCHITECTURE.md)를 새로 썼고, 아래 답변은 그 문서를
+> 첫 줄에 둡니다 — 원페이저는 제품·시장까지 함께 다루지만, 이 문항이 정확히
+> 묻는 것은 아키텍처 문서입니다.
+>
+> **⚠️ 이 링크는 `docs/ARCHITECTURE.md`가 `claude/work-history-pjm57c` 브랜치에
+> 들어간 뒤에 동작합니다.** (PR 머지 후) 시크릿 모드로 한 번 열어보고
+> 붙여넣으세요.
+
+### 🇬🇧 영어판 (498자 / 500)
+
+```
+Technical documentation — product architecture and implementation (English + Korean):
+https://github.com/mycyi1994-hash/GIWASTEPN/blob/claude/work-history-pjm57c/docs/ARCHITECTURE.md
+
+Three planes (Android client, Cloudflare Worker attester, four GIWA contracts), the sensor-to-SUP pipeline, GPS anti-cheat thresholds, the EIP-712 claim flow, the trust model, and what is not done. Every constant links to its source file, with commands to run its 73 tests.
+
+Same folder: ONEPAGER.md, TOKENOMICS.md
+```
+
+### 🇰🇷 한국어판 (385자 / 500)
+
+```
+기술 문서 — 제품 아키텍처와 기술 구현(영문·한국어 병기):
+https://github.com/mycyi1994-hash/GIWASTEPN/blob/claude/work-history-pjm57c/docs/ARCHITECTURE.md
+
+세 개 층(안드로이드 클라이언트 · Cloudflare Worker 어테스터 · GIWA 컨트랙트 4종), 센서에서 SUP까지의 파이프라인, GPS 부정 방지 임계값, EIP-712 청구 흐름, 어테스터 키가 털려도 토큰이 인플레이션되지 않는 이유를 적은 신뢰 모델, 그리고 아직 안 된 것까지 담았습니다. 모든 상수에 실제 파일 링크와, 테스트 73개를 직접 돌려보는 명령을 붙였습니다.
+
+같은 폴더: ONEPAGER.md, TOKENOMICS.md
+```
+
+<details>
+<summary>원페이저를 그대로 내고 싶다면 (기존 답변)</summary>
 
 ```
 One-pager (product structure and technical execution):
@@ -217,17 +250,7 @@ https://github.com/mycyi1994-hash/GIWASTEPN/blob/claude/work-history-pjm57c/docs
 Both are written in English and Korean. The repository also holds the app source, the contracts and device screenshots.
 ```
 
-### 🇰🇷 한국어판 (384자 / 500)
-
-```
-원페이저(제품 구조 및 기술 실행):
-https://github.com/mycyi1994-hash/GIWASTEPN/blob/claude/work-history-pjm57c/docs/ONEPAGER.md
-
-전체 토크노믹스 — 발행, 소각처, 페르소나별 연간 밸런스 표, 공급 스케줄, 어뷰징 방지, 그리고 아직 해결하지 못한 과제:
-https://github.com/mycyi1994-hash/GIWASTEPN/blob/claude/work-history-pjm57c/docs/TOKENOMICS.md
-
-두 문서 모두 영문과 한국어를 병기했습니다. 앱에 구현된 수치(1보당 0.01 SUP, 에너지 600보/칸, 부스트 상한 +17.8%)와 GIWA Sepolia 온체인 설계를 절을 나눠 구분했습니다.
-```
+</details>
 
 ---
 
@@ -246,4 +269,4 @@ https://github.com/mycyi1994-hash/GIWASTEPN/blob/claude/work-history-pjm57c/docs
 | 7/12 | [`docs/PITCH.md`](PITCH.md) |
 | 8/12 | [`docs/DEMO.md`](DEMO.md) (촬영 대본) · [APK](https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk) |
 | 9/12 | [`contracts/`](../contracts/) · [`contracts/README.md`](../contracts/README.md) (배포 6단계) |
-| 10/12 | [`docs/ONEPAGER.md`](ONEPAGER.md) · [`docs/TOKENOMICS.md`](TOKENOMICS.md) |
+| 10/12 | [`docs/ARCHITECTURE.md`](ARCHITECTURE.md) · [`docs/ONEPAGER.md`](ONEPAGER.md) · [`docs/TOKENOMICS.md`](TOKENOMICS.md) |

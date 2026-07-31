@@ -333,7 +333,7 @@ https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk
 데모 영상(2분 30초): <VIDEO_URL>
 
 직접 설치해 보실 수 있습니다. StepUp은 Move-to-Earn 러닝 앱으로, 랩이 있는 GPS
-코스 측정, 44종 스니커즈 NFT, 크루와 파티런을 4개 언어로 제공합니다. Kotlin 76개
+코스 측정, 44종 스니커즈 NFT, 크루와 파티런을 4개 언어로 제공합니다. Kotlin 81개
 파일, 60개 이상 화면, 푸시마다 CI가 APK를 빌드합니다. 에너지 게이트와 +17.8%
 부스트 상한으로 배출을 구조적으로 묶었습니다.
 
