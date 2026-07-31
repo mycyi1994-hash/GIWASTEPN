@@ -4,12 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.giwa.strideup.data.prefs.UserPrefs
+import com.giwa.strideup.data.repo.SneakerRepository
+import com.giwa.strideup.data.local.WalkSessionDao
+import com.giwa.strideup.domain.Faction
 import com.giwa.strideup.core.ServiceLocator
 import com.giwa.strideup.data.repo.CommunityRepository
 import com.giwa.strideup.data.repo.Crew
 import com.giwa.strideup.data.repo.CrewRepository
 import com.giwa.strideup.data.repo.RewardRepository
-import com.giwa.strideup.data.repo.StepRepository
 import com.giwa.strideup.domain.CommentThread
 import com.giwa.strideup.domain.Post
 import com.giwa.strideup.domain.PostCategory
@@ -27,8 +30,10 @@ enum class CommunityTab { BOARD, CREW }
 class CommunityViewModel(
     private val crewRepository: CrewRepository,
     private val communityRepository: CommunityRepository,
-    stepRepository: StepRepository,
     rewardRepository: RewardRepository,
+    userPrefs: UserPrefs,
+    sneakerRepository: SneakerRepository,
+    walkSessionDao: WalkSessionDao,
 ) : ViewModel() {
 
     val crews: StateFlow<List<Crew>> = crewRepository.crews
@@ -42,13 +47,25 @@ class CommunityViewModel(
     val allPosts: StateFlow<List<Post>> = communityRepository.posts
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    /** 이번 주(최근 7일) 걸음 합계 — 랭킹 산정에 쓴다 */
-    val weeklySteps: StateFlow<Long> = stepRepository.observeWeek()
-        .map { days -> days.sumOf { it.steps.toLong() } }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0L)
-
     val balance: StateFlow<Double> = rewardRepository.balance
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0.0)
+
+    /** 역대 최고 속도(km/h) — 러닝 판정을 통과한 구간에서만 기록된다 */
+    val topSpeedKmh: StateFlow<Double> = userPrefs.topSpeedKmh
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0.0)
+
+    /** 러닝에 쓴 누적 시간(초). 무효 판정된 세션은 0초로 기록돼 여기 안 들어온다. */
+    val totalActiveSec: StateFlow<Long> = walkSessionDao.observeDurationSince(0L)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0L)
+
+    /** 종족별 내 누적 거리(km) */
+    val factionKm: StateFlow<Map<Faction, Double>> = userPrefs.factionKm
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyMap())
+
+    /** 지금 신고 있는 신발의 종족 — 종족 랭킹에서 "우리 편"을 표시한다 */
+    val myFaction: StateFlow<Faction?> = sneakerRepository.equipped
+        .map { it?.faction }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     /** 선택된 세그먼트 — 탭을 오갔다 와도 유지된다 */
     val tab = MutableStateFlow(CommunityTab.BOARD)
@@ -153,8 +170,10 @@ class CommunityViewModel(
                 CommunityViewModel(
                     ServiceLocator.crewRepository,
                     ServiceLocator.communityRepository,
-                    ServiceLocator.stepRepository,
                     ServiceLocator.rewardRepository,
+                    ServiceLocator.userPrefs,
+                    ServiceLocator.sneakerRepository,
+                    ServiceLocator.database.walkSessionDao(),
                 )
             }
         }

@@ -428,12 +428,23 @@
 
     <!-- Ranking -->
     <string name="rank_me">我</string>
-    <string name="rank_board_steps">本周步数</string>
+    <string name="rank_board_speed">极速</string>
+    <string name="rank_board_time">耐力</string>
+    <string name="rank_board_faction">族群</string>
     <string name="rank_board_sup">SUP 余额</string>
     <string name="rank_my_position">我的排名</string>
     <string name="rank_total_runners">本周共 %1$d 位跑者</string>
-    <string name="rank_steps_value">%1$s 步</string>
-    <string name="ranking_teaser">本周第 %1$d 名 · %2$s 步</string>
+    <string name="ranking_teaser">第 %1$d 名 · %2$s SUP</string>
+    <string name="rank_faction_title">族群排行</string>
+    <string name="rank_faction_body">你跑的每一公里都会计入当时所穿鞋子的族群。即使你不是第一，你的族群也可能是。</string>
+    <string name="rank_faction_km">累计 %1$s km</string>
+    <string name="rank_faction_my_km">我的贡献 · %1$s km</string>
+    <string name="rank_faction_mine">我的族群</string>
+    <string name="run_flagged_title">速度校验</string>
+    <string name="run_flagged_body">已剔除 %1$d 个路段 — 超出人类奔跑速度。</string>
+    <string name="run_void_title">本次无效</string>
+    <string name="run_void_body">无法确认为跑步，因此未计入奖励。</string>
+    <string name="run_top_speed">最高速度</string>
 
     <!-- Seed crews -->
     <string name="seed_crew_trailblazer_tagline">每个周末的越野路线</string>

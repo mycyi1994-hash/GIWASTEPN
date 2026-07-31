@@ -429,12 +429,23 @@
 
     <!-- Ranking -->
     <string name="rank_me">あなた</string>
-    <string name="rank_board_steps">週間歩数</string>
+    <string name="rank_board_speed">スピード</string>
+    <string name="rank_board_time">継続時間</string>
+    <string name="rank_board_faction">種族</string>
     <string name="rank_board_sup">SUP 残高</string>
     <string name="rank_my_position">自分の順位</string>
     <string name="rank_total_runners">今週のランナー %1$d 人中</string>
-    <string name="rank_steps_value">%1$s 歩</string>
-    <string name="ranking_teaser">今週 %1$d 位 · %2$s 歩</string>
+    <string name="ranking_teaser">%1$d 位 · %2$s SUP</string>
+    <string name="rank_faction_title">種族ランキング</string>
+    <string name="rank_faction_body">走った距離は、その時履いていたシューズの種族に加算されます。あなたが1位でなくても、種族は1位になれます。</string>
+    <string name="rank_faction_km">累計 %1$s km</string>
+    <string name="rank_faction_my_km">あなたの貢献 · %1$s km</string>
+    <string name="rank_faction_mine">自分の種族</string>
+    <string name="run_flagged_title">速度チェック</string>
+    <string name="run_flagged_body">%1$d 区間を除外しました — 人が走れる速度を超えています。</string>
+    <string name="run_void_title">セッション無効</string>
+    <string name="run_void_body">ランとして確認できなかったため、付与されませんでした。</string>
+    <string name="run_top_speed">最高速度</string>
 
     <!-- Seed crews -->
     <string name="seed_crew_trailblazer_tagline">週末はトレイルコース</string>

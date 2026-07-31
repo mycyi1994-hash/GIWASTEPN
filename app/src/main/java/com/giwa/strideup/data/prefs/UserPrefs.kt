@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.giwa.strideup.domain.Faction
 import com.giwa.strideup.domain.RewardEconomy
 import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
@@ -38,6 +39,8 @@ class UserPrefs(private val context: Context) {
         val GUIDE_SEEN = intPreferencesKey("guide_seen")
         val LANGUAGE = stringPreferencesKey("language")
         val SELECTED_COURSE = longPreferencesKey("selected_course")
+        val TOP_SPEED = doublePreferencesKey("top_speed_kmh")
+        val FACTION_KM = stringPreferencesKey("faction_km")
     }
 
     val dailyGoal: Flow<Int> = context.dataStore.data.map { it[Keys.DAILY_GOAL] ?: DEFAULT_GOAL }
@@ -85,6 +88,47 @@ class UserPrefs(private val context: Context) {
     }
 
     suspend fun selectedCourseNow(): Long = context.dataStore.data.first()[Keys.SELECTED_COURSE] ?: -1L
+
+    // ── 랭킹 재료 ────────────────────────────────────────────────
+
+    /** 역대 최고 속도(km/h). 러닝 판정을 통과한 구간에서만 갱신된다. */
+    val topSpeedKmh: Flow<Double> = context.dataStore.data.map { it[Keys.TOP_SPEED] ?: 0.0 }
+
+    suspend fun recordTopSpeed(kmh: Double) {
+        if (kmh <= 0.0) return
+        context.dataStore.edit { prefs ->
+            val best = prefs[Keys.TOP_SPEED] ?: 0.0
+            if (kmh > best) prefs[Keys.TOP_SPEED] = kmh
+        }
+    }
+
+    /**
+     * 종족별 누적 러닝 거리(km) — 착용한 신발의 종족에 쌓인다.
+     *
+     * Faction.entries 순서대로 ";"로 이어 붙인 문자열 하나로 보관한다.
+     * 종족이 늘어도 키를 새로 파지 않아도 되고, 짧아진 문자열은 0으로 채운다.
+     */
+    val factionKm: Flow<Map<Faction, Double>> = context.dataStore.data.map { prefs ->
+        decodeFactionKm(prefs[Keys.FACTION_KM])
+    }
+
+    suspend fun addFactionKm(faction: Faction, km: Double) {
+        if (km <= 0.0) return
+        context.dataStore.edit { prefs ->
+            val current = decodeFactionKm(prefs[Keys.FACTION_KM]).toMutableMap()
+            current[faction] = (current[faction] ?: 0.0) + km
+            prefs[Keys.FACTION_KM] = Faction.entries.joinToString(";") {
+                "%.4f".format(current[it] ?: 0.0)
+            }
+        }
+    }
+
+    private fun decodeFactionKm(raw: String?): Map<Faction, Double> {
+        val parts = raw?.split(';').orEmpty()
+        return Faction.entries.withIndex().associate { (index, faction) ->
+            faction to (parts.getOrNull(index)?.toDoubleOrNull() ?: 0.0)
+        }
+    }
 
     /** 온보딩 가이드를 끝까지 봤는지 */
     val guideSeen: Flow<Boolean> = context.dataStore.data.map { (it[Keys.GUIDE_SEEN] ?: 0) == 1 }

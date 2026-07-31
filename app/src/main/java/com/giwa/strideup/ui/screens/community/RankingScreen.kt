@@ -38,6 +38,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.giwa.strideup.R
+import com.giwa.strideup.domain.FactionLeaderboard
+import com.giwa.strideup.domain.FactionRank
 import com.giwa.strideup.domain.Leaderboard
 import com.giwa.strideup.domain.RankBoard
 import com.giwa.strideup.domain.RankEntry
@@ -60,14 +62,22 @@ fun RankingScreen(
     onBack: () -> Unit = {},
     viewModel: CommunityViewModel = viewModel(factory = CommunityViewModel.Factory),
 ) {
-    val weeklySteps by viewModel.weeklySteps.collectAsStateWithLifecycle()
     val balance by viewModel.balance.collectAsStateWithLifecycle()
+    val topSpeed by viewModel.topSpeedKmh.collectAsStateWithLifecycle()
+    val activeSec by viewModel.totalActiveSec.collectAsStateWithLifecycle()
+    val factionKm by viewModel.factionKm.collectAsStateWithLifecycle()
+    val myFaction by viewModel.myFaction.collectAsStateWithLifecycle()
     var boardIndex by rememberSaveable { mutableIntStateOf(0) }
 
-    val board = if (boardIndex == 0) RankBoard.WEEKLY_STEPS else RankBoard.TOTAL_SUP
+    val personalBoards = RankBoard.entries
+    val isFactionTab = boardIndex >= personalBoards.size
+    val board = personalBoards[boardIndex.coerceIn(0, personalBoards.lastIndex)]
     val meLabel = stringResource(R.string.rank_me)
-    val entries = remember(board, weeklySteps, balance, meLabel) {
-        Leaderboard.build(board, meLabel, weeklySteps, balance)
+    val entries = remember(board, topSpeed, activeSec, balance, meLabel) {
+        Leaderboard.build(board, meLabel, topSpeed, activeSec, balance)
+    }
+    val factions = remember(factionKm, myFaction) {
+        FactionLeaderboard.build(factionKm, myFaction)
     }
     val me = entries.first { it.isMe }
     val podium = entries.take(3)
@@ -104,12 +114,34 @@ fun RankingScreen(
         item {
             SegmentedTabs(
                 labels = listOf(
-                    stringResource(R.string.rank_board_steps),
+                    stringResource(R.string.rank_board_speed),
+                    stringResource(R.string.rank_board_time),
                     stringResource(R.string.rank_board_sup),
+                    stringResource(R.string.rank_board_faction),
                 ),
                 selected = boardIndex,
                 onSelect = { boardIndex = it },
             )
+        }
+
+        if (isFactionTab) {
+            item {
+                GlowCard(contentPadding = PaddingValues(16.dp), spacing = 6.dp) {
+                    Text(
+                        text = stringResource(R.string.rank_faction_title),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = Snow,
+                    )
+                    Text(
+                        text = stringResource(R.string.rank_faction_body),
+                        fontSize = 11.sp,
+                        color = Silver,
+                        lineHeight = 17.sp,
+                    )
+                }
+            }
+            items(factions, key = { it.faction.id }) { row -> FactionRow(row) }
+            return@LazyColumn
         }
 
         item { Podium(podium, board) }
@@ -290,6 +322,87 @@ private fun medalColor(rank: Int): Color = when (rank) {
 
 @Composable
 private fun valueLabel(entry: RankEntry, board: RankBoard): String = when (board) {
-    RankBoard.WEEKLY_STEPS -> stringResource(R.string.rank_steps_value, "%,d".format(entry.steps))
+    RankBoard.TOP_SPEED -> "%.1f km/h".format(entry.topSpeedKmh)
+    RankBoard.LONGEST_TIME -> durationLabel(entry.activeSec)
     RankBoard.TOTAL_SUP -> "%,.0f SUP".format(entry.sup)
+}
+
+/** 누적 시간을 "12h 30m" / "45m" 로 — 랭킹 줄에 들어갈 만큼 짧게 */
+private fun durationLabel(seconds: Long): String {
+    val hours = seconds / 3600
+    val minutes = (seconds % 3600) / 60
+    return if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
+}
+
+/** 종족 한 줄 — 순위 · 이름 · 누적 거리 · 내 기여 비중 막대 */
+@Composable
+private fun FactionRow(row: FactionRank) {
+    GlowCard(
+        accent = row.isMine,
+        contentPadding = PaddingValues(14.dp),
+        spacing = 9.dp,
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(11.dp),
+        ) {
+            Box(Modifier.width(24.dp), contentAlignment = Alignment.CenterStart) {
+                Text(
+                    text = "${row.rank}",
+                    color = if (row.rank <= 3) medalColor(row.rank) else Slate,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Black,
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .size(30.dp)
+                    .background(Color(row.faction.accent).copy(alpha = 0.18f), CircleShape)
+                    .border(1.dp, Color(row.faction.accent), CircleShape),
+            )
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(
+                    text = row.faction.displayName,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = Snow,
+                )
+                Text(
+                    text = stringResource(R.string.rank_faction_km, "%,.1f".format(row.km)),
+                    fontSize = 11.sp,
+                    color = Silver,
+                )
+            }
+            if (row.isMine) {
+                Text(
+                    text = stringResource(R.string.rank_faction_mine),
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Black,
+                    color = Volt,
+                )
+            }
+        }
+        // 내 기여 — 종족 누적 대비 얼마나 보탰는지
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(5.dp)
+                    .clip(RoundedCornerShape(50))
+                    .background(CarbonHigh),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(row.myShare.coerceAtLeast(0.012f))
+                        .height(5.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(Color(row.faction.accent)),
+                )
+            }
+            Text(
+                text = stringResource(R.string.rank_faction_my_km, "%,.2f".format(row.myKm)),
+                fontSize = 10.sp,
+                color = Slate,
+            )
+        }
+    }
 }

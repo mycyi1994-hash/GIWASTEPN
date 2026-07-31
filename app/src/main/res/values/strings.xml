@@ -430,12 +430,23 @@
 
     <!-- Ranking -->
     <string name="rank_me">You</string>
-    <string name="rank_board_steps">Weekly steps</string>
+    <string name="rank_board_speed">Top speed</string>
+    <string name="rank_board_time">Time run</string>
+    <string name="rank_board_faction">Factions</string>
     <string name="rank_board_sup">SUP balance</string>
     <string name="rank_my_position">MY POSITION</string>
     <string name="rank_total_runners">out of %1$d runners this week</string>
-    <string name="rank_steps_value">%1$s steps</string>
-    <string name="ranking_teaser">You\'re #%1$d this week · %2$s steps</string>
+    <string name="ranking_teaser">You\'re #%1$d · %2$s SUP</string>
+    <string name="rank_faction_title">Faction standings</string>
+    <string name="rank_faction_body">Every kilometre you run counts for the faction of the sneaker you had on. You may not be #1 — your faction still can be.</string>
+    <string name="rank_faction_km">%1$s km total</string>
+    <string name="rank_faction_my_km">Your contribution · %1$s km</string>
+    <string name="rank_faction_mine">YOURS</string>
+    <string name="run_flagged_title">Speed check</string>
+    <string name="run_flagged_body">%1$d segment(s) ignored — faster than a person can run.</string>
+    <string name="run_void_title">Session voided</string>
+    <string name="run_void_body">This could not be verified as a run, so nothing was credited.</string>
+    <string name="run_top_speed">Top speed</string>
 
     <!-- Seed crews -->
     <string name="seed_crew_trailblazer_tagline">Trail routes every weekend</string>

@@ -428,12 +428,23 @@
 
     <!-- Ranking -->
     <string name="rank_me">나</string>
-    <string name="rank_board_steps">주간 걸음</string>
+    <string name="rank_board_speed">쾌속</string>
+    <string name="rank_board_time">지구력</string>
+    <string name="rank_board_faction">종족</string>
     <string name="rank_board_sup">보유 SUP</string>
     <string name="rank_my_position">내 순위</string>
     <string name="rank_total_runners">이번 주 러너 %1$d명 중</string>
-    <string name="rank_steps_value">%1$s 걸음</string>
-    <string name="ranking_teaser">이번 주 %1$d위 · %2$s 걸음</string>
+    <string name="ranking_teaser">전체 %1$d위 · %2$s SUP</string>
+    <string name="rank_faction_title">종족 순위</string>
+    <string name="rank_faction_body">달린 거리는 그때 신고 있던 신발의 종족에 쌓입니다. 내가 1등이 아니어도 우리 종족은 1등일 수 있어요.</string>
+    <string name="rank_faction_km">누적 %1$s km</string>
+    <string name="rank_faction_my_km">내 기여 · %1$s km</string>
+    <string name="rank_faction_mine">내 종족</string>
+    <string name="run_flagged_title">속도 검증</string>
+    <string name="run_flagged_body">%1$d개 구간을 제외했어요 — 사람이 낼 수 없는 속도입니다.</string>
+    <string name="run_void_title">세션 무효</string>
+    <string name="run_void_body">러닝으로 확인되지 않아 적립되지 않았어요.</string>
+    <string name="run_top_speed">최고 속도</string>
 
     <!-- Seed crews -->
     <string name="seed_crew_trailblazer_tagline">주말마다 트레일 코스</string>

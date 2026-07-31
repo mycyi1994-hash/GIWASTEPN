@@ -95,11 +95,20 @@ fun List<Comment>.toThreads(): List<CommentThread> {
 // 랭킹
 // ─────────────────────────────────────────────────────────────
 
+/**
+ * 개인 랭킹 부문.
+ *
+ * 걸음 수 하나로 줄을 세우면 "많이 걷기"만 남는다. 러닝은 빠르기·지구력·꾸준함이
+ * 서로 다른 능력이라, 잘하는 축이 다른 사람이 각자 오를 자리를 갖도록 셋으로 나눴다.
+ */
 enum class RankBoard {
-    /** 이번 주 걸음 수 */
-    WEEKLY_STEPS,
+    /** 쾌속 — 세션 최고 속도(km/h) */
+    TOP_SPEED,
 
-    /** 누적 SUP */
+    /** 지구력 — 러닝에 쓴 누적 시간 */
+    LONGEST_TIME,
+
+    /** 적립 — 누적 SUP */
     TOTAL_SUP,
 }
 
@@ -107,7 +116,10 @@ data class RankEntry(
     val rank: Int,
     val name: String,
     val monogram: String,
-    val steps: Long,
+    /** 역대 최고 속도(km/h) */
+    val topSpeedKmh: Double,
+    /** 러닝에 쓴 누적 시간(초) */
+    val activeSec: Long,
     val sup: Double,
     val isMe: Boolean,
 )
@@ -139,16 +151,29 @@ object Leaderboard {
     )
 
     /**
+     * 상대의 최고 속도 — 9.0~19.5 km/h 사이에 흩뿌린다.
+     * 시드 순서와 어긋나게 섞어, 적립 1등이 속도 1등도 하는 일이 없게 한다.
+     */
+    private fun rivalSpeed(seed: Int): Double = 9.0 + (seed * 7 % 43) * 0.25
+
+    /** 상대의 누적 러닝 시간 — 시드에 비례하되 속도와는 다른 순서로 */
+    private fun rivalActiveSec(seed: Int): Long = (seed * 13 % 97) * 1_450L + 3_600L
+
+    private fun rivalSup(seed: Int): Double = seed * 74.5 + 260.0
+
+    /**
      * 내 실적을 끼워 넣은 순위표.
      *
      * @param myName "나"에 해당하는 표시 이름
-     * @param myWeeklySteps 이번 주 실제 걸음 수
+     * @param myTopSpeedKmh 판정을 통과한 구간에서 기록한 역대 최고 속도
+     * @param myActiveSec 러닝에 쓴 누적 시간(초)
      * @param myTotalSup 실제 누적 SUP
      */
     fun build(
         board: RankBoard,
         myName: String,
-        myWeeklySteps: Long,
+        myTopSpeedKmh: Double,
+        myActiveSec: Long,
         myTotalSup: Double,
     ): List<RankEntry> {
         val rows = rivals.map { rival ->
@@ -156,22 +181,27 @@ object Leaderboard {
                 rank = 0,
                 name = rival.name,
                 monogram = rival.monogram,
-                steps = rival.seed * 1_130L + 4_800L,
-                sup = rival.seed * 74.5 + 260.0,
+                topSpeedKmh = rivalSpeed(rival.seed),
+                activeSec = rivalActiveSec(rival.seed),
+                sup = rivalSup(rival.seed),
                 isMe = false,
             )
         } + RankEntry(
             rank = 0,
             name = myName,
             monogram = "ME",
-            steps = myWeeklySteps,
+            topSpeedKmh = myTopSpeedKmh,
+            activeSec = myActiveSec,
             sup = myTotalSup,
             isMe = true,
         )
 
         val sorted = when (board) {
-            RankBoard.WEEKLY_STEPS -> rows.sortedWith(
-                compareByDescending<RankEntry> { it.steps }.thenBy { it.name }
+            RankBoard.TOP_SPEED -> rows.sortedWith(
+                compareByDescending<RankEntry> { it.topSpeedKmh }.thenBy { it.name }
+            )
+            RankBoard.LONGEST_TIME -> rows.sortedWith(
+                compareByDescending<RankEntry> { it.activeSec }.thenBy { it.name }
             )
             RankBoard.TOTAL_SUP -> rows.sortedWith(
                 compareByDescending<RankEntry> { it.sup }.thenBy { it.name }
@@ -179,4 +209,63 @@ object Leaderboard {
         }
         return sorted.mapIndexed { index, entry -> entry.copy(rank = index + 1) }
     }
+}
+
+// ─────────────────────────────────────────────────────────────
+// 종족 랭킹
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * 종족 순위 한 줄.
+ *
+ * @param km 그 종족 신발을 신고 달린 거리의 합
+ * @param myKm 그중 내가 기여한 거리
+ */
+data class FactionRank(
+    val rank: Int,
+    val faction: Faction,
+    val km: Double,
+    val myKm: Double,
+    /** 내가 지금 이 종족 신발을 신고 있는지 */
+    val isMine: Boolean,
+) {
+    /** 내 기여 비중(0..1) */
+    val myShare: Float
+        get() = if (km > 0.0) (myKm / km).coerceIn(0.0, 1.0).toFloat() else 0f
+}
+
+/**
+ * 종족별 누적 거리 순위.
+ *
+ * 개인 랭킹이 "나 vs 남"이라면 이건 "우리 vs 저쪽"이다. 신발을 고르는 행위가
+ * 내 부스트뿐 아니라 소속을 정하는 선택이 되고, 한 번 달릴 때마다 그 소속에
+ * 거리가 쌓인다. 내가 1등을 못 해도 우리 종족은 1등일 수 있다.
+ *
+ * 백엔드가 없으므로 다른 러너들의 누적은 종족마다 고정된 기준값으로 둔다.
+ * 값이 실행할 때마다 흔들리면 순위가 의미를 잃는다.
+ */
+object FactionLeaderboard {
+
+    /** 종족별 다른 러너들의 누적 거리(km). 고정값이라 순위가 흔들리지 않는다. */
+    private fun baseKm(faction: Faction): Double = when (faction) {
+        Faction.FIRE -> 12_840.5
+        Faction.WATER -> 11_930.2
+        Faction.LIGHTNING -> 13_505.8
+        Faction.WIND -> 10_460.4
+    }
+
+    fun build(myKm: Map<Faction, Double>, myFaction: Faction?): List<FactionRank> =
+        Faction.entries
+            .map { faction ->
+                val mine = myKm[faction] ?: 0.0
+                FactionRank(
+                    rank = 0,
+                    faction = faction,
+                    km = baseKm(faction) + mine,
+                    myKm = mine,
+                    isMine = faction == myFaction,
+                )
+            }
+            .sortedWith(compareByDescending<FactionRank> { it.km }.thenBy { it.faction.ordinal })
+            .mapIndexed { index, row -> row.copy(rank = index + 1) }
 }

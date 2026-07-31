@@ -37,6 +37,7 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Terrain
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -64,6 +65,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -73,6 +75,7 @@ import com.giwa.strideup.BuildConfig
 import com.giwa.strideup.R
 import com.giwa.strideup.domain.CourseRewards
 import com.giwa.strideup.domain.GeoPoint
+import com.giwa.strideup.domain.RunVerdict
 import com.giwa.strideup.domain.RewardEconomy
 import com.giwa.strideup.domain.RunCourse
 import com.giwa.strideup.domain.normalizedTrack
@@ -574,6 +577,43 @@ fun RunScreen(
             }
         }
 
+        // 러닝 중 실시간 경고 — 왜 거리가 안 늘어나는지 바로 알 수 있게 한다
+        if (session.isActive && session.flaggedSegments > 0) {
+            item {
+                val voided = session.liveVerdict == RunVerdict.VOID
+                GlowCard(contentPadding = PaddingValues(14.dp), spacing = 5.dp) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(9.dp),
+                    ) {
+                        Icon(
+                            Icons.Filled.Warning,
+                            contentDescription = null,
+                            tint = if (voided) Color(0xFFFF6B4A) else Color(0xFFFFC24F),
+                            modifier = Modifier.size(17.dp),
+                        )
+                        Text(
+                            text = stringResource(
+                                if (voided) R.string.run_void_title else R.string.run_flagged_title,
+                            ),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = Snow,
+                        )
+                    }
+                    Text(
+                        text = if (voided) {
+                            stringResource(R.string.run_void_body)
+                        } else {
+                            stringResource(R.string.run_flagged_body, session.flaggedSegments)
+                        },
+                        fontSize = 11.sp,
+                        color = Silver,
+                        lineHeight = 17.sp,
+                    )
+                }
+            }
+        }
+
         session.lastRewardPoints?.let { points ->
             item {
                 GlowCard(accent = true, contentPadding = PaddingValues(22.dp), spacing = 11.dp) {
@@ -604,15 +644,37 @@ fun RunScreen(
                             )
                         }
                         HairlineDivider()
-                        Text(
-                            text = stringResource(
-                                R.string.run_rewarded,
-                                "%,d".format(session.lastRewardedSteps),
-                                "%,d".format(session.lastSessionSteps),
-                            ),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Silver,
-                        )
+                        if (session.lastVerdict == RunVerdict.VOID) {
+                            Text(
+                                text = stringResource(R.string.run_void_title),
+                                style = MaterialTheme.typography.titleSmall,
+                                color = Color(0xFFFF6B4A),
+                            )
+                            Text(
+                                text = stringResource(R.string.run_void_body),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Silver,
+                                textAlign = TextAlign.Center,
+                            )
+                        } else {
+                            Text(
+                                text = stringResource(
+                                    R.string.run_rewarded,
+                                    "%,d".format(session.lastRewardedSteps),
+                                    "%,d".format(session.lastSessionSteps),
+                                ),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Silver,
+                            )
+                            if (session.lastTopSpeedKmh > 0.0) {
+                                Text(
+                                    text = stringResource(R.string.run_top_speed) +
+                                        " · %.1f km/h".format(session.lastTopSpeedKmh),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Volt,
+                                )
+                            }
+                        }
                         if (session.lastPartySize > 1) {
                             Text(
                                 text = stringResource(

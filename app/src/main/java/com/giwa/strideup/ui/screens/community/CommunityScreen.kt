@@ -175,13 +175,15 @@ private fun BoardTab(
 ) {
     val posts by viewModel.boardPosts.collectAsStateWithLifecycle()
     val filter by viewModel.categoryFilter.collectAsStateWithLifecycle()
-    val weeklySteps by viewModel.weeklySteps.collectAsStateWithLifecycle()
     val balance by viewModel.balance.collectAsStateWithLifecycle()
     var query by rememberSaveable { mutableStateOf("") }
 
     val meLabel = stringResource(R.string.rank_me)
-    val myRank = remember(weeklySteps, balance, meLabel) {
-        Leaderboard.build(RankBoard.WEEKLY_STEPS, meLabel, weeklySteps, balance)
+    val topSpeed by viewModel.topSpeedKmh.collectAsStateWithLifecycle()
+    val activeSec by viewModel.totalActiveSec.collectAsStateWithLifecycle()
+    // 티저는 적립 랭킹을 보여준다 — 세 부문 중 누구에게나 값이 있는 축이다
+    val myRank = remember(topSpeed, activeSec, balance, meLabel) {
+        Leaderboard.build(RankBoard.TOTAL_SUP, meLabel, topSpeed, activeSec, balance)
             .first { it.isMe }
             .rank
     }
@@ -200,7 +202,7 @@ private fun BoardTab(
             item {
                 RankingTeaser(
                     rank = myRank,
-                    weeklySteps = weeklySteps,
+                    balance = balance,
                     onClick = onOpenRanking,
                 )
             }
@@ -390,7 +392,7 @@ private fun FlashRunWindow(
 }
 
 @Composable
-private fun RankingTeaser(rank: Int, weeklySteps: Long, onClick: () -> Unit) {
+private fun RankingTeaser(rank: Int, balance: Double, onClick: () -> Unit) {
     GlowCard(
         modifier = Modifier
             .quietClickable(onClick)
@@ -428,7 +430,7 @@ private fun RankingTeaser(rank: Int, weeklySteps: Long, onClick: () -> Unit) {
                     text = stringResource(
                         R.string.ranking_teaser,
                         rank,
-                        "%,d".format(weeklySteps),
+                        "%,.0f".format(balance),
                     ),
                     fontSize = 11.sp,
                     color = Silver,

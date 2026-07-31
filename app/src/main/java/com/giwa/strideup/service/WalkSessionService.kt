@@ -23,6 +23,8 @@ import com.giwa.strideup.core.ServiceLocator
 import com.giwa.strideup.data.local.WalkSessionEntity
 import com.giwa.strideup.domain.GeoPoint
 import com.giwa.strideup.domain.RewardEconomy
+import com.giwa.strideup.domain.RunIntegrity
+import com.giwa.strideup.domain.RunVerdict
 import com.giwa.strideup.domain.haversineMeters
 import com.giwa.strideup.domain.simplify
 import kotlinx.coroutines.CoroutineScope
@@ -63,11 +65,27 @@ data class WalkSessionState(
      * 러닝 중 화면을 나갔다 돌아와도 랩이 사라지거나 꼬이지 않는다.
      */
     val laps: List<RunLap> = emptyList(),
-    /** GPS로 기록한 이번 세션의 실제 경로 */
+    /** GPS로 기록한 이번 세션의 실제 경로 — 사람 속도로 인정된 구간만 담긴다 */
     val track: List<GeoPoint> = emptyList(),
     /** 최근에 GPS 좌표를 받았는지 (지도 카드 GPS 배지) */
     val gpsFix: Boolean = false,
-)
+    /** GPS로 잰 유효 거리(km). 속도 상한을 넘긴 구간은 빠져 있다. */
+    val gpsKm: Double = 0.0,
+    /** 이번 세션의 최고 속도(km/h) — 사람 범위 안의 값만 */
+    val topSpeedKmh: Double = 0.0,
+    /** 사람 속도로 인정된 GPS 구간 수 */
+    val validSegments: Int = 0,
+    /** 속도 상한을 넘겨 버려진 구간 수 */
+    val flaggedSegments: Int = 0,
+    /** 마지막 세션의 판정 (종료 직후 화면 표시용) */
+    val lastVerdict: RunVerdict = RunVerdict.CLEAN,
+    val lastTopSpeedKmh: Double = 0.0,
+    val lastGpsKm: Double = 0.0,
+) {
+    /** 러닝 중 실시간 판정 — 화면에 경고 배지를 띄우는 근거 */
+    val liveVerdict: RunVerdict
+        get() = RunIntegrity.verdict(validSegments, flaggedSegments, steps, elapsedSec)
+}
 
 /**
  * 워킹 세션을 추적하는 포그라운드 서비스(health 타입).
@@ -88,15 +106,38 @@ class WalkSessionService : Service() {
     private val locationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
             val p = GeoPoint(location.latitude, location.longitude)
+            val now = System.currentTimeMillis()
+            // 속도 판정 기준점은 트랙과 따로 든다. 튄 구간의 점은 트랙에 넣지
+            // 않지만 기준점은 옮겨야, 다음 구간이 연쇄로 튀지 않는다.
+            val prev = speedAnchor
+            val prevAt = speedAnchorAt
+            speedAnchor = p
+            speedAnchorAt = now
+
+            val meters = if (prev == null) 0.0 else haversineMeters(prev, p)
+            val seconds = if (prevAt == 0L) 0L else (now - prevAt) / 1000
+            val plausible = prev == null || RunIntegrity.isPlausible(meters, seconds)
+
             // 걸음 수집기·타이머와 서로 덮어쓰지 않게 원자적으로 갱신한다
             _state.update { current ->
                 if (!current.isActive || current.isPaused) return@update current
-                val track = current.track
-                if (track.isEmpty() || haversineMeters(track.last(), p) >= 8.0) {
-                    current.copy(track = track + p, gpsFix = true)
-                } else {
-                    current.copy(gpsFix = true)
+                if (!plausible) {
+                    // 사람이 낼 수 없는 속도 — 거리도, 경로도 남기지 않는다
+                    return@update current.copy(
+                        gpsFix = true,
+                        flaggedSegments = current.flaggedSegments + 1,
+                    )
                 }
+                val track = current.track
+                val moved = track.isEmpty() || haversineMeters(track.last(), p) >= 8.0
+                val counted = prev != null && meters >= RunIntegrity.MIN_SEGMENT_METERS
+                current.copy(
+                    track = if (moved) track + p else track,
+                    gpsFix = true,
+                    gpsKm = if (counted) current.gpsKm + meters / 1000 else current.gpsKm,
+                    validSegments = if (counted) current.validSegments + 1 else current.validSegments,
+                    topSpeedKmh = RunIntegrity.updateTopSpeed(current.topSpeedKmh, meters, seconds),
+                )
             }
         }
 
@@ -137,6 +178,10 @@ class WalkSessionService : Service() {
         locationManager = null
     }
 
+    /** 속도 판정용 직전 좌표와 시각. GPS 리스너(메인 루퍼)에서만 만진다. */
+    private var speedAnchor: GeoPoint? = null
+    private var speedAnchorAt: Long = 0L
+
     /** 세션 걸음 집계 기준점. 첫 실측값 방출로 초기화된다(null = 아직 미정). */
     private var lastTodaySteps: Int? = null
     private var settling = false
@@ -155,6 +200,8 @@ class WalkSessionService : Service() {
 
     private fun startSession(partySize: Int) {
         if (_state.value.isActive) return
+        speedAnchor = null
+        speedAnchorAt = 0L
         createChannel()
         // 위치 권한이 있을 때만 location 타입을 함께 선언한다 —
         // 권한 없이 선언하면 API 34+에서 시작 자체가 거부된다.
@@ -251,23 +298,47 @@ class WalkSessionService : Service() {
             } else {
                 session.partySize
             }
-            val reward = ServiceLocator.rewardRepository.settleSession(session.steps, settleSize)
+            // 러닝으로 볼 수 없는 세션은 여기서 걸러진다 — 걸음 0으로 정산해
+            // 적립도, 에너지 소모도, 코스 완주도 일어나지 않게 한다.
+            val verdict = RunIntegrity.verdict(
+                validSegments = session.validSegments,
+                flaggedSegments = session.flaggedSegments,
+                steps = session.steps,
+                elapsedSec = session.elapsedSec,
+            )
+            val creditedSteps = if (verdict.isRewardable) session.steps else 0
+            val reward = ServiceLocator.rewardRepository.settleSession(creditedSteps, settleSize)
             ServiceLocator.database.walkSessionDao().insert(
                 WalkSessionEntity(
                     startedAt = session.startedAt,
                     endedAt = System.currentTimeMillis(),
-                    steps = session.steps,
-                    durationSec = session.elapsedSec,
-                    distanceMeters = RewardEconomy.distanceMeters(session.steps),
-                    calories = RewardEconomy.calories(session.steps),
+                    steps = creditedSteps,
+                    durationSec = if (verdict.isRewardable) session.elapsedSec else 0,
+                    distanceMeters = RewardEconomy.distanceMeters(creditedSteps),
+                    calories = RewardEconomy.calories(creditedSteps),
                     pointsEarned = reward.points,
                 )
             )
-            // 코스 완주 정산 — 거리 1km당 정량 SUP. 코스 미선택이면 조용히 지나간다.
-            runCatching {
-                ServiceLocator.courseRepository.grantCompletionIfFinished(
-                    RewardEconomy.distanceMeters(session.steps) / 1000,
-                )
+            if (verdict.isRewardable) {
+                // 코스 완주 정산 — 거리 1km당 정량 SUP. 코스 미선택이면 조용히 지나간다.
+                runCatching {
+                    ServiceLocator.courseRepository.grantCompletionIfFinished(
+                        RewardEconomy.distanceMeters(creditedSteps) / 1000,
+                    )
+                }
+                // 랭킹 재료 — 최고 속도와, 착용 신발의 종족별 누적 거리.
+                // 거리는 GPS 실측이 있으면 그걸 쓰고, 없으면 걸음 환산으로 대체한다.
+                runCatching {
+                    val prefs = ServiceLocator.userPrefs
+                    prefs.recordTopSpeed(session.topSpeedKmh)
+                    val km = if (session.gpsKm > 0.0) {
+                        session.gpsKm
+                    } else {
+                        RewardEconomy.distanceMeters(creditedSteps) / 1000
+                    }
+                    val faction = ServiceLocator.database.sneakerDao().equippedNow()?.faction
+                    if (km > 0.0 && faction != null) prefs.addFactionKm(faction, km)
+                }
             }
             // 방금 달린 트랙을 남겨 "코스 만들기"의 재료로 쓴다
             if (session.track.size >= 2) {
@@ -278,6 +349,9 @@ class WalkSessionService : Service() {
                 lastRewardedSteps = reward.rewardedSteps,
                 lastSessionSteps = session.steps,
                 lastPartySize = settleSize,
+                lastVerdict = verdict,
+                lastTopSpeedKmh = session.topSpeedKmh,
+                lastGpsKm = session.gpsKm,
             )
             // 파티런이었다면 크루 로비를 결과 화면으로 전환한다.
             if (session.partySize > 1) {
