@@ -80,13 +80,34 @@ GIWA 메인넷(Chain ID 9134)은 준비 중입니다. RPC가 공개되면 `.env`
 
 ### Step 2 — `.env` 만들기
 
+> **먼저 Node.js가 있어야 합니다.** 명령창에 `node -v` 를 쳐서 버전이 안 나오면
+> https://nodejs.org 에서 **LTS**를 설치하고 **명령창을 껐다가 다시 켜세요.**
+
+**Windows (명령 프롬프트)**
+
+```bat
+cd C:\stepup\GIWASTEPN\contracts
+copy .env.example .env
+notepad .env
+```
+
+**macOS · Linux**
+
 ```bash
 cd contracts
 cp .env.example .env
 ```
 
-`.env`를 열어 `DEPLOYER_PRIVATE_KEY`에 Step 1에서 복사한 키를 붙여넣고
-저장합니다. 나머지 항목은 테스트넷에서는 비워도 됩니다.
+열린 파일에 두 줄을 채우고 저장합니다.
+
+```
+DEPLOYER_PRIVATE_KEY=0x배포용_계정의_개인키
+ATTESTER_ADDRESS=0x심판용_계정의_주소
+```
+
+`DEPLOYER_PRIVATE_KEY`는 **개인키**, `ATTESTER_ADDRESS`는 **주소**입니다.
+헷갈리기 쉬우니 한 번 더 확인하세요. 심판(어테스터) 계정은 서명만 하므로
+가스비가 필요 없고, 그 개인키는 나중에 Cloudflare Secret으로 따로 넣습니다.
 
 `.env`는 `.gitignore`에 있어 커밋되지 않습니다.
 
@@ -136,12 +157,14 @@ GIWA 익스플로러는 Blockscout이라 **API 키가 필요 없습니다.** 이
 
 ### Step 6 — 배포 기록 커밋
 
-```bash
+```bat
 cd ..
 git add contracts/deployments/giwaSepolia.json
 git commit -m "chore: record GIWA Sepolia deployment"
 git push -u origin claude/work-history-pjm57c
 ```
+
+> Windows·macOS·Linux 모두 같은 명령입니다.
 
 주소가 저장소에 남아야 심사자가 코드와 배포본을 대조할 수 있습니다.
 
