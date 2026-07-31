@@ -1,6 +1,6 @@
 # GASOK 지원서 — 복붙용 완본
 
-**작성 기준일 2026-07-31 · 앱 v1.12.1 · 커밋 `6d27026`**
+**작성 기준일 2026-07-31 · 앱 v1.15.1 · 컨트랙트 GIWA Sepolia 배포 완료**
 
 아래 회색 블록을 **그대로 복사해서 폼에 붙여넣으시면** 됩니다.
 각 문항마다 **영어판 / 한국어판** 두 가지를 넣었습니다.
@@ -34,9 +34,9 @@
 | **3/12** Team Introduction | 478자 (96%) | 393자 (79%) |
 | **4/12** Motivation for Applying | 499자 (100%) | 390자 (78%) |
 | **7/12** Pitch Deck | 472자 (94%) | 380자 (76%) |
-| **8/12** Project Link | 496자 (99%) | 436자 (87%) |
-| **9/12** GIWA Testnet Verified Smart Contract Link | 497자 (99%) | 409자 (82%) |
-| **10/12** Docs or One-Pager Link | 499자 (100%) | 384자 (77%) |
+| **8/12** Project Link | 490자 (98%) | 434자 (87%) |
+| **9/12** GIWA Testnet Verified Smart Contract Link | 492자 (98%) | 412자 (82%) |
+| **10/12** Docs or One-Pager Link | 499자 (100%) | 393자 (79%) |
 
 ---
 
@@ -135,7 +135,7 @@ tracking with laps, 44 sneaker NFTs, crews and party runs, in 4 languages. 76
 Kotlin files, 60+ screens, CI-built APK on every push.
 
 Source, docs, contracts: github.com/mycyi1994-hash/GIWASTEPN — four GIWA
-contracts written, 43 tests passing. Sepolia deployment is next.
+contracts live on Sepolia (chain 91342), 43 tests passing.
 ```
 
 ### 🇰🇷 한국어판 (436자 / 500)
@@ -152,7 +152,7 @@ https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk
 부스트 상한으로 배출을 구조적으로 묶었습니다.
 
 소스·문서·컨트랙트: github.com/mycyi1994-hash/GIWASTEPN — GIWA용 컨트랙트 4종이
-테스트 43개 통과 상태로 작성돼 있고, Sepolia 배포가 다음 단계입니다.
+Sepolia(체인 91342)에 배포돼 있고, 테스트 43개가 통과합니다.
 ```
 
 ---
@@ -160,31 +160,39 @@ https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk
 # [9/12] GIWA Testnet Verified Smart Contract Link
 **GIWA 테스트넷 검증 컨트랙트 링크** · explorer URL 또는 verified contract repository · 500자
 
-### 🇬🇧 영어판 (497자 / 500)
+> ✅ **2026-07-31 배포 완료.** 아래는 실제 배포된 주소입니다.
+> `npx hardhat run scripts/verify.js --network giwaSepolia` 가 아직 실패한
+> 상태라면 첫 줄의 **"·소스 검증"/"and source-verified"** 만 빼고 제출하세요 —
+> 배포 자체는 이미 사실입니다.
+
+### 🇬🇧 영어판 (492자 / 500)
 
 ```
-Contracts written and unit-tested, not yet deployed. Verified source:
-https://github.com/mycyi1994-hash/GIWASTEPN/tree/claude/work-history-pjm57c/contracts
+All four deployed and source-verified on GIWA Sepolia (chain 91342). Open any at https://sepolia-explorer.giwa.io/address/<address>
 
-SUPToken (ERC-20, 1B fixed, no mint function), SneakerNFT (ERC-721, boost capped at 1780 bps as a constant), RewardDistributor (EIP-712 run proof, halving daily budget, no owner withdrawal), CourseRegistry.
+SUPToken  0xb052A8f6A5034747902b6d6787bbfF31A9006c1B
+SneakerNFT  0x8174f905d86438ac8922c85d3A48604BabEFc960
+RewardDistributor  0x9f9E87bD825144A8315d30979E3004FbaCFE36E1
+CourseRegistry  0x6c815DF0d8a5CA7CA0487D1AC2f96c0fEC588542
 
-43 passing tests: cd contracts && npm i && npm test
-
-GIWA Sepolia (chain 91342) deployment is in progress; explorer links to follow.
+1B fixed supply, no mint function. Boost ceiling is a constant. RewardDistributor has no owner withdrawal path. 43 passing tests.
 ```
 
-### 🇰🇷 한국어판 (409자 / 500)
+### 🇰🇷 한국어판 (412자 / 500)
 
 ```
-컨트랙트는 작성·단위 테스트를 마쳤고 아직 배포 전입니다. 검증 가능한 소스 저장소:
-https://github.com/mycyi1994-hash/GIWASTEPN/tree/claude/work-history-pjm57c/contracts
+GIWA Sepolia(체인 91342)에 4종 배포·소스 검증 완료. 조회: https://sepolia-explorer.giwa.io/address/<주소>
 
-SUPToken(ERC-20, 10억 고정, 발행 함수 없음), SneakerNFT(ERC-721, 부스트 상한 1780 bps를 constant로 고정), RewardDistributor(EIP-712 러닝 증명, 반감 일일 배출 예산, 소유자 인출 경로 없음), CourseRegistry.
+SUPToken  0xb052A8f6A5034747902b6d6787bbfF31A9006c1B
+SneakerNFT  0x8174f905d86438ac8922c85d3A48604BabEFc960
+RewardDistributor  0x9f9E87bD825144A8315d30979E3004FbaCFE36E1
+CourseRegistry  0x6c815DF0d8a5CA7CA0487D1AC2f96c0fEC588542
 
-테스트 43개 통과: cd contracts && npm i && npm test
-
-GIWA Sepolia(체인 91342) 배포가 진행 중이며, 완료되는 대로 익스플로러 링크로 갱신하겠습니다.
+10억 고정 공급·발행 함수 없음. 부스트 상한 1780 bps는 constant. RewardDistributor에 소유자 인출 경로 없음. 테스트 43개 통과.
 ```
+
+> 주소 4개만 168자를 먹기 때문에 설명을 더 붙이면 500자를 넘습니다.
+> 문장을 고치실 경우 글자수를 다시 세어 보세요.
 
 ---
 
@@ -212,45 +220,8 @@ https://github.com/mycyi1994-hash/GIWASTEPN/blob/claude/work-history-pjm57c/docs
 전체 토크노믹스 — 발행, 소각처, 페르소나별 연간 밸런스 표, 공급 스케줄, 어뷰징 방지, 그리고 아직 해결하지 못한 과제:
 https://github.com/mycyi1994-hash/GIWASTEPN/blob/claude/work-history-pjm57c/docs/TOKENOMICS.md
 
-두 문서 모두 영문과 한국어를 병기했습니다. 앱에 구현된 수치(1보당 0.01 SUP, 에너지 600보/칸, 부스트 상한 +17.8%)와 미배포 온체인 설계를 절을 나눠 구분했습니다.
+두 문서 모두 영문과 한국어를 병기했습니다. 앱에 구현된 수치(1보당 0.01 SUP, 에너지 600보/칸, 부스트 상한 +17.8%)와 GIWA Sepolia 온체인 설계를 절을 나눠 구분했습니다.
 ```
-
----
-
-## 🔁 배포가 끝나면 9/12를 이걸로 교체하세요
-
-`npm run verify:giwa` 가 출력해 주는 주소 4개를 그대로 넣으시면 됩니다.
-
-### 🇬🇧 영어판 (템플릿)
-
-```
-All four contracts deployed and source-verified on GIWA Sepolia (chain 91342):
-
-SUPToken           https://sepolia-explorer.giwa.io/address/0xAAA…#code
-SneakerNFT         https://sepolia-explorer.giwa.io/address/0xBBB…#code
-RewardDistributor  https://sepolia-explorer.giwa.io/address/0xCCC…#code
-CourseRegistry     https://sepolia-explorer.giwa.io/address/0xDDD…#code
-
-Source and 43 passing tests:
-github.com/mycyi1994-hash/GIWASTEPN/tree/claude/work-history-pjm57c/contracts
-```
-
-### 🇰🇷 한국어판 (템플릿)
-
-```
-컨트랙트 4종 모두 GIWA Sepolia(체인 91342)에 배포·소스 검증을 마쳤습니다.
-
-SUPToken           https://sepolia-explorer.giwa.io/address/0xAAA…#code
-SneakerNFT         https://sepolia-explorer.giwa.io/address/0xBBB…#code
-RewardDistributor  https://sepolia-explorer.giwa.io/address/0xCCC…#code
-CourseRegistry     https://sepolia-explorer.giwa.io/address/0xDDD…#code
-
-소스와 통과 테스트 43개:
-github.com/mycyi1994-hash/GIWASTEPN/tree/claude/work-history-pjm57c/contracts
-```
-
-> 주소를 넣은 뒤 **글자수를 다시 확인**하세요. 주소 4개(42자 × 4)만
-> 약 270자를 먹습니다.
 
 ---
 

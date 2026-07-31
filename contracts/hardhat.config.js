@@ -99,8 +99,12 @@ module.exports = {
     ],
   },
 
+  // Sourcify는 GIWA(91342 / 9134)를 아직 모른다. 켜 두면 Blockscout 검증이
+  // 통과한 뒤에도 Sourcify 단계에서 "Failed to send contract verification
+  // request"로 터져, 성공한 검증이 실패로 보고된다. 실제로 CourseRegistry가
+  // 그렇게 나왔다. Blockscout만 쓴다.
   sourcify: {
-    enabled: true,
+    enabled: false,
   },
 
   gasReporter: {

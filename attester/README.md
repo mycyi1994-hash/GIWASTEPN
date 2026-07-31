@@ -50,8 +50,10 @@
 
 ## 배포 (5분)
 
-> **선행 조건:** 컨트랙트가 GIWA Sepolia에 배포되어 있어야 한다.
-> [`../contracts/README.md`](../contracts/README.md) 참고.
+> **선행 조건 — 이미 충족됐다.** 컨트랙트 4종은 2026-07-31에 GIWA Sepolia
+> (91342)에 배포됐고, `wrangler.toml`의 `DISTRIBUTOR_ADDRESS`도 실제 주소
+> [`0x9f9E87bD…aCFE36E1`](https://sepolia-explorer.giwa.io/address/0x9f9E87bD825144A8315d30979E3004FbaCFE36E1)
+> 로 채워져 있다. 3번 항목은 건너뛰어도 된다.
 
 ### 1. 어테스터 전용 지갑 만들기
 
@@ -64,12 +66,18 @@ MetaMask → 계정 추가 → 새 계정 → 이름 "StepUp 어테스터" → �
 
 ### 2. 컨트랙트에 어테스터 주소 알려주기
 
+> **지금 배포된 컨트랙트는 이 단계가 필요하다.** 2026-07-31 배포 시
+> `ATTESTER_ADDRESS`를 지정하지 않아 **어테스터가 배포자 계정과 같다.**
+> 1번에서 만든 전용 지갑으로 반드시 바꿔야 한다 — 안 그러면 배포자 개인키를
+> 클라우드에 올리게 된다.
+
 배포할 때 `ATTESTER_ADDRESS`로 넣었다면 이미 끝났다. 아니라면 배포자 계정으로
 한 번 호출한다.
 
 ```
-sepolia-explorer.giwa.io/address/<RewardDistributor>?tab=write_contract
-  → setAttester(<어테스터 주소>)
+https://sepolia-explorer.giwa.io/address/0x9f9E87bD825144A8315d30979E3004FbaCFE36E1?tab=write_contract
+  → Connect Wallet (배포자 계정으로)
+  → setAttester(<1번에서 만든 어테스터 주소>)
 ```
 
 ### 3. Worker 설정
@@ -79,7 +87,8 @@ cd attester
 npm install
 ```
 
-`wrangler.toml`의 `DISTRIBUTOR_ADDRESS`를 실제 주소로 바꾼다.
+`wrangler.toml`의 `DISTRIBUTOR_ADDRESS`는 이미 배포된 주소로 채워져 있다.
+다른 네트워크에 다시 배포했을 때만 손대면 된다.
 
 ### 4. 서명 키를 Secret으로
 

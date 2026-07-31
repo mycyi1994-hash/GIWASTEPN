@@ -3,9 +3,10 @@ main = "src/index.js"
 compatibility_date = "2026-01-01"
 compatibility_flags = ["nodejs_compat"]
 
-# 배포 후 실제 주소로 바꾼다 (npm run deploy:giwa 가 출력해 준다)
+# GIWA Sepolia (91342) 에 배포된 RewardDistributor
+# https://sepolia-explorer.giwa.io/address/0x9f9E87bD825144A8315d30979E3004FbaCFE36E1
 [vars]
-DISTRIBUTOR_ADDRESS = "0x0000000000000000000000000000000000000000"
+DISTRIBUTOR_ADDRESS = "0x9f9E87bD825144A8315d30979E3004FbaCFE36E1"
 
 # 서명 키는 vars 가 아니라 Secret 으로 넣는다:
 #   npx wrangler secret put ATTESTER_PRIVATE_KEY

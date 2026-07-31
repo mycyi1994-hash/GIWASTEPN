@@ -234,7 +234,19 @@ settled on-chain — the client already produces exactly the per-session
 ## ⛓️ Contracts
 
 Solidity 0.8.28 · OpenZeppelin 5.x · Hardhat · **43 passing tests** ·
-target chain **GIWA Sepolia (91342)** · not yet deployed
+**live on GIWA Sepolia (91342)** since 2026-07-31
+
+| Deployed | Address |
+|---|---|
+| `SUPToken` | [`0xb052A8f6…9006c1B`](https://sepolia-explorer.giwa.io/address/0xb052A8f6A5034747902b6d6787bbfF31A9006c1B) |
+| `SneakerNFT` | [`0x8174f905…BabEFc960`](https://sepolia-explorer.giwa.io/address/0x8174f905d86438ac8922c85d3A48604BabEFc960) |
+| `RewardDistributor` | [`0x9f9E87bD…aCFE36E1`](https://sepolia-explorer.giwa.io/address/0x9f9E87bD825144A8315d30979E3004FbaCFE36E1) |
+| `CourseRegistry` | [`0x6c815DF0…C588542`](https://sepolia-explorer.giwa.io/address/0x6c815DF0d8a5CA7CA0487D1AC2f96c0fEC588542) |
+
+The reward pool holds 50,000,000 SUP (5% of supply). Full record:
+[`contracts/deployments/giwaSepolia.json`](contracts/deployments/giwaSepolia.json).
+The app still settles locally — wiring the client to these contracts is the
+next step, and this README will say so plainly until it is done.
 
 | Contract | Standard | What it guarantees |
 |---|---|---|
@@ -595,7 +607,19 @@ APK를 다시 빌드해 [`apk-dist`](../../tree/apk-dist) 브랜치에 강제 �
 ## ⛓️ 컨트랙트
 
 Solidity 0.8.28 · OpenZeppelin 5.x · Hardhat · **테스트 43개 통과** ·
-대상 체인 **GIWA Sepolia (91342)** · 배포 전
+2026-07-31 **GIWA Sepolia (91342) 배포 완료**
+
+| 배포된 컨트랙트 | 주소 |
+|---|---|
+| `SUPToken` | [`0xb052A8f6…9006c1B`](https://sepolia-explorer.giwa.io/address/0xb052A8f6A5034747902b6d6787bbfF31A9006c1B) |
+| `SneakerNFT` | [`0x8174f905…BabEFc960`](https://sepolia-explorer.giwa.io/address/0x8174f905d86438ac8922c85d3A48604BabEFc960) |
+| `RewardDistributor` | [`0x9f9E87bD…aCFE36E1`](https://sepolia-explorer.giwa.io/address/0x9f9E87bD825144A8315d30979E3004FbaCFE36E1) |
+| `CourseRegistry` | [`0x6c815DF0…C588542`](https://sepolia-explorer.giwa.io/address/0x6c815DF0d8a5CA7CA0487D1AC2f96c0fEC588542) |
+
+리워드 풀에 5천만 SUP(전체 공급의 5%)가 들어가 있습니다. 전체 기록은
+[`contracts/deployments/giwaSepolia.json`](contracts/deployments/giwaSepolia.json).
+**앱은 아직 로컬에서 정산합니다.** 클라이언트를 이 컨트랙트에 붙이는 것이 다음
+단계이고, 끝나기 전까지 이 README는 그 사실을 그대로 적어 둡니다.
 
 | 컨트랙트 | 표준 | 보장하는 것 |
 |---|---|---|

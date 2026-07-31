@@ -231,16 +231,17 @@ before the users are counted.
 | | Today | Next |
 |---|---|---|
 | Client | **Shipped, installable** | — |
-| Contracts | **Written, 43 tests passing** | Deploy + verify on GIWA Sepolia |
-| SUP | Local ledger (Room) | ERC-20 on GIWA |
-| NFT | 44 designs, mint/upgrade/equip working | ERC-721 |
-| Settlement | On-device `RewardEconomy` | `RewardDistributor` |
-| Wallet | Ledger + withdrawal UX in place | Connect + withdraw |
+| Contracts | **Live on GIWA Sepolia, 43 tests passing** | Mainnet + external audit |
+| SUP | **ERC-20 deployed**, 1B fixed, 50M in the reward pool | App claims against it |
+| NFT | 44 designs working in-app; `SneakerNFT` deployed | Mint on chain, metadata on IPFS |
+| Settlement | On-device `RewardEconomy` | `RewardDistributor` (deployed, not yet called) |
+| Wallet | Ledger + withdrawal UX in place | Connect + claim |
 
-> **Nothing is deployed yet, and we are not claiming otherwise.** The four
-> contracts are written and tested; the client already emits exactly the
-> per-session record they consume. What is missing is a testnet deployment and
-> the attester service.
+> **The contracts are on chain; the app is not connected to them yet, and we
+> are not claiming otherwise.** All four deployed to GIWA Sepolia on 2026-07-31.
+> The client already emits exactly the per-session record they consume. What is
+> missing is the wallet-connect and claim path in the app, and deploying the
+> attester service that signs those claims.
 
 *Visual: two-column status table, "Today" column mostly green.*
 
@@ -512,15 +513,16 @@ rate(d) = min(1, B(d) / Σ claimScore(d))
 | | 현재 | 다음 |
 |---|---|---|
 | 클라이언트 | **완성, 설치 가능** | — |
-| 컨트랙트 | **작성 완료, 테스트 43개 통과** | GIWA Sepolia 배포·검증 |
-| SUP | 로컬 원장(Room) | GIWA의 ERC-20 |
-| NFT | 44종, 민팅·강화·착용 동작 | ERC-721 |
-| 정산 | 기기 내 `RewardEconomy` | `RewardDistributor` |
-| 지갑 | 원장 + 출금 UX 구현됨 | 연결 + 출금 |
+| 컨트랙트 | **GIWA Sepolia 배포 완료, 테스트 43개 통과** | 메인넷 + 외부 감사 |
+| SUP | **ERC-20 배포 완료**, 10억 고정, 리워드 풀 5천만 | 앱에서 청구 |
+| NFT | 44종 앱 내 동작, `SneakerNFT` 배포 완료 | 온체인 민팅, 메타데이터 IPFS |
+| 정산 | 기기 내 `RewardEconomy` | `RewardDistributor` (배포됨, 아직 호출 안 함) |
+| 지갑 | 원장 + 출금 UX 구현됨 | 연결 + 청구 |
 
-> **아직 배포된 것은 없고, 그렇지 않은 척하지 않습니다.** 컨트랙트 4종은 작성과
-> 테스트를 마쳤고, 클라이언트는 그것들이 소비할 세션 레코드를 이미 그대로
-> 생성합니다. 빠진 것은 테스트넷 배포와 어테스터 서비스입니다.
+> **컨트랙트는 체인 위에 있고, 앱은 아직 거기 연결돼 있지 않습니다. 그렇지 않은
+> 척하지 않습니다.** 2026-07-31에 4종 모두 GIWA Sepolia에 배포했습니다.
+> 클라이언트는 그것들이 소비할 세션 레코드를 이미 그대로 생성합니다. 빠진 것은
+> 앱의 지갑 연결·청구 경로와, 그 청구에 서명할 어테스터 서비스 배포입니다.
 
 *비주얼: 2단 현황 표, "현재" 열이 대부분 초록.*
 

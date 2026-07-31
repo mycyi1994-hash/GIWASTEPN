@@ -1,0 +1,37 @@
+{
+  "network": "giwaSepolia",
+  "chainId": 91342,
+  "deployedAt": "2026-07-31",
+  "deployer": "0xe96a75e86e25BF4c3d56b17ECfad5aEe39046FF7",
+  "treasury": "0xe96a75e86e25BF4c3d56b17ECfad5aEe39046FF7",
+  "attester": "0xe96a75e86e25BF4c3d56b17ECfad5aEe39046FF7",
+  "roller": "0xe96a75e86e25BF4c3d56b17ECfad5aEe39046FF7",
+  "baseURI": "ipfs://REPLACE_WITH_CID/",
+  "rewardPoolFunded": "50000000.0",
+  "contracts": {
+    "SUPToken": {
+      "address": "0xb052A8f6A5034747902b6d6787bbfF31A9006c1B",
+      "args": ["0xe96a75e86e25BF4c3d56b17ECfad5aEe39046FF7"]
+    },
+    "SneakerNFT": {
+      "address": "0x8174f905d86438ac8922c85d3A48604BabEFc960",
+      "args": [
+        "0xb052A8f6A5034747902b6d6787bbfF31A9006c1B",
+        "0xe96a75e86e25BF4c3d56b17ECfad5aEe39046FF7",
+        "0xe96a75e86e25BF4c3d56b17ECfad5aEe39046FF7",
+        "ipfs://REPLACE_WITH_CID/"
+      ]
+    },
+    "RewardDistributor": {
+      "address": "0x9f9E87bD825144A8315d30979E3004FbaCFE36E1",
+      "args": [
+        "0xb052A8f6A5034747902b6d6787bbfF31A9006c1B",
+        "0xe96a75e86e25BF4c3d56b17ECfad5aEe39046FF7"
+      ]
+    },
+    "CourseRegistry": {
+      "address": "0x6c815DF0d8a5CA7CA0487D1AC2f96c0fEC588542",
+      "args": ["0xe96a75e86e25BF4c3d56b17ECfad5aEe39046FF7"]
+    }
+  }
+}

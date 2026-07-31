@@ -104,12 +104,17 @@ Full model, balance tables per persona, supply schedule and open questions:
 | Courses | Room, shared in-app | `CourseRegistry` — publicly verifiable authorship |
 | Wallet | Ledger + withdrawal UX in place | GIWA wallet connect + withdraw |
 
-**The contracts are written and tested; nothing is deployed yet, and we are not
-claiming otherwise.** [`contracts/`](../contracts/) holds all four in Solidity
-0.8.28 with **43 passing tests** that assert the on-chain constants match the
-client's — including that the boost ceiling really is 1780 bps and that the
-reward pool has no owner withdrawal path. What remains is a testnet deployment
-and the attester service, not the app and not the contract code.
+**All four contracts are live on GIWA Sepolia (chain 91342) as of 2026-07-31**,
+with 50M SUP funded into the reward pool —
+[`contracts/deployments/giwaSepolia.json`](../contracts/deployments/giwaSepolia.json).
+They carry **43 passing tests** asserting the on-chain constants match the
+client's, including that the boost ceiling really is 1780 bps and that the
+reward pool has no owner withdrawal path.
+
+**What is not done, stated plainly:** the app still settles locally. It does not
+yet connect a wallet or claim on chain, and the attester service is written and
+tested but not deployed. That wiring is the remaining work — not the app, not
+the contracts.
 
 ## 8. Roadmap
 
@@ -248,11 +253,15 @@ StepUp은 **완결된 컨슈머 러닝 앱**입니다 — GPS 코스 기록, 랩
 | 코스 | Room 저장, 앱 내 공유 | `CourseRegistry` — 작성자 공개 검증 |
 | 지갑 | 원장 + 출금 UX 구현됨 | GIWA 지갑 연결 + 출금 |
 
-**컨트랙트는 작성·테스트를 마쳤고, 아직 배포되지 않았습니다. 그렇지 않은 척하지
-않습니다.** [`contracts/`](../contracts/)에 4종이 Solidity 0.8.28로 들어 있고,
+**2026-07-31 기준 컨트랙트 4종 모두 GIWA Sepolia(체인 91342)에 배포돼 있고**,
+리워드 풀에 5천만 SUP가 들어가 있습니다 —
+[`contracts/deployments/giwaSepolia.json`](../contracts/deployments/giwaSepolia.json).
 온체인 상수가 앱과 일치하는지 확인하는 **테스트 43개가 통과**합니다 — 부스트
 천장이 실제로 1780 bps인지, 리워드 풀에 소유자 인출 경로가 없는지까지 포함합니다.
-남은 것은 테스트넷 배포와 어테스터 서비스이지, 앱도 컨트랙트 코드도 아닙니다.
+
+**안 된 것도 그대로 적습니다.** 앱은 아직 로컬에서 정산합니다. 지갑을 연결하지도,
+체인에 청구하지도 않습니다. 어테스터 서비스도 작성·테스트는 끝났지만 배포 전입니다.
+남은 것은 그 연결이지, 앱도 컨트랙트도 아닙니다.
 
 ## 8. 로드맵
 

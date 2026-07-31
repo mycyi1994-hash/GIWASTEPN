@@ -222,14 +222,17 @@ A 세션이 이 영상의 핵심입니다. **반드시 실제로 걸으면서** 
 > **Where we actually are**
 >
 > ✅ App: shipped, installable APK
-> ✅ Contracts: written, 43 tests passing
-> ⏳ Next: deploy on **GIWA Sepolia** (chain 91342)
+> ✅ Contracts: deployed on **GIWA Sepolia** (chain 91342), 43 tests passing
+> ⏳ Next: the app claims on chain
 >
 > github.com/mycyi1994-hash/GIWASTEPN
 
-> ⚠️ **여기서 과장하면 안 됩니다.** "Live on GIWA" 같은 문구를 쓰면, 심사자가
-> 익스플로러에서 확인하는 순간 프로젝트 전체의 신뢰가 무너집니다. 아직
-> 배포 전이라는 사실을 먼저 말하는 쪽이 훨씬 강합니다.
+> ⚠️ **여기서 과장하면 안 됩니다.** 컨트랙트는 2026-07-31에 GIWA Sepolia에
+> 올라갔으니 "deployed on GIWA Sepolia"는 사실입니다. 하지만 **앱은 아직 그
+> 컨트랙트에 청구하지 않습니다.** 영상에서 앱 화면의 SUP 숫자를 보여주면서
+> "온체인"이라고 말하면 안 됩니다 — 그 숫자는 아직 로컬 원장입니다.
+> 익스플로러에서 확인당하는 순간 신뢰가 무너지는 종류의 과장입니다.
+> 안 된 것을 먼저 말하는 쪽이 언제나 더 강합니다.
 
 ---
 
@@ -318,7 +321,7 @@ tracking with laps, 44 sneaker NFTs, crews and party runs, in 4 languages. 76
 Kotlin files, 60+ screens, CI-built APK on every push.
 
 Source, docs, contracts: github.com/mycyi1994-hash/GIWASTEPN — four GIWA
-contracts written, 43 tests passing. Sepolia deployment is next.
+contracts live on Sepolia (chain 91342), 43 tests passing.
 ```
 
 ### 한국어 버전 (실제 링크 삽입 시 436자 / 500자)
@@ -335,7 +338,7 @@ https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk
 부스트 상한으로 배출을 구조적으로 묶었습니다.
 
 소스·문서·컨트랙트: github.com/mycyi1994-hash/GIWASTEPN — GIWA용 컨트랙트 4종이
-테스트 43개 통과 상태로 작성돼 있고, Sepolia 배포가 다음 단계입니다.
+Sepolia(체인 91342)에 배포돼 있고, 테스트 43개가 통과합니다.
 ```
 
 > 두 버전 모두 유튜브 링크를 넣은 실제 길이 기준으로 500자 이내입니다.
@@ -359,8 +362,8 @@ https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk
 **편집 후**
 - [ ] 전체 길이 3분 미만
 - [ ] GPS 경로가 자라는 구간이 최소 10초 이상 보임
-- [ ] 마지막 카드에 **"deploy on GIWA Sepolia is next"** 가 들어감
-- [ ] 배포 전인데 "Live on GIWA" 같은 문구가 없는지
+- [ ] 마지막 카드에 **"deployed on GIWA Sepolia (chain 91342)"** 가 들어감
+- [ ] 앱 화면의 SUP 숫자를 "온체인"이라고 말하지 않았는지 (아직 로컬 원장)
 - [ ] 개인정보 노출 없음 (전화번호, 실명, 위치 상세, 알림 내용)
 
 **업로드 후**

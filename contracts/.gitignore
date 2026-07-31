@@ -13,3 +13,6 @@ coverage.json
 # 로컬 테스트 배포 기록 (실제 네트워크 배포 기록은 커밋한다)
 deployments/hardhat.json
 deployments/localhost.json
+
+# scripts/standard-json.js 가 만드는 수동 검증용 파일 — 컴파일하면 다시 나온다
+verification/

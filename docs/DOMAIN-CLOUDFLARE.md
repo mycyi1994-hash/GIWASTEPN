@@ -161,7 +161,7 @@ CI-built APK on every push.
 Demo video (2m30s): <VIDEO_URL>
 
 Source, docs and contracts: github.com/mycyi1994-hash/GIWASTEPN — four GIWA
-contracts written, 60 tests passing. Sepolia deployment is next.
+contracts live on Sepolia (chain 91342), 43 tests passing.
 ```
 
 > 붙여넣은 뒤 폼의 글자 수 표시가 500을 넘지 않는지 확인하세요.

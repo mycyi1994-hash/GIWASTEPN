@@ -17,6 +17,25 @@
 
 ---
 
+## 배포 현황 — GIWA Sepolia (chain 91342)
+
+**2026-07-31 배포 완료.** 리워드 풀에 5천만 SUP(전체 공급의 5%)가 들어가 있습니다.
+
+| 컨트랙트 | 주소 |
+|---|---|
+| `SUPToken` | [`0xb052A8f6A5034747902b6d6787bbfF31A9006c1B`](https://sepolia-explorer.giwa.io/address/0xb052A8f6A5034747902b6d6787bbfF31A9006c1B) |
+| `SneakerNFT` | [`0x8174f905d86438ac8922c85d3A48604BabEFc960`](https://sepolia-explorer.giwa.io/address/0x8174f905d86438ac8922c85d3A48604BabEFc960) |
+| `RewardDistributor` | [`0x9f9E87bD825144A8315d30979E3004FbaCFE36E1`](https://sepolia-explorer.giwa.io/address/0x9f9E87bD825144A8315d30979E3004FbaCFE36E1) |
+| `CourseRegistry` | [`0x6c815DF0d8a5CA7CA0487D1AC2f96c0fEC588542`](https://sepolia-explorer.giwa.io/address/0x6c815DF0d8a5CA7CA0487D1AC2f96c0fEC588542) |
+
+기계가 읽는 형태: [`deployments/giwaSepolia.json`](deployments/giwaSepolia.json)
+
+> **테스트넷 배포라 treasury·attester·roller가 모두 배포자 계정입니다.**
+> 메인넷에서는 treasury를 멀티시그로, 어테스터를 별도 키로 분리해야 합니다.
+> 어테스터 분리는 배포자 계정으로 `setAttester(주소)` 한 번이면 됩니다.
+
+---
+
 ## 설계에서 중요한 세 가지
 
 **1. 발행 상한이 파라미터가 아니라 `constant`입니다.**
@@ -180,6 +199,29 @@ CourseRegistry     https://sepolia-explorer.giwa.io/address/0x…#code
 
 GIWA 익스플로러는 Blockscout이라 **API 키가 필요 없습니다.** 이미 검증된
 컨트랙트는 건너뛰므로 재실행해도 안전합니다.
+
+#### `Unexpected token '<', "<!DOCTYPE "...` 가 나오면
+
+익스플로러가 JSON 대신 HTML 오류 페이지를 돌려준 것입니다. **컨트랙트가 잘못된
+것이 아닙니다** — Blockscout이 큰 페이로드나 연속 요청에서 종종 이럽니다.
+
+1. **그냥 한 번 더 실행하세요.** 스크립트가 간격을 벌려가며 세 번까지 자동으로
+   다시 보내고, 마지막에는 hardhat이 뭐라 하든 **익스플로러에 직접 물어서**
+   최종 상태(`✓`/`✗`)를 찍습니다.
+2. 몇 번을 해도 같은 컨트랙트에서 막히면 **웹 화면에서 직접 올립니다.**
+
+   ```bash
+   npm run standard-json:giwa
+   ```
+
+   컨트랙트별 **Standard JSON Input** 파일과 **ABI 인코딩된 생성자 인자**를
+   `verification/` 에 뽑아 주고, 각 컨트랙트의 검증 페이지 주소를 함께
+   출력합니다. 그 화면에서 `Solidity (Standard JSON Input)` 을 고르고 파일과
+   인자를 넣으면 끝입니다.
+
+> **Sourcify는 꺼져 있습니다.** Sourcify가 GIWA 체인 ID를 아직 모르는데,
+> 켜 두면 Blockscout 검증이 통과한 뒤 Sourcify 단계에서 터져 **성공한 검증이
+> 실패로 보고됩니다.** 실제로 그 증상을 겪고 껐습니다.
 
 ### Step 6 — 배포 기록 커밋
 

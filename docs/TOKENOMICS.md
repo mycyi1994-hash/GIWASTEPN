@@ -197,13 +197,18 @@ Stated plainly, because grant reviewers should not have to guess:
   from the efforts of the team is offered or implied.
 - **SUP is not sold to users.** There is no token sale, no presale, no bonding
   curve in the product. The only way a user gets SUP is by moving.
-- **Today, SUP is not on-chain.** It is a local ledger (Room) inside the app.
-  §7 describes how that becomes an ERC-20 on GIWA. Nothing in this document
-  should be read as a claim that an on-chain SUP exists at the time of writing.
+- **SUP exists on GIWA Sepolia, not on a mainnet.** `SUPToken` is deployed at
+  [`0xb052A8f6…9006c1B`](https://sepolia-explorer.giwa.io/address/0xb052A8f6A5034747902b6d6787bbfF31A9006c1B)
+  on chain 91342 with the full 1,000,000,000 supply. It is a **testnet** token:
+  it has no price, no market, and no path to one. Nothing here should be read as
+  a claim that a tradable SUP exists.
+- **What a user earns in the app is still a local ledger.** The Room ledger has
+  not been wired to `RewardDistributor` yet. Until it is, the balance in the app
+  and the balance on chain are separate things, and this document says so.
 
 ---
 
-## 6. Supply and allocation *(proposed — not yet deployed)*
+## 6. Supply and allocation *(supply deployed; allocation still proposed)*
 
 | | |
 |---|---|
@@ -275,8 +280,10 @@ proves too steep, **without** raising the 1B cap.
 
 ### 7.3 Contracts
 
-Written and unit-tested in [`contracts/`](../contracts/) — Solidity 0.8.28,
-OpenZeppelin 5.x, 43 passing tests. Not yet deployed.
+In [`contracts/`](../contracts/) — Solidity 0.8.28, OpenZeppelin 5.x, 43 passing
+tests. **Deployed to GIWA Sepolia (91342) on 2026-07-31**; addresses in
+[`contracts/deployments/giwaSepolia.json`](../contracts/deployments/giwaSepolia.json).
+The reward pool holds 50M SUP. The app does not yet claim against it.
 
 | Contract | Standard | Responsibility |
 |---|---|---|
@@ -549,13 +556,18 @@ maxEnergy(레벨) = 10 + (레벨 − 1) × 2      칸
   제공하거나 암시하지 않습니다.
 - **SUP를 유저에게 판매하지 않습니다.** 프로덕트 안에 토큰 세일·프리세일·본딩
   커브가 없습니다. 유저가 SUP를 얻는 유일한 방법은 움직이는 것입니다.
-- **현재 SUP는 온체인이 아닙니다.** 앱 내부의 로컬 원장(Room)입니다. §7이 이것을
-  GIWA의 ERC-20으로 만드는 방법입니다. 이 문서의 어떤 문장도 작성 시점에
-  온체인 SUP가 존재한다는 뜻으로 읽혀서는 안 됩니다.
+- **SUP는 GIWA Sepolia에 있고, 메인넷에는 없습니다.** `SUPToken`이 체인 91342의
+  [`0xb052A8f6…9006c1B`](https://sepolia-explorer.giwa.io/address/0xb052A8f6A5034747902b6d6787bbfF31A9006c1B)
+  에 10억 전량과 함께 배포돼 있습니다. **테스트넷 토큰**이라 가격도, 시장도,
+  거기로 가는 경로도 없습니다. 이 문서의 어떤 문장도 거래 가능한 SUP가 존재한다는
+  뜻으로 읽혀서는 안 됩니다.
+- **앱에서 적립되는 것은 아직 로컬 원장입니다.** Room 원장을 아직
+  `RewardDistributor`에 연결하지 않았습니다. 연결 전까지 앱의 잔액과 체인의
+  잔액은 별개이고, 이 문서는 그 사실을 그대로 적습니다.
 
 ---
 
-## 6. 공급량과 배분 *(제안 — 미배포)*
+## 6. 공급량과 배분 *(공급은 배포 완료 · 배분은 제안)*
 
 | | |
 |---|---|
@@ -624,8 +636,11 @@ rate(d)  = min(1, B(d) / Σ claimScore(d))
 
 ### 7.3 컨트랙트
 
-[`contracts/`](../contracts/)에 작성·단위 테스트까지 되어 있습니다 — Solidity
-0.8.28, OpenZeppelin 5.x, 테스트 43개 통과. 아직 배포 전입니다.
+[`contracts/`](../contracts/) — Solidity 0.8.28, OpenZeppelin 5.x, 테스트 43개
+통과. **2026-07-31 GIWA Sepolia(91342)에 배포 완료**했고, 주소는
+[`contracts/deployments/giwaSepolia.json`](../contracts/deployments/giwaSepolia.json)
+에 있습니다. 리워드 풀에 5천만 SUP가 들어가 있습니다. 앱은 아직 여기에
+청구하지 않습니다.
 
 | 컨트랙트 | 표준 | 역할 |
 |---|---|---|

@@ -7,7 +7,8 @@
     "build": "hardhat compile",
     "test": "hardhat test",
     "deploy:giwa": "hardhat run scripts/deploy.js --network giwaSepolia",
-    "verify:giwa": "hardhat run scripts/verify.js --network giwaSepolia"
+    "verify:giwa": "hardhat run scripts/verify.js --network giwaSepolia",
+    "standard-json:giwa": "hardhat run scripts/standard-json.js --network giwaSepolia"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
