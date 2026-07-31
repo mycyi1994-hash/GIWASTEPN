@@ -36,7 +36,7 @@
 | **7/12** Pitch Deck | 472자 (94%) | 380자 (76%) |
 | **8/12** Project Link | 490자 (98%) | 434자 (87%) |
 | **9/12** GIWA Testnet Verified Smart Contract Link | 492자 (98%) | 412자 (82%) |
-| **10/12** 기술 문서 / 원페이저 링크 | 497자 (99%) | 387자 (77%) |
+| **10/12** 기술 문서 / 원페이저 링크 | 496자 (99%) | 389자 (78%) |
 
 ---
 
@@ -207,10 +207,10 @@ CourseRegistry  0x6c815DF0d8a5CA7CA0487D1AC2f96c0fEC588542
 · *제품 아키텍처와 기술 구현을 설명하는 GitBook / 백서 / 원페이저*
 
 > 📌 **문항이 요구하는 건 "제품 아키텍처와 기술 구현"입니다.** 그래서
-> 기술 문서를 새로 썼습니다 — **PDF 16쪽**
+> 기술 문서를 새로 썼습니다 — **영문 PDF 9쪽**
 > [`docs/StepUp-Architecture.pdf`](StepUp-Architecture.pdf), 원본 마크다운은
-> [`docs/ARCHITECTURE.md`](ARCHITECTURE.md)입니다. 원페이저는 제품·시장까지
-> 함께 다루지만, 이 문항이 정확히 묻는 것은 아키텍처 문서입니다.
+> 영문·한국어 병기인 [`docs/ARCHITECTURE.md`](ARCHITECTURE.md)입니다. 원페이저는
+> 제품·시장까지 함께 다루지만, 이 문항이 정확히 묻는 것은 아키텍처 문서입니다.
 >
 > **답변에는 PDF를 넣었습니다.** GitHub 링크를 열면 브라우저에서 바로 열리고,
 > 심사자가 내려받아 보관하기도 좋습니다. 마크다운을 선호하시면 URL 끝을
@@ -219,26 +219,26 @@ CourseRegistry  0x6c815DF0d8a5CA7CA0487D1AC2f96c0fEC588542
 > **⚠️ 이 링크는 문서가 `claude/work-history-pjm57c` 브랜치에 들어간 뒤에
 > 동작합니다.** (PR 머지 후) 시크릿 모드로 한 번 열어보고 붙여넣으세요.
 
-### 🇬🇧 영어판 (497자 / 500)
+### 🇬🇧 영어판 (496자 / 500)
 
 ```
-Technical documentation — product architecture and implementation (English + Korean, 16pp):
+Technical documentation — product architecture and implementation (9pp):
 https://github.com/mycyi1994-hash/GIWASTEPN/blob/claude/work-history-pjm57c/docs/StepUp-Architecture.pdf
 
 Three planes (Android client, Cloudflare Worker attester, four GIWA contracts), the sensor-to-SUP pipeline, GPS anti-cheat limits, the EIP-712 claim flow, the trust model, and what is not done. Every constant names its source file and how to re-run its tests.
 
-Markdown: same folder, ARCHITECTURE.md
+Markdown, English + Korean: same folder, ARCHITECTURE.md
 ```
 
-### 🇰🇷 한국어판 (387자 / 500)
+### 🇰🇷 한국어판 (389자 / 500)
 
 ```
-기술 문서 — 제품 아키텍처와 기술 구현(영문·한국어 병기, 16쪽):
+기술 문서 — 제품 아키텍처와 기술 구현(영문 9쪽):
 https://github.com/mycyi1994-hash/GIWASTEPN/blob/claude/work-history-pjm57c/docs/StepUp-Architecture.pdf
 
 세 개 층(안드로이드 클라이언트 · Cloudflare Worker 어테스터 · GIWA 컨트랙트 4종), 센서에서 SUP까지의 파이프라인, GPS 부정 방지 임계값, EIP-712 청구 흐름, 어테스터 키가 털려도 토큰이 인플레이션되지 않는 이유를 적은 신뢰 모델, 그리고 아직 안 된 것까지 담았습니다. 모든 상수에 출처 파일과 테스트를 다시 돌리는 명령을 붙였습니다.
 
-마크다운 원본: 같은 폴더의 ARCHITECTURE.md
+마크다운 원본(영문·한국어 병기): 같은 폴더의 ARCHITECTURE.md
 ```
 
 <details>
