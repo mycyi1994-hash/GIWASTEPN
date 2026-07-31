@@ -33,7 +33,7 @@
 |---|---:|---:|
 | **3/12** Team Introduction | 478자 (96%) | 393자 (79%) |
 | **4/12** Motivation for Applying | 499자 (100%) | 390자 (78%) |
-| **7/12** Pitch Deck | 472자 (94%) | 380자 (76%) |
+| **7/12** Pitch Deck | 496자 (99%) | 388자 (78%) |
 | **8/12** Project Link | 490자 (98%) | 434자 (87%) |
 | **9/12** GIWA Testnet Verified Smart Contract Link | 492자 (98%) | 412자 (82%) |
 | **10/12** Docs or One-Pager Link | 499자 (100%) | 393자 (79%) |
@@ -101,27 +101,30 @@ StepUp은 그에 대한 답입니다. 앱을 먼저 완성했고, 적립 상한�
 # [7/12] Pitch Deck
 **피치덱** · shareable link · 500자
 
-### 🇬🇧 영어판 (472자 / 500)
+### 🇬🇧 영어판 (496자 / 500)
 
 ```
-Pitch deck (15 slides, English and Korean):
-https://github.com/mycyi1994-hash/GIWASTEPN/blob/claude/work-history-pjm57c/docs/PITCH.md
+Pitch deck — 15 slides, PDF (16:9):
+https://github.com/mycyi1994-hash/GIWASTEPN/raw/claude/work-history-pjm57c/docs/StepUp-PitchDeck.pdf
 
-Covers the problem, why the last M2E cycle failed, our thesis (app first, +17.8% earning ceiling), the shipped product, the token economy with per-persona balance tables, the on-chain design for GIWA, current status, roadmap, team, and the ask.
+Covers the problem, why the last M2E cycle failed, our thesis (app first, +17.8% earning ceiling instead of 10x), the shipped product with real device screenshots, the token economy with per-persona balance tables, the on-chain design for GIWA, current status, roadmap, team and the ask.
 
-Each slide separates headline, body and visual direction, so it drops straight into slides.
+Markdown source, English and Korean, is in the same repo under docs/.
 ```
 
-### 🇰🇷 한국어판 (380자 / 500)
+### 🇰🇷 한국어판 (388자 / 500)
 
 ```
-피치덱(15장, 영문·한국어 병기):
-https://github.com/mycyi1994-hash/GIWASTEPN/blob/claude/work-history-pjm57c/docs/PITCH.md
+피치덱 — 15장, PDF (16:9):
+https://github.com/mycyi1994-hash/GIWASTEPN/raw/claude/work-history-pjm57c/docs/StepUp-PitchDeck.pdf
 
-문제 정의, 지난 M2E 사이클이 실패한 이유, 우리의 주장(앱 우선 · 적립 상한 +17.8%), 완성된 제품, 페르소나별 연간 밸런스 표가 있는 토큰 이코노미, GIWA 온체인 설계, 현재 상태, 로드맵, 팀, 요청 사항을 담았습니다.
+문제 정의, 지난 M2E 사이클이 실패한 이유, 우리의 주장(앱 우선 · 적립 상한이 10배가 아니라 +17.8%), 실제 기기 화면이 들어간 완성된 제품, 페르소나별 연간 밸런스 표가 있는 토큰 이코노미, GIWA 온체인 설계, 현재 정확한 진행 상황, 로드맵, 팀, 요청 사항을 담았습니다.
 
-3장을 "지난 사이클은 왜 실패했나"에 배정해 배율 사다리가 원인이었다는 진단을 먼저 내고, 4장에서 +17.8% 상한을 그 해답으로 제시하는 구성입니다. 각 장이 제목·본문·비주얼 지시로 분리돼 있어 그대로 슬라이드로 옮길 수 있습니다.
+영문·한국어 마크다운 원본: github.com/mycyi1994-hash/GIWASTEPN/blob/claude/work-history-pjm57c/docs/PITCH.md
 ```
+
+> PDF는 `docs/StepUp-PitchDeck.pdf` 에 있고, 만든 소스는 `docs/pitch-deck.html` 입니다.
+> 내용을 고치면 그 HTML을 고친 뒤 크로미움으로 다시 뽑으면 됩니다.
 
 ---
 
@@ -243,7 +246,7 @@ https://github.com/mycyi1994-hash/GIWASTEPN/blob/claude/work-history-pjm57c/docs
 | 문항 | 문서 |
 |---|---|
 | 3/12 | **별도 파일** (저장소 외부) — 실명·이력은 공개하지 않습니다 |
-| 7/12 | [`docs/PITCH.md`](PITCH.md) |
+| 7/12 | [`docs/StepUp-PitchDeck.pdf`](StepUp-PitchDeck.pdf) · 원본 [`docs/PITCH.md`](PITCH.md) |
 | 8/12 | [`docs/DEMO.md`](DEMO.md) (촬영 대본) · [APK](https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk) |
 | 9/12 | [`contracts/`](../contracts/) · [`contracts/README.md`](../contracts/README.md) (배포 6단계) |
 | 10/12 | [`docs/ONEPAGER.md`](ONEPAGER.md) · [`docs/TOKENOMICS.md`](TOKENOMICS.md) |
