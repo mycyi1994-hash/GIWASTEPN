@@ -72,7 +72,7 @@ belongs on chain where it cannot.
 | Pattern | MVVM + Repository, `StateFlow` end to end, no `LiveData` | `ui/screens/*/…ViewModel.kt` |
 | DI | Manual — one `object ServiceLocator`, wired in `Application.onCreate` | [`core/ServiceLocator.kt`](../app/src/main/java/com/giwa/strideup/core/ServiceLocator.kt) |
 | Persistence | Room 2.6.1 via KSP — `strideup.db`, **schema v6, 12 entities, 12 DAOs** | [`data/local/`](../app/src/main/java/com/giwa/strideup/data/local/) |
-| Settings | DataStore (`UserPrefs`) — step baselines, locale, goals, wallet | `data/prefs/UserPrefs.kt` |
+| Settings | DataStore (`UserPrefs`) — step baselines, energy and streak, locale, daily goal, selected course | `data/prefs/UserPrefs.kt` |
 | Domain | Pure Kotlin objects, no Android imports, unit-tested | [`domain/`](../app/src/main/java/com/giwa/strideup/domain/) |
 | i18n | 665 strings × ko / en / zh / ja + `localeConfig` in-app override | `res/values*/strings.xml` |
 
@@ -337,9 +337,9 @@ differ on how they accept multi-file sources.
 | The app is real | Install the [APK](https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk) on any Android 8.0+ phone |
 | The contracts are real | Open any address in §7 on `sepolia-explorer.giwa.io` |
 
-**Scale:** 81 Kotlin source files · 60+ screens · 665 strings × 4 languages ·
-Room schema v6 · 44 sneaker designs · 100 achievements · 60 runner levels ·
-73 tests across three codebases.
+**Scale:** 81 Kotlin source files · 23 navigation routes over 26 screen
+composables · 665 strings × 4 languages · Room schema v6 · 44 sneaker designs ·
+100 achievements · 60 runner levels · 73 tests across three codebases.
 
 ---
 
@@ -445,7 +445,7 @@ StepUp은 세 개의 층으로 나뉘고, **그 나눔 자체가 설계**입니�
 | 패턴 | MVVM + Repository, 전 구간 `StateFlow`, `LiveData` 미사용 | `ui/screens/*/…ViewModel.kt` |
 | DI | 수동 — `object ServiceLocator` 하나를 `Application.onCreate`에서 초기화 | [`core/ServiceLocator.kt`](../app/src/main/java/com/giwa/strideup/core/ServiceLocator.kt) |
 | 저장소 | Room 2.6.1 (KSP) — `strideup.db`, **스키마 v6, 엔티티 12개, DAO 12개** | [`data/local/`](../app/src/main/java/com/giwa/strideup/data/local/) |
-| 설정 | DataStore(`UserPrefs`) — 걸음 기준점, 언어, 목표, 지갑 | `data/prefs/UserPrefs.kt` |
+| 설정 | DataStore(`UserPrefs`) — 걸음 기준점, 에너지·스트릭, 언어, 일일 목표, 선택한 코스 | `data/prefs/UserPrefs.kt` |
 | 도메인 | 순수 Kotlin, 안드로이드 의존 없음, 단위 테스트 대상 | [`domain/`](../app/src/main/java/com/giwa/strideup/domain/) |
 | 다국어 | 문자열 665개 × ko / en / zh / ja + `localeConfig` 앱 내 언어 변경 | `res/values*/strings.xml` |
 
@@ -704,9 +704,9 @@ Solidity **0.8.28**, OpenZeppelin, Hardhat, **테스트 43개 통과**. 4종 모
 | 앱이 실재한다 | [APK](https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk)를 Android 8.0+ 기기에 설치 |
 | 컨트랙트가 실재한다 | §7의 주소를 `sepolia-explorer.giwa.io`에서 열기 |
 
-**규모:** Kotlin 81개 파일 · 60개 이상 화면 · 문자열 665개 × 4개 언어 · Room
-스키마 v6 · 스니커즈 44종 · 업적 100종 · 러너 레벨 60단계 · 세 코드베이스 합
-테스트 73개.
+**규모:** Kotlin 81개 파일 · 내비게이션 라우트 23개 / 화면 컴포저블 26개 ·
+문자열 665개 × 4개 언어 · Room 스키마 v6 · 스니커즈 44종 · 업적 100종 · 러너
+레벨 60단계 · 세 코드베이스 합 테스트 73개.
 
 ---
 
