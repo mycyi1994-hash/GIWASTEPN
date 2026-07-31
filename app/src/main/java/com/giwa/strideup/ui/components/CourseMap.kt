@@ -80,8 +80,11 @@ fun CourseTrackMap(
     }
 }
 
-/** 시드 고정 의사 도로망 — 지도 SDK 없이 "지도 위" 느낌을 만든다 */
-private fun DrawScope.drawStreets(seed: Int) {
+/**
+ * 시드 고정 의사 도로망 — 실제 타일을 못 받았을 때 까는 대체 배경.
+ * [LiveRouteMap]도 오프라인일 때 이걸 쓴다.
+ */
+internal fun DrawScope.drawStreets(seed: Int) {
     var s = seed * 92821 + 137
     fun rand(): Float {
         s = s * 1_103_515_245 + 12_345

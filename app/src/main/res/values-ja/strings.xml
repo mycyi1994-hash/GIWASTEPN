@@ -872,6 +872,8 @@ StepUp と走り出そう。</string>
     <string name="course_unshare">共有解除</string>
     <string name="course_runs">%1$d回走破</string>
     <string name="course_by">by %1$s</string>
+    <string name="map_open_google">Google マップで開く</string>
+    <string name="map_attribution">© OpenStreetMap</string>
     <string name="course_apply_title">このコースを適用しますか？</string>
     <string name="course_apply_body">%1$s · %2$s km\n完走すると %3$s SUP を獲得できます。</string>
     <string name="course_clear_title">コースの適用を解除しますか？</string>

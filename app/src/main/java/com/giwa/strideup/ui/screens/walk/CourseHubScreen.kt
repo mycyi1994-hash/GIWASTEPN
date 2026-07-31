@@ -50,11 +50,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.giwa.strideup.R
 import com.giwa.strideup.domain.CourseRewards
 import com.giwa.strideup.domain.RunCourse
-import com.giwa.strideup.domain.normalizedTrack
 import com.giwa.strideup.domain.trackDistanceKm
 import com.giwa.strideup.service.WalkSessionService
 import com.giwa.strideup.ui.components.CourseTrackMap
 import com.giwa.strideup.ui.components.DarkIconButton
+import com.giwa.strideup.ui.components.LiveRouteMap
 import com.giwa.strideup.ui.components.Eyebrow
 import com.giwa.strideup.ui.components.GhostButton
 import com.giwa.strideup.ui.components.GlowCard
@@ -475,8 +475,8 @@ private fun CourseMaker(
                     .background(Night)
                     .border(1.dp, Edge, RoundedCornerShape(18.dp)),
             ) {
-                CourseTrackMap(
-                    points = remember(lastTrack) { lastTrack.normalizedTrack() },
+                LiveRouteMap(
+                    points = lastTrack,
                     seed = lastTrack.size,
                     modifier = Modifier.fillMaxSize(),
                 )

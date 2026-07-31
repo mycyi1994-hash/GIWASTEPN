@@ -37,6 +37,7 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Terrain
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -76,14 +77,14 @@ import com.giwa.strideup.R
 import com.giwa.strideup.domain.CourseRewards
 import com.giwa.strideup.domain.GeoPoint
 import com.giwa.strideup.domain.RunVerdict
+import com.giwa.strideup.core.ExternalIntents
 import com.giwa.strideup.domain.RewardEconomy
 import com.giwa.strideup.domain.RunCourse
-import com.giwa.strideup.domain.normalizedTrack
 import com.giwa.strideup.service.RunLap
 import com.giwa.strideup.service.WalkSessionService
 import com.giwa.strideup.ui.StepPermissions
 import com.giwa.strideup.ui.components.BarMeter
-import com.giwa.strideup.ui.components.CourseTrackMap
+import com.giwa.strideup.ui.components.LiveRouteMap
 import com.giwa.strideup.ui.components.DarkIconButton
 import com.giwa.strideup.ui.components.EnergyMeter
 import com.giwa.strideup.ui.components.GhostButton
@@ -1156,30 +1157,65 @@ private fun CourseChallengeCard(
                 .fillMaxWidth()
                 .height(200.dp),
         ) {
+            // 지도에 그릴 좌표 — 달리는 중이면 내 실시간 경로가 우선이다.
+            // 코스를 골랐어도 "내가 지금 어디를 뛰고 있는지"가 더 급한 정보다.
+            val mapPoints = when {
+                liveTrack.size >= 2 -> liveTrack
+                course != null && course.hasTrack -> course.points
+                else -> emptyList()
+            }
             when {
-                course != null && course.hasTrack -> {
-                    val points = remember(course.id) { course.normalized() }
-                    val progress = if (course.distanceKm > 0) {
+                mapPoints.isNotEmpty() -> {
+                    val progress = if (course != null && course.distanceKm > 0) {
                         (sessionKm / course.distanceKm).toFloat().coerceIn(0f, 1f)
                     } else {
                         0f
                     }
-                    CourseTrackMap(
-                        points = points,
-                        seed = course.id.toInt(),
-                        progress = progress.takeIf { sessionKm > 0.005 },
+                    // 시드는 세션 내내 고정이어야 한다. 좌표 수로 만들면 8점마다
+                    // 폴백 도로망이 다시 추첨돼 배경이 눈앞에서 뒤바뀐다.
+                    val fallbackSeed = remember(course?.id, mapPoints.firstOrNull()) {
+                        course?.id?.toInt() ?: mapPoints.firstOrNull()?.let {
+                            (it.lat * 1e4).toInt() xor (it.lng * 1e4).toInt()
+                        } ?: 0
+                    }
+                    LiveRouteMap(
+                        points = mapPoints,
+                        seed = fallbackSeed,
+                        progress = progress.takeIf { course != null && sessionKm > 0.005 },
                         modifier = Modifier.fillMaxSize(),
                     )
                 }
 
-                // 코스는 없지만 GPS가 잡혀 있으면 지금 그리고 있는 실제 경로를 보여준다
-                liveTrack.size >= 2 -> CourseTrackMap(
-                    points = liveTrack.normalizedTrack(),
-                    seed = liveTrack.size / 8,
-                    modifier = Modifier.fillMaxSize(),
-                )
-
                 else -> RouteMap(Modifier.fillMaxSize())
+            }
+
+            // 앱 안 지도는 어디를 뛰었는지까지, 확대·길안내는 구글 지도로
+            if (mapPoints.size >= 2) {
+                val context = LocalContext.current
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(10.dp)
+                        .background(Night.copy(alpha = 0.82f), RoundedCornerShape(50))
+                        .border(1.dp, Edge, RoundedCornerShape(50))
+                        .quietClickable { ExternalIntents.openRouteInMaps(context, mapPoints) }
+                        .padding(horizontal = 10.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
+                ) {
+                    Icon(
+                        Icons.Filled.Map,
+                        contentDescription = null,
+                        tint = Volt,
+                        modifier = Modifier.size(13.dp),
+                    )
+                    Text(
+                        text = stringResource(R.string.map_open_google),
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Snow,
+                    )
+                }
             }
 
             // 오늘의 챌린지 + GPS 상태

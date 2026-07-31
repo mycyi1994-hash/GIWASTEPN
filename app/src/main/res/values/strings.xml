@@ -873,6 +873,8 @@ Start running with StepUp.</string>
     <string name="course_unshare">Unshare</string>
     <string name="course_runs">%1$d runs</string>
     <string name="course_by">by %1$s</string>
+    <string name="map_open_google">Open in Google Maps</string>
+    <string name="map_attribution">© OpenStreetMap</string>
     <string name="course_apply_title">Apply this course?</string>
     <string name="course_apply_body">%1$s · %2$s km\nFinish it and you earn %3$s SUP.</string>
     <string name="course_clear_title">Clear this course?</string>

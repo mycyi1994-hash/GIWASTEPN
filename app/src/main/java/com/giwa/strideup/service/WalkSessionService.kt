@@ -28,6 +28,7 @@ import com.giwa.strideup.domain.RunIntegrity
 import com.giwa.strideup.domain.RunVerdict
 import com.giwa.strideup.domain.haversineMeters
 import com.giwa.strideup.domain.simplify
+import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -308,6 +309,20 @@ class WalkSessionService : Service() {
                 elapsedSec = session.elapsedSec,
             )
             val creditedSteps = if (verdict.isRewardable) session.steps else 0
+
+            // 기준점을 **먼저** 올린다. 지급하고 나서 올리면 그 사이에 프로세스가
+            // 죽었을 때 백그라운드가 같은 걸음을 다시 지급한다. 순서가 곧 안전장치다.
+            //
+            // 더하지 않고 "지금 이 순간의 오늘 걸음 수"로 못 박는 이유는 두 가지다.
+            //  - 자정을 넘긴 세션이 어제 몫까지 오늘 기준점에 얹으면, 오늘 처음
+            //    걷는 그만큼이 통째로 사라진다.
+            //  - 일시정지 중 걸은 몫은 session.steps에 안 잡히므로, 더하기만으로는
+            //    기준점이 모자라 그 몫을 백그라운드가 다시 지급한다.
+            ServiceLocator.userPrefs.raiseAccountedTo(
+                LocalDate.now().toEpochDay(),
+                ServiceLocator.stepRepository.todaySteps.value,
+            )
+
             val reward = ServiceLocator.rewardRepository.settleSession(creditedSteps, settleSize)
             ServiceLocator.database.walkSessionDao().insert(
                 WalkSessionEntity(

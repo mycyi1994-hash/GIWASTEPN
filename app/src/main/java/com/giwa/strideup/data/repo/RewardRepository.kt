@@ -136,6 +136,51 @@ class RewardRepository(
         return reward
     }
 
+    /**
+     * 백그라운드 걸음 정산.
+     *
+     * 러닝 세션을 켜지 않고 걸은 걸음도 적립한다. 사람은 하루 종일 앱을 열어두지
+     * 않으므로, 세션 중에만 적립하면 실제로 움직인 대부분이 버려진다.
+     *
+     * 세션 적립과 다른 점은 두 가지다.
+     *  - 파티런 배율이 붙지 않는다. 같이 뛴 게 아니기 때문이다.
+     *  - GPS 속도 검증을 통과하지 않는다. 세션이 아니면 GPS를 켜지 않는다.
+     *    대신 [RewardEconomy]의 에너지 상한이 그대로 걸리고, 케이던스가 사람
+     *    범위를 벗어나면(폰 흔들기) 호출부에서 걸러진다.
+     *
+     * 알림은 띄우지 않는다. 하루에 열 번 넘게 울리면 그건 알림이 아니라 소음이다.
+     */
+    suspend fun settleBackground(steps: Int): SessionReward {
+        if (steps <= 0) return SessionReward(0, 0.0, 0.0)
+        val today = LocalDate.now().toEpochDay()
+        val energyRemaining = prefs.currentEnergy(today)
+        val equipped = sneakerDao.equippedNow()?.toDomain()
+
+        val earningMultiplier = equipped?.earningMultiplier
+            ?: RewardEconomy.sneakerMultiplier(prefs.sneakerLevel.first())
+        val energyEfficiency = equipped?.energyEfficiency ?: 1.0
+
+        val now = System.currentTimeMillis()
+        val xpBoosted = boostDao.activeOf(BoostType.XP_BOOSTER.id, now) != null
+        val boostMultiplier = if (xpBoosted) RewardEconomy.XP_BOOST_MULTIPLIER else 1.0
+
+        val reward = RewardEconomy.sessionReward(
+            walkedSteps = steps,
+            energyRemaining = energyRemaining,
+            earningMultiplier = earningMultiplier,
+            energyEfficiency = energyEfficiency,
+            boostMultiplier = boostMultiplier,
+        )
+
+        if (reward.points > 0) {
+            credit(RewardType.EARN_WALK, reward.points, "일상 걸음 적립 (${reward.rewardedSteps}보)")
+        }
+        if (reward.energyUsed > 0) {
+            prefs.consumeEnergy(today, reward.energyUsed)
+        }
+        return reward
+    }
+
     /** 레거시 레벨 기반 업그레이드 (스니커즈 인벤토리가 비어 있을 때의 폴백) */
     suspend fun upgradeSneaker(): Boolean {
         val level = prefs.sneakerLevel.first()

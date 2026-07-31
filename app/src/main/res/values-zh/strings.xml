@@ -871,6 +871,8 @@
     <string name="course_unshare">取消分享</string>
     <string name="course_runs">%1$d 次完成</string>
     <string name="course_by">by %1$s</string>
+    <string name="map_open_google">在谷歌地图中打开</string>
+    <string name="map_attribution">© OpenStreetMap</string>
     <string name="course_apply_title">要应用该路线吗？</string>
     <string name="course_apply_body">%1$s · %2$s km\n完成后可获得 %3$s SUP。</string>
     <string name="course_clear_title">要取消应用该路线吗？</string>
