@@ -12,6 +12,8 @@ Every number in this document is a constant you can open in the repository.
 
 [English](#1-system-overview) · [한국어 ↓](#한국어)
 
+📄 **[This document as a PDF (16pp)](StepUp-Architecture.pdf)**
+
 **[⬇️ APK](https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk)** · [Repository](https://github.com/mycyi1994-hash/GIWASTEPN) · [One-Pager](ONEPAGER.md) · [Tokenomics](TOKENOMICS.md) · [Contracts](../contracts/) · [Attester](../attester/)
 
 </div>
@@ -372,7 +374,6 @@ Room schema v6 · 44 sneaker designs · 100 achievements · 60 runner levels ·
 </div>
 
 ---
----
 
 <a name="한국어"></a>
 
@@ -385,6 +386,8 @@ Room schema v6 · 44 sneaker designs · 100 achievements · 60 runner levels ·
 
 `앱 v1.15.1` · 안드로이드 · Kotlin + Jetpack Compose · Cloudflare Worker 어테스터 ·
 컨트랙트 4종 **GIWA Sepolia(체인 91342)** 배포 완료
+
+📄 **[이 문서의 PDF (16쪽)](StepUp-Architecture.pdf)**
 
 **[⬇️ APK](https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk)** · [저장소](https://github.com/mycyi1994-hash/GIWASTEPN) · [원페이저](ONEPAGER.md) · [토크노믹스](TOKENOMICS.md) · [컨트랙트](../contracts/) · [어테스터](../attester/)
 

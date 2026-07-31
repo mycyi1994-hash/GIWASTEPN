@@ -83,7 +83,8 @@ install the APK from the link above on any Android 8.0+ phone.
 
 **Full detail:** system diagram, the sensor-to-SUP pipeline, anti-cheat
 thresholds, the EIP-712 claim flow and the trust model are in
-**[ARCHITECTURE.md](ARCHITECTURE.md)**.
+**[ARCHITECTURE.md](ARCHITECTURE.md)** — also as a
+[16-page PDF](StepUp-Architecture.pdf).
 
 ## 6. Token economy in five lines
 
@@ -236,7 +237,7 @@ StepUp은 **완결된 컨슈머 러닝 앱**입니다 — GPS 코스 기록, 랩
 
 **자세한 내용:** 시스템 구성도, 센서에서 SUP까지의 파이프라인, 부정 방지 임계값,
 EIP-712 청구 흐름, 신뢰 모델은 **[ARCHITECTURE.md](ARCHITECTURE.md)**에
-있습니다.
+있습니다 — [PDF 16쪽](StepUp-Architecture.pdf)으로도 있습니다.
 
 ## 6. 다섯 줄로 보는 토큰 이코노미
 
