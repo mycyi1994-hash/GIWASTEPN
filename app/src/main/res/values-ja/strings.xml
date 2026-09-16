@@ -653,8 +653,10 @@
 StepUp と走り出そう。</string>
     <string name="login_google">Google で続行</string>
     <string name="login_google_progress">ログイン中…</string>
-    <string name="login_guest">ゲストモードで見てみる</string>
-    <string name="login_terms">続行するとデモ利用規約に同意したことになります。実際のアカウント情報は収集しません。</string>
+    <string name="login_terms">続行すると利用規約とプライバシーポリシーに同意したものとみなされます。</string>
+    <string name="login_failed">ログインに失敗しました。もう一度お試しください。</string>
+    <string name="login_no_account">この端末にGoogleアカウントがありません。設定で追加してからお試しください。</string>
+    <string name="login_offline">サーバーに接続できません。通信環境をご確認ください。</string>
 
     <!-- Guide -->
     <string name="settings_guide">アプリガイド</string>

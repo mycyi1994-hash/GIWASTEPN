@@ -1,5 +1,8 @@
 package com.stepup.android.ui.screens.login
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,7 +19,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -33,6 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stepup.android.R
 import com.stepup.android.core.ServiceLocator
+import com.stepup.android.data.remote.GoogleIdResult
+import com.stepup.android.data.remote.TokenResult
 import com.stepup.android.ui.components.HexEmblem
 import com.stepup.android.ui.components.Wordmark
 import com.stepup.android.ui.components.quietClickable
@@ -40,27 +45,64 @@ import com.stepup.android.ui.theme.Night
 import com.stepup.android.ui.theme.Silver
 import com.stepup.android.ui.theme.Slate
 import com.stepup.android.ui.theme.Snow
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
  * 첫 진입 로그인.
  *
- * 구글 로그인 버튼과, 그 아래 작은 회색 "게스트 모드"를 둔다.
- * 아직 백엔드가 없어 구글 로그인은 데모 흐름(잠시 후 완료)으로 처리하고,
- * 선택 결과만 저장해 다음 실행부터는 이 화면을 건너뛴다.
+ * 로그인 수단은 구글 하나다. 기록이 서버에 쌓이려면 누구의 기록인지가 정해져야
+ * 하고, 그걸 정할 방법이 이것뿐이다.
+ *
+ * 로그인에 성공하기 전에는 이 화면을 벗어날 수 없다. 예전에는 "게스트로
+ * 둘러보기"가 있었지만, 게스트가 쌓은 기록은 기기를 바꾸는 순간 사라진다 —
+ * 그 상태로 몇 달 모은 뒤에 잃는 것보다 지금 한 번 탭하는 편이 낫다.
  */
 @Composable
 fun LoginScreen(onDone: () -> Unit) {
     var signingIn by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<Int?>(null) }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
-    // 구글 로그인 데모 흐름 — 스피너를 잠깐 보여주고 완료 처리
-    LaunchedEffect(signingIn) {
-        if (signingIn) {
-            delay(1400)
-            ServiceLocator.userPrefs.setLoginMethod("google")
-            onDone()
+    fun signIn() {
+        if (signingIn) return
+        val activity = context.findActivity()
+        if (activity == null) {
+            // 계정 선택 창을 띄울 화면이 없다. 정상 실행에서는 일어나지 않는다.
+            error = R.string.login_failed
+            return
+        }
+
+        signingIn = true
+        error = null
+        scope.launch {
+            try {
+                when (val id = ServiceLocator.googleSignIn.requestIdToken(activity)) {
+                    is GoogleIdResult.Ok -> {
+                        when (val session =
+                            ServiceLocator.sessionHolder.signInWithGoogle(id.idToken, id.nonce)) {
+                            is TokenResult.Ok -> {
+                                ServiceLocator.userPrefs.setLoginMethod("google")
+                                onDone()
+                            }
+                            // 서버가 토큰을 거절했다. 대개 설정 문제다 —
+                            // 클라이언트 ID 가 서버에 등록되지 않은 경우가 가장 흔하다.
+                            is TokenResult.SignInRequired -> error = R.string.login_failed
+                            is TokenResult.Unavailable -> error = R.string.login_offline
+                        }
+                    }
+
+                    // 사용자가 창을 닫았다. 본인이 한 일이므로 오류를 띄우지 않는다.
+                    GoogleIdResult.Cancelled -> Unit
+
+                    is GoogleIdResult.NoAccount -> error = R.string.login_no_account
+                    is GoogleIdResult.Failed -> error = R.string.login_failed
+                }
+            } finally {
+                // 성공하면 화면이 바뀌지만, 그 사이 무엇이 터져도 버튼이
+                // 영원히 도는 상태로 남으면 안 된다.
+                signingIn = false
+            }
         }
     }
 
@@ -98,13 +140,12 @@ fun LoginScreen(onDone: () -> Unit) {
             )
             Spacer(Modifier.height(18.dp))
 
-            // 구글 로그인 버튼
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(50))
                     .background(Color.White)
-                    .quietClickable { if (!signingIn) signingIn = true }
+                    .quietClickable { signIn() }
                     .padding(vertical = 15.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
@@ -121,7 +162,7 @@ fun LoginScreen(onDone: () -> Unit) {
                 Spacer(Modifier.size(10.dp))
                 Text(
                     text = stringResource(
-                        if (signingIn) R.string.login_google_progress else R.string.login_google
+                        if (signingIn) R.string.login_google_progress else R.string.login_google,
                     ),
                     color = Color(0xFF1F1F1F),
                     fontSize = 15.sp,
@@ -129,27 +170,20 @@ fun LoginScreen(onDone: () -> Unit) {
                 )
             }
 
-            Spacer(Modifier.height(16.dp))
-
-            // 게스트 모드 — 작고 회색으로
-            Text(
-                text = stringResource(R.string.login_guest),
-                modifier = Modifier
-                    .quietClickable {
-                        if (!signingIn) {
-                            scope.launch {
-                                ServiceLocator.userPrefs.setLoginMethod("guest")
-                                onDone()
-                            }
-                        }
-                    }
-                    .padding(8.dp),
-                fontSize = 12.sp,
-                color = Slate,
-                textAlign = TextAlign.Center,
-            )
-
             Spacer(Modifier.height(14.dp))
+
+            // 실패했으면 이유를 보여준다. 아무 말 없이 제자리면 사용자는
+            // 버튼이 고장 난 줄 안다.
+            error?.let { message ->
+                Text(
+                    text = stringResource(message),
+                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 12.sp,
+                    color = Color(0xFFFF6B6B),
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(Modifier.height(10.dp))
+            }
 
             Text(
                 text = stringResource(R.string.login_terms),
@@ -160,6 +194,21 @@ fun LoginScreen(onDone: () -> Unit) {
             )
         }
     }
+}
+
+/**
+ * 계정 선택 창을 띄우려면 화면(Activity)이 필요하다.
+ *
+ * Compose 의 LocalContext 가 늘 Activity 인 것은 아니다 — 테마를 감싸는
+ * 래퍼가 끼면 ContextWrapper 가 온다. 벗겨 내며 찾는다.
+ */
+private fun Context.findActivity(): Activity? {
+    var current: Context? = this
+    while (current is ContextWrapper) {
+        if (current is Activity) return current
+        current = current.baseContext
+    }
+    return null
 }
 
 /** 구글 'G' 글리프 */

@@ -652,8 +652,10 @@
 和 StepUp 一起开跑吧。</string>
     <string name="login_google">使用 Google 继续</string>
     <string name="login_google_progress">正在登录…</string>
-    <string name="login_guest">以访客模式浏览</string>
-    <string name="login_terms">继续即表示同意演示条款。不会收集真实账户信息。</string>
+    <string name="login_terms">继续即表示您同意服务条款与隐私政策。</string>
+    <string name="login_failed">登录失败，请重试。</string>
+    <string name="login_no_account">此设备上没有 Google 账号。请在系统设置中添加后重试。</string>
+    <string name="login_offline">无法连接服务器，请检查网络。</string>
 
     <!-- Guide -->
     <string name="settings_guide">使用指南</string>

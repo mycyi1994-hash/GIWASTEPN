@@ -61,6 +61,20 @@ android {
             "SUPABASE_URL",
             "\"${secret("SUPABASE_URL", "stepupSupabaseUrl") ?: "https://pupjzcmybuoyhzfwrsdf.supabase.co"}\"",
         )
+        // 구글 로그인에 쓰는 **웹** 클라이언트 ID.
+        //
+        // 안드로이드 클라이언트 ID 가 아니다. 헷갈리기 쉬운데, 안드로이드 쪽은
+        // "이 앱이 진짜 맞다"를 구글이 확인하는 용도로 등록만 해 두고 코드에는
+        // 넣지 않는다. 앱이 받는 ID 토큰의 수신자(aud)는 웹 클라이언트 ID 이고,
+        // 서버는 그 값으로 토큰을 검증한다.
+        //
+        // 공개 값이다 — APK 를 뜯으면 나오고, 이것만으로는 아무것도 못 한다.
+        buildConfigField(
+            "String",
+            "GOOGLE_WEB_CLIENT_ID",
+            "\"${secret("GOOGLE_WEB_CLIENT_ID", "stepupGoogleWebClientId")
+                ?: "201996080239-8hrgea5hfe58ank2f6rbbqnkk5ek2mf3.apps.googleusercontent.com"}\"",
+        )
         buildConfigField(
             "String",
             "SUPABASE_KEY",
@@ -178,6 +192,9 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services)
+    implementation(libs.google.id)
 
     testImplementation(libs.junit)
     debugImplementation(libs.androidx.compose.ui.tooling)

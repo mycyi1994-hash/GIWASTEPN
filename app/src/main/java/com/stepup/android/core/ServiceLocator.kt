@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.stepup.android.BuildConfig
 import com.stepup.android.data.local.AppDatabase
 import com.stepup.android.data.prefs.UserPrefs
+import com.stepup.android.data.remote.GoogleSignIn
 import com.stepup.android.data.remote.SessionHolder
 import com.stepup.android.data.remote.StepUpServer
 import com.stepup.android.data.remote.SupabaseAuth
@@ -59,6 +60,10 @@ object ServiceLocator {
     lateinit var sessionHolder: SessionHolder
         private set
 
+    /** 구글 계정을 받아 오는 쪽. 로그인 화면이 쓴다. */
+    lateinit var googleSignIn: GoogleSignIn
+        private set
+
     fun init(context: Context) {
         if (this::database.isInitialized) return
         val app = context.applicationContext
@@ -76,6 +81,7 @@ object ServiceLocator {
             .fallbackToDestructiveMigration()
             .build()
         userPrefs = UserPrefs(app)
+        googleSignIn = GoogleSignIn(BuildConfig.GOOGLE_WEB_CLIENT_ID)
         sessionHolder = SessionHolder(
             auth = SupabaseAuth(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_KEY),
             store = PrefsAuthSessionStore(userPrefs),

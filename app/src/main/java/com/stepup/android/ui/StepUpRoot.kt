@@ -148,11 +148,24 @@ fun StepUpRoot() {
     val guideSeen by ServiceLocator.userPrefs.guideSeen
         .collectAsState(initial = null)
 
+    // 로그인 표시와 실제 세션이 어긋나면 로그인 화면을 다시 띄운다.
+    //
+    // 표시만 보고 통과시키면, 세션을 잃은 사람이 로그인돼 있다고 믿으면서
+    // 아무것도 서버에 안 올라가는 상태로 계속 뛰게 된다. 조용히 기록을
+    // 잃는 것보다 한 번 더 로그인하는 편이 낫다.
+    var sessionChecked by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(loginMethod) {
+        if (loginMethod?.isNotEmpty() == true && !ServiceLocator.sessionHolder.isSignedIn()) {
+            ServiceLocator.userPrefs.setLoginMethod("")
+        }
+        sessionChecked = true
+    }
+
     Box(Modifier.fillMaxSize()) {
         NightCanvas(Modifier.fillMaxSize())
 
         when {
-            !ready || loginMethod == null || guideSeen == null ->
+            !ready || loginMethod == null || guideSeen == null || !sessionChecked ->
                 SplashScreen(onReady = { ready = true })
 
             loginMethod!!.isEmpty() -> LoginScreen(onDone = {})
