@@ -4,7 +4,7 @@
 -- 온체인으로 가지 않기로 했으므로 이 표가 유일한 보관처다.
 
 -- ── 일별 걸음 ──────────────────────────────────────────────────────
-create table public.daily_steps (
+create table if not exists public.daily_steps (
   user_id uuid not null references auth.users on delete cascade,
   -- LocalDate.toEpochDay() 와 같은 값. 시간대 문제를 피하려고 날짜를
   -- 타임스탬프가 아니라 "며칠째"로 센다 — 기기 시간대가 바뀌어도
@@ -20,7 +20,7 @@ comment on table public.daily_steps is
   '하루치 걸음 합계. 러닝 세션과 별개로 걸은 것까지 포함한다.';
 
 -- ── 러닝 세션 ──────────────────────────────────────────────────────
-create table public.walk_sessions (
+create table if not exists public.walk_sessions (
   id bigint generated always as identity primary key,
   user_id uuid not null references auth.users on delete cascade,
 
@@ -68,23 +68,56 @@ comment on column public.walk_sessions.points_awarded is
 
 -- 같은 세션이 두 번 올라오는 것을 막는다. 앱이 재시도할 때 응답을 못 받고
 -- 다시 보내면 중복 적립이 된다. (사용자, 시작시각)이면 충분히 유일하다.
-create unique index walk_sessions_user_started_unique
+create unique index if not exists walk_sessions_user_started_unique
   on public.walk_sessions (user_id, started_at);
 
-create index walk_sessions_user_recent
+create index if not exists walk_sessions_user_recent
   on public.walk_sessions (user_id, started_at desc);
+
+-- ── 첫 배포 뒤에 추가된 열 ─────────────────────────────────────────
+--
+-- 위의 create table 은 "없으면 만든다"라서, 이미 표가 있는 프로젝트는
+-- 통째로 건너뛴다. 나중에 늘어난 열은 여기서 따로 붙여야 그런 프로젝트에도
+-- 들어간다. setup.sql 을 다시 붙여넣어도 안전한 이유다.
+
+-- 정산 시점에 신고 있던 신발의 종족. 종족 랭킹의 재료다.
+alter table public.walk_sessions
+  add column if not exists faction text not null default '';
+
+-- 경로에서 서버가 직접 계산한 최고 속도. 앱이 보낸 값이 아니다 —
+-- 속도 랭킹이 있는 이상, 앱이 말하는 속도를 믿으면 랭킹은 타자 연습이 된다.
+alter table public.walk_sessions
+  add column if not exists top_speed_kmh double precision not null default 0;
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint
+     where conrelid = 'public.walk_sessions'::regclass
+       and conname = 'walk_sessions_faction_known'
+  ) then
+    alter table public.walk_sessions
+      add constraint walk_sessions_faction_known
+      check (faction in ('', 'FIRE', 'WATER', 'LIGHTNING', 'WIND'));
+  end if;
+end $$;
+
+comment on column public.walk_sessions.top_speed_kmh is
+  '서버가 GPS 경로에서 직접 계산한 구간 최고 속도. 경로가 없으면 0.';
 
 -- ── 권한 ───────────────────────────────────────────────────────────
 alter table public.daily_steps enable row level security;
 alter table public.walk_sessions enable row level security;
 
 -- 걸음은 본인 것만 읽고 쓴다.
+drop policy if exists daily_steps_own on public.daily_steps;
 create policy daily_steps_own
   on public.daily_steps for all
   using ((select auth.uid()) = user_id)
   with check ((select auth.uid()) = user_id);
 
 -- 세션은 본인 것만 읽는다.
+drop policy if exists walk_sessions_select_own on public.walk_sessions;
 create policy walk_sessions_select_own
   on public.walk_sessions for select
   using ((select auth.uid()) = user_id);

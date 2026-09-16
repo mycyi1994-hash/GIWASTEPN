@@ -24,5 +24,6 @@ class ServerSessionRecorder(private val server: StepUpServer) : SessionRecorder 
             track = session.track,
             boostBps = session.boostBps,
             partySize = session.partySize,
+            faction = session.faction,
         )
 }

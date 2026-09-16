@@ -4,7 +4,7 @@
 -- 곁에 프로필 표를 두어 1:1로 붙인다. 이렇게 두면 인증 방식이 바뀌어도
 -- (구글에서 애플로, 또는 익명 계정 추가) 프로필은 그대로 산다.
 
-create table public.profiles (
+create table if not exists public.profiles (
   -- auth.users 와 같은 id 를 쓴다. 계정이 지워지면 프로필도 함께 지워진다.
   id uuid primary key references auth.users on delete cascade,
 
@@ -53,6 +53,7 @@ begin
 end;
 $$;
 
+drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
@@ -68,6 +69,7 @@ begin
 end;
 $$;
 
+drop trigger if exists profiles_touch_updated_at on public.profiles;
 create trigger profiles_touch_updated_at
   before update on public.profiles
   for each row execute function public.touch_updated_at();
@@ -80,11 +82,13 @@ create trigger profiles_touch_updated_at
 alter table public.profiles enable row level security;
 
 -- 프로필은 서로 볼 수 있어야 한다 — 게시글 작성자, 크루 명단, 랭킹.
+drop policy if exists profiles_select_all on public.profiles;
 create policy profiles_select_all
   on public.profiles for select
   using (true);
 
 -- 고치는 것은 본인만.
+drop policy if exists profiles_update_own on public.profiles;
 create policy profiles_update_own
   on public.profiles for update
   using ((select auth.uid()) = id)

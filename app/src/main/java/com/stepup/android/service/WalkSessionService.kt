@@ -339,6 +339,10 @@ class WalkSessionService : Service() {
             // 부스트는 정산 **전에** 읽는다. 정산이 신발이나 크루 상태를 건드릴
             // 수 있으므로, 청구서에 적힐 값은 적립을 계산할 때 쓴 값이어야 한다.
             val boostBps = ServiceLocator.rewardRepository.equippedBoostBps()
+            // 종족도 같은 이유로 정산 전에 읽는다. 이 값이 종족 랭킹에서
+            // 이 거리가 어느 편에 쌓일지를 정한다.
+            val equippedFaction = ServiceLocator.database.sneakerDao().equippedNow()
+                ?.factionId?.let { Faction.of(it) }
             val reward = ServiceLocator.rewardRepository.settleSession(creditedSteps, settleSize)
             ServiceLocator.database.walkSessionDao().insert(
                 WalkSessionEntity(
@@ -355,6 +359,7 @@ class WalkSessionService : Service() {
                     track = RunTrack.encode(session.track),
                     boostBps = boostBps,
                     partySize = settleSize,
+                    faction = equippedFaction?.id.orEmpty(),
                 )
             )
             if (verdict.isRewardable) {
@@ -374,9 +379,7 @@ class WalkSessionService : Service() {
                     } else {
                         RewardEconomy.distanceMeters(creditedSteps) / 1000
                     }
-                    val faction = ServiceLocator.database.sneakerDao().equippedNow()
-                        ?.factionId?.let { Faction.of(it) }
-                    if (km > 0.0 && faction != null) prefs.addFactionKm(faction, km)
+                    if (km > 0.0 && equippedFaction != null) prefs.addFactionKm(equippedFaction, km)
                 }
             }
             // 방금 달린 트랙을 남겨 "코스 만들기"의 재료로 쓴다

@@ -17,14 +17,20 @@ HEADER = """-- ═════════════════════�
 --  Supabase 대시보드 → SQL Editor 에 이 파일 전체를 붙여넣고 Run 하세요.
 --  한 번에 다 만들어집니다.
 --
---  끝나면 왼쪽 Table Editor 에 표 4개가 보입니다:
---    profiles · daily_steps · walk_sessions · sup_ledger
+--  끝나면 왼쪽 Table Editor 에 표가 보입니다.
 --
 --  이 파일은 supabase/migrations/ 의 파일들을 순서대로 이어 붙인 것입니다.
 --  내용을 고칠 때는 그쪽을 고치고 scripts/build-setup-sql.py 로 다시 만드세요.
 -- ════════════════════════════════════════════════════════════════════
 
+-- 이 파일은 몇 번을 다시 붙여넣어도 안전합니다. 이미 있는 것은 건너뛰고,
+-- 달라진 규칙만 새로 씁니다. 기록은 지워지지 않습니다.
+
 begin;
+
+-- "없어서 건너뛴다"는 안내는 처음 설치할 때 잔뜩 나오는데, 문제가 아닌데도
+-- 문제처럼 보입니다. 경고 이상만 보여 줍니다.
+set local client_min_messages = warning;
 
 """
 

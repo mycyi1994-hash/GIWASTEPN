@@ -20,7 +20,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         CourseEntity::class,
         NotificationEntity::class,
     ],
-    version = 8,
+    version = 9,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -89,6 +89,19 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-        val MIGRATIONS = arrayOf(MIGRATION_6_7, MIGRATION_7_8)
+        /**
+         * 세션에 정산 시점 종족을 더한다.
+         *
+         * 기존 행은 빈 값으로 남는다. 그 세션들이 어느 신발로 달린 것인지는
+         * 이제 알 수 없고, 모르는 것을 아무 종족에나 얹으면 종족 순위가
+         * 지어낸 숫자가 된다.
+         */
+        val MIGRATION_8_9 = object : Migration(8, 9) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE walk_sessions ADD COLUMN faction TEXT NOT NULL DEFAULT ''")
+            }
+        }
+
+        val MIGRATIONS = arrayOf(MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9)
     }
 }

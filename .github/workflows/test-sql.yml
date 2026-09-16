@@ -1,0 +1,51 @@
+# 서버 스키마 검사.
+#
+# setup.sql 은 사용자가 대시보드에 직접 붙여넣는 파일이다. 붙여넣고 나서야
+# 틀린 것을 알면 이미 늦다 — 반쯤 적용된 데이터베이스를 손으로 되돌려야 한다.
+# 여기서 깨끗한 Postgres 에 두 번 올려 보고, 앱과 같은 권한으로 규칙을
+# 두드려 본다.
+#
+# 두 번 올리는 것이 핵심이다. 스키마는 앞으로도 늘어나고, 그때마다 사용자는
+# 같은 파일을 다시 붙여넣는다. "다시 붙여넣어도 안전하다"가 깨지면 그때부터
+# 스키마 변경은 사용자에게 수작업이 된다.
+name: Test server schema
+
+on:
+  push:
+    branches:
+      - "claude/**"
+      - "main"
+    paths:
+      - "supabase/**"
+      - "scripts/build-setup-sql.py"
+      - ".github/workflows/test-sql.yml"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: test-sql-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  schema:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # setup.sql 은 migrations/ 를 이어 붙인 결과물이다. 손으로 고치고
+      # 다시 만드는 것을 잊으면, 검사를 통과한 파일과 붙여넣는 파일이 달라진다.
+      - name: setup.sql 이 migrations 와 일치하는가
+        run: |
+          python3 scripts/build-setup-sql.py
+          if ! git diff --quiet -- supabase/setup.sql; then
+            echo "::error::supabase/setup.sql 이 migrations/ 와 다릅니다. scripts/build-setup-sql.py 를 실행해 다시 만들고 커밋하세요."
+            git --no-pager diff --stat -- supabase/setup.sql
+            exit 1
+          fi
+
+      - name: 스키마 검사
+        run: supabase/tests/run.sh

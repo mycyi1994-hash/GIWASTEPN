@@ -8,7 +8,7 @@
 --   - record_session()  적립. 서버가 걸음 수를 검사하고 금액을 직접 계산한다.
 --   - spend_sup()       소비. 잔고를 확인하고 차감한다.
 
-create table public.sup_ledger (
+create table if not exists public.sup_ledger (
   id bigint generated always as identity primary key,
   user_id uuid not null references auth.users on delete cascade,
 
@@ -35,10 +35,10 @@ create table public.sup_ledger (
 comment on table public.sup_ledger is
   'SUP 적립·사용 원장. 잔고는 이 표의 합이다. 직접 쓰기는 막혀 있고 함수로만 들어온다.';
 
-create index sup_ledger_user_recent on public.sup_ledger (user_id, occurred_at desc);
+create index if not exists sup_ledger_user_recent on public.sup_ledger (user_id, occurred_at desc);
 
 -- 한 세션이 두 번 적립되는 것을 막는다.
-create unique index sup_ledger_session_once
+create unique index if not exists sup_ledger_session_once
   on public.sup_ledger (session_id)
   where session_id is not null;
 
@@ -89,6 +89,134 @@ create or replace function economy.boost_multiplier(boost_bps int) returns numer
   select 1 + least(greatest(coalesce(boost_bps, 0), 0), 2000)::numeric / 10000
 $$;
 
+-- ── GPS 경로에서 속도 읽기 ─────────────────────────────────────────
+--
+-- 속도 랭킹이 있는 이상, 앱이 말하는 속도를 그대로 받으면 그 랭킹은 달리기가
+-- 아니라 타자 실력을 재게 된다. 경로는 이미 올라오니 서버가 직접 잰다.
+
+create or replace function economy.haversine_m(
+  lat1 double precision, lng1 double precision,
+  lat2 double precision, lng2 double precision
+) returns double precision
+language sql immutable as $$
+  select 2 * 6371000 * asin(least(1, sqrt(
+    power(sin(radians(lat2 - lat1) / 2), 2)
+      + cos(radians(lat1)) * cos(radians(lat2))
+      * power(sin(radians(lng2 - lng1) / 2), 2)
+  )))
+$$;
+
+-- 한 구간으로 볼 최소 시간(초). 1초짜리 구간으로 재면 GPS 가 몇 미터 튀는
+-- 것만으로 시속 수십 km 가 나온다. 10초면 그 흔들림이 묻힌다.
+create or replace function economy.speed_window_sec() returns int
+  language sql immutable as $$ select 10 $$;
+
+-- 이 이상은 사람의 이동으로 보지 않는다. 사람이 낸 최고 기록이 약 37km/h 이므로
+-- 60 은 넉넉히 위다 — 여기 걸리는 구간은 달린 게 아니라 튄 것이거나 탄 것이다.
+create or replace function economy.speed_glitch_kmh() returns double precision
+  language sql immutable as $$ select 60::double precision $$;
+
+-- 랭킹에 올릴 수 있는 상한. 튀지 않았더라도 세계 기록 위는 기록으로 받지 않는다.
+create or replace function economy.speed_record_cap_kmh() returns double precision
+  language sql immutable as $$ select 45::double precision $$;
+
+drop function if exists economy.track_speed_stats(text);
+
+/*
+ * 경로에서 구간 최고 속도와 "말이 안 되는 구간"의 비율을 뽑는다.
+ *
+ * 둘을 함께 돌려주는 이유는 판단이 다르기 때문이다. 터널이나 빌딩 사이에서
+ * 좌표 하나가 튀는 것은 흔한 일이라 그 구간 하나로 세션 전체를 버리면 정직한
+ * 기록이 사라진다. 하지만 구간 대부분이 말이 안 되면 그건 GPS 오류가 아니라
+ * 그 사람이 달리지 않은 것이다.
+ */
+create or replace function economy.track_speed_stats(p_track text)
+returns table (top_speed_kmh double precision, glitch_ratio double precision)
+language plpgsql immutable as $$
+declare
+  v_num constant text := '^-?[0-9]+(\.[0-9]+)?$';
+  v_chunk text;
+  v_parts text[];
+  v_lat double precision;
+  v_lng double precision;
+  v_at bigint;
+  -- 비교 기준점. 여기서부터 speed_window_sec 초가 지나야 한 구간으로 친다.
+  v_blat double precision;
+  v_blng double precision;
+  v_bat bigint;
+  v_have_base boolean := false;
+  v_dt double precision;
+  v_kmh double precision;
+  v_best double precision := 0;
+  v_windows int := 0;
+  v_glitches int := 0;
+begin
+  if p_track is null or p_track = '' then
+    return query select 0::double precision, 0::double precision;
+    return;
+  end if;
+
+  foreach v_chunk in array string_to_array(p_track, ';') loop
+    v_parts := string_to_array(v_chunk, ',');
+    -- 깨진 조각은 건너뛴다. 한 점이 깨졌다고 나머지 경로를 버릴 이유는 없다.
+    continue when v_parts is null or array_length(v_parts, 1) <> 3;
+    continue when v_parts[1] !~ v_num or v_parts[2] !~ v_num or v_parts[3] !~ '^[0-9]+$';
+
+    v_lat := v_parts[1]::double precision;
+    v_lng := v_parts[2]::double precision;
+    v_at := v_parts[3]::bigint;  -- epoch 밀리초. 앱의 RunTrack 과 같은 단위다.
+
+    if not v_have_base then
+      v_blat := v_lat; v_blng := v_lng; v_bat := v_at; v_have_base := true;
+      continue;
+    end if;
+
+    v_dt := (v_at - v_bat) / 1000.0;
+    -- 시계가 거꾸로 간 점은 기준을 다시 잡는다.
+    if v_dt <= 0 then
+      v_blat := v_lat; v_blng := v_lng; v_bat := v_at;
+      continue;
+    end if;
+    continue when v_dt < economy.speed_window_sec();
+
+    v_kmh := economy.haversine_m(v_blat, v_blng, v_lat, v_lng) / v_dt * 3.6;
+    v_windows := v_windows + 1;
+    if v_kmh > economy.speed_glitch_kmh() then
+      v_glitches := v_glitches + 1;
+    elsif v_kmh > v_best then
+      v_best := v_kmh;
+    end if;
+
+    v_blat := v_lat; v_blng := v_lng; v_bat := v_at;
+  end loop;
+
+  return query select
+    least(v_best, economy.speed_record_cap_kmh()),
+    case when v_windows = 0 then 0::double precision
+         else v_glitches::double precision / v_windows end;
+end;
+$$;
+
+comment on function economy.track_speed_stats is
+  '경로에서 구간 최고 속도와 비정상 구간 비율을 뽑는다. 앱이 보낸 속도는 쓰지 않는다.';
+
+-- ── 지난 버전의 함수를 치운다 ──────────────────────────────────────
+--
+-- 인자가 늘면 create or replace 로는 못 바꾸고 같은 이름이 둘이 된다. 그러면
+-- 호출이 어느 쪽으로 갈지 모호해져 앱이 조용히 옛 규칙으로 적립될 수 있다.
+do $$
+declare r record;
+begin
+  for r in
+    select oid::regprocedure as sig
+      from pg_proc
+     where pronamespace = 'public'::regnamespace
+       and proname in ('record_session', 'spend_sup')
+  loop
+    execute 'drop function ' || r.sig;
+  end loop;
+end $$;
+
 -- ── 적립 ───────────────────────────────────────────────────────────
 --
 -- 앱이 세션을 올리면 이 함수가 받는다. 앱이 계산한 금액은 받지도 않는다 —
@@ -100,7 +228,9 @@ create or replace function public.record_session(
   p_duration_sec int,
   p_track text default '',
   p_boost_bps int default 0,
-  p_party_size int default 1
+  p_party_size int default 1,
+  -- 정산 시점에 신고 있던 신발의 종족. 종족 랭킹에 쌓인다.
+  p_faction text default ''
 )
 returns table (
   session_id bigint,
@@ -123,6 +253,9 @@ declare
   v_session_id bigint;
   v_kind text;
   v_elapsed int;
+  v_faction text;
+  v_top_speed double precision := 0;
+  v_glitch double precision := 0;
 begin
   if v_user is null then
     raise exception '로그인이 필요합니다' using errcode = '28000';
@@ -142,6 +275,14 @@ begin
 
   v_elapsed := greatest(coalesce(p_duration_sec, 0), 0);
   v_day := floor(extract(epoch from p_started_at) / 86400)::bigint;
+  v_faction := case when coalesce(p_faction, '') in ('FIRE', 'WATER', 'LIGHTNING', 'WIND')
+                    then p_faction else '' end;
+
+  -- 경로에서 속도를 직접 잰다. 경로가 없으면 0 이고, 그 세션은 속도 랭킹에
+  -- 올라가지 않는다 — 잴 수 없는 기록은 기록이 아니다.
+  select t.top_speed_kmh, t.glitch_ratio
+    into v_top_speed, v_glitch
+    from economy.track_speed_stats(coalesce(p_track, '')) t;
 
   -- ── 판정 ──
   --
@@ -151,6 +292,13 @@ begin
   if v_elapsed >= 60 and p_steps::numeric * 60 / v_elapsed > 240 then
     v_verdict := 'VOID';
     v_reason := '케이던스가 사람 범위를 벗어납니다';
+
+  -- 구간 대부분이 사람 속도를 넘으면 GPS 오류가 아니라 타고 간 것이다.
+  -- 절반이라는 선은 넉넉하다 — 도심에서 좌표가 튀는 일은 흔해도, 구간의
+  -- 절반이 시속 60km 를 넘는 일은 흔하지 않다.
+  elsif v_glitch > 0.5 then
+    v_verdict := 'VOID';
+    v_reason := '이동 속도가 사람 범위를 벗어납니다';
   end if;
 
   -- ── 적립 대상 걸음 ──
@@ -191,11 +339,13 @@ begin
   insert into public.walk_sessions (
     user_id, started_at, ended_at, duration_sec, steps,
     distance_meters, calories, track, boost_bps, party_size,
+    faction, top_speed_kmh,
     verdict, verdict_reason, points_awarded, rewarded_steps
   )
   values (
     v_user, p_started_at, p_ended_at, v_elapsed, p_steps,
     p_steps * 0.762, p_steps * 0.04, coalesce(p_track, ''), p_boost_bps, p_party_size,
+    v_faction, case when v_verdict = 'VOID' then 0 else v_top_speed end,
     v_verdict, v_reason, v_points, v_rewardable
   )
   on conflict (user_id, started_at) do nothing
@@ -221,10 +371,15 @@ begin
             v_session_id, p_ended_at);
   end if;
 
-  -- 랭킹 재료 갱신
-  update public.profiles
-     set lifetime_km = lifetime_km + (p_steps * 0.762 / 1000)
-   where id = v_user;
+  -- 랭킹 재료 갱신.
+  -- VOID 판정을 받은 세션은 아무것도 남기지 않는다 — 적립을 막아 놓고
+  -- 기록만 올려 주면 속도 랭킹은 그쪽으로 뚫린다.
+  if v_verdict <> 'VOID' then
+    update public.profiles
+       set lifetime_km = lifetime_km + (p_steps * 0.762 / 1000),
+           top_speed_kmh = greatest(top_speed_kmh, v_top_speed)
+     where id = v_user;
+  end if;
 
   return query
     select v_session_id, v_verdict, v_points,
@@ -287,6 +442,7 @@ comment on function public.spend_sup is
 alter table public.sup_ledger enable row level security;
 
 -- 본인 원장만 읽는다.
+drop policy if exists sup_ledger_select_own on public.sup_ledger;
 create policy sup_ledger_select_own
   on public.sup_ledger for select
   using ((select auth.uid()) = user_id);
@@ -299,6 +455,6 @@ create policy sup_ledger_select_own
 revoke insert, update, delete on public.sup_ledger from anon, authenticated;
 revoke insert, update, delete on public.walk_sessions from anon, authenticated;
 
-grant execute on function public.record_session(timestamptz, timestamptz, int, int, text, int, int)
+grant execute on function public.record_session(timestamptz, timestamptz, int, int, text, int, int, text)
   to authenticated;
 grant execute on function public.spend_sup(text, numeric, text) to authenticated;
