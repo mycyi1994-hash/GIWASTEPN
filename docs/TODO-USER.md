@@ -67,8 +67,12 @@ npm run verify:giwa
   API 키도 필요 없습니다.
 - 성공하면 컨트랙트 4종의 익스플로러 링크가 출력됩니다. 각 주소 페이지에 **`Code` 탭**이
   생기면 끝난 겁니다.
-- 자동 검증이 실패하면 `npm run verify:blockscout` 이 `verification/` 폴더에 수동 업로드용
-  파일을 뽑아 줍니다. 자세한 내용은 [`contracts/README.md`](../contracts/README.md) Step 5.
+### Node.js 없이 하는 방법 (터미널이 부담되시면 이쪽)
+
+익스플로러 웹 화면에 파일만 올리면 되도록 **미리 뽑아 뒀습니다.**
+[`contracts/verification-giwa-sepolia/`](../contracts/verification-giwa-sepolia/) 폴더의
+README를 그대로 따라 하시면 됩니다 — 컨트랙트 4개, 각각 2분쯤 걸립니다.
+GitHub에서 JSON 파일을 내려받아 업로드하고, 적어 둔 생성자 인자를 붙여넣는 게 전부입니다.
 
 **막히면 터미널에 나온 에러 메시지를 그대로 보내주세요.**
 
