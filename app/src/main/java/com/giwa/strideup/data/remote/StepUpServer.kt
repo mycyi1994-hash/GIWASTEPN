@@ -2,7 +2,11 @@ package com.giwa.strideup.data.remote
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
 
 /**
  * 서버가 세션을 받아 내린 결론.
@@ -162,13 +166,9 @@ class StepUpServer(
  * 흘리면 사용자에게 "알 수 없는 오류"만 보여주게 된다.
  */
 private fun HttpResponse.postgrestMessage(): String {
-    val parsed = runCatching {
-        Json { ignoreUnknownKeys = true }.parseToJsonElement(body)
-    }.getOrNull() as? kotlinx.serialization.json.JsonObject
+    val obj = runCatching { Json.parseToJsonElement(body) }.getOrNull() as? JsonObject
     val message = listOf("message", "hint", "details")
-        .firstNotNullOfOrNull { key ->
-            (parsed?.get(key) as? kotlinx.serialization.json.JsonPrimitive)?.contentOrNull
-        }
+        .firstNotNullOfOrNull { key -> (obj?.get(key) as? JsonPrimitive)?.contentOrNull }
     return message ?: "요청이 거절되었습니다 ($status)"
 }
 

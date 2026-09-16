@@ -3,6 +3,7 @@ package com.giwa.strideup.data.repo
 import com.giwa.strideup.data.prefs.UserPrefs
 import com.giwa.strideup.data.remote.AuthSession
 import com.giwa.strideup.data.remote.AuthSessionStore
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 /**

@@ -2,6 +2,12 @@ package com.giwa.strideup.data.remote
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
 
 /**
  * 로그인 세션. 서버에 요청할 때 쓰는 출입증이다.
@@ -119,7 +125,7 @@ class SupabaseAuth(
 
         return when {
             response.status in 200..299 -> {
-                val session = runCatching { Json.decodeFromString<AuthSession>(response.body) }
+                val session = runCatching { json.decodeFromString<AuthSession>(response.body) }
                     .getOrNull()
                     ?: return AuthResult.Retry("응답을 이해할 수 없습니다")
                 AuthResult.Ok(session.withExpiryFilled(now()))
@@ -137,7 +143,7 @@ class SupabaseAuth(
     }
 
     private companion object {
-        val Json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
+        val json = Json { ignoreUnknownKeys = true }
     }
 }
 
@@ -152,21 +158,12 @@ internal fun AuthSession.withExpiryFilled(nowSeconds: Long): AuthSession =
 
 /** JSON 문자열 리터럴로 감싼다 — 토큰에 따옴표나 역슬래시가 들어가도 깨지지 않게. */
 internal fun String.asJsonString(): String =
-    kotlinx.serialization.json.Json.encodeToString(
-        kotlinx.serialization.json.JsonPrimitive.serializer(),
-        kotlinx.serialization.json.JsonPrimitive(this),
-    )
+    Json.encodeToString(String.serializer(), this)
 
 private fun HttpResponse.errorMessage(): String {
     // Supabase 는 실패 이유를 본문에 담아 보낸다. 흘리면 "왜 안 되는지 모르는" 상태가 된다.
-    val parsed = runCatching {
-        kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
-            .parseToJsonElement(body)
-    }.getOrNull()
-    val obj = (parsed as? kotlinx.serialization.json.JsonObject)
+    val obj = runCatching { Json.parseToJsonElement(body) }.getOrNull() as? JsonObject
     val message = listOf("error_description", "msg", "message", "error")
-        .firstNotNullOfOrNull { key ->
-            (obj?.get(key) as? kotlinx.serialization.json.JsonPrimitive)?.contentOrNull
-        }
+        .firstNotNullOfOrNull { key -> (obj?.get(key) as? JsonPrimitive)?.contentOrNull }
     return message ?: "요청이 거절되었습니다 ($status)"
 }
