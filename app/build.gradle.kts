@@ -8,8 +8,12 @@ plugins {
 // 릴리즈 서명 자격 — 환경변수(CI) 또는 ~/.gradle/gradle.properties(로컬)에서 읽는다.
 // 저장소에는 키도 비밀번호도 커밋하지 않는다. 값이 없으면 release 빌드는
 // 서명되지 않은 채로 만들어지고, 그 사실이 빌드 로그에 찍힌다.
+// 빈 문자열은 "없음"으로 취급한다. CI가 시크릿 없이 env를 넘기면 getenv는
+// null이 아니라 ""를 돌려주고, 그대로 file("")을 부르면 설정 단계에서 죽는다.
 fun secret(env: String, prop: String): String? =
-    System.getenv(env) ?: project.findProperty(prop) as String?
+    (System.getenv(env) ?: project.findProperty(prop) as String?)
+        ?.trim()
+        ?.takeIf { it.isNotEmpty() }
 
 val releaseStorePath = secret("RELEASE_KEYSTORE_PATH", "stepupReleaseKeystorePath")
 val releaseStorePassword = secret("RELEASE_KEYSTORE_PASSWORD", "stepupReleaseKeystorePassword")
