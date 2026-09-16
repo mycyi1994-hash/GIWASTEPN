@@ -5,9 +5,13 @@ import androidx.room.Room
 import com.giwa.strideup.BuildConfig
 import com.giwa.strideup.data.local.AppDatabase
 import com.giwa.strideup.data.prefs.UserPrefs
-import com.giwa.strideup.data.remote.AttesterClient
+import com.giwa.strideup.data.remote.SessionHolder
+import com.giwa.strideup.data.remote.StepUpServer
+import com.giwa.strideup.data.remote.SupabaseAuth
 import com.giwa.strideup.data.repo.BoostRepository
 import com.giwa.strideup.data.repo.ClaimRepository
+import com.giwa.strideup.data.repo.PrefsAuthSessionStore
+import com.giwa.strideup.data.repo.ServerSessionRecorder
 import com.giwa.strideup.data.repo.CommunityRepository
 import com.giwa.strideup.data.repo.CourseRepository
 import com.giwa.strideup.data.repo.CrewRepository
@@ -17,7 +21,6 @@ import com.giwa.strideup.data.repo.RewardRepository
 import com.giwa.strideup.data.repo.SneakerRepository
 import com.giwa.strideup.data.repo.StepRepository
 import com.giwa.strideup.sensor.StepTracker
-import kotlinx.coroutines.flow.first
 
 /** 간단한 수동 DI 컨테이너. Application.onCreate에서 [init]을 호출한다. */
 object ServiceLocator {
@@ -52,6 +55,10 @@ object ServiceLocator {
     lateinit var claimRepository: ClaimRepository
         private set
 
+    /** 지금 누구로 로그인해 있는지. 화면이 로그인 상태를 물을 때 쓴다. */
+    lateinit var sessionHolder: SessionHolder
+        private set
+
     fun init(context: Context) {
         if (this::database.isInitialized) return
         val app = context.applicationContext
@@ -66,10 +73,15 @@ object ServiceLocator {
             .fallbackToDestructiveMigration()
             .build()
         userPrefs = UserPrefs(app)
+        sessionHolder = SessionHolder(
+            auth = SupabaseAuth(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_KEY),
+            store = PrefsAuthSessionStore(userPrefs),
+        )
         claimRepository = ClaimRepository(
             sessionDao = database.walkSessionDao(),
-            client = AttesterClient(BuildConfig.ATTESTER_URL),
-            runnerAddress = { userPrefs.runnerAddress.first() },
+            recorder = ServerSessionRecorder(
+                StepUpServer(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_KEY, sessionHolder),
+            ),
         )
         stepTracker = StepTracker(app, userPrefs) { day ->
             database.stepDao().byDay(day)?.steps ?: 0

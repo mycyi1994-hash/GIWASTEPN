@@ -3,11 +3,10 @@ package com.giwa.strideup
 import com.giwa.strideup.data.local.UploadState
 import com.giwa.strideup.data.local.WalkSessionDao
 import com.giwa.strideup.data.local.WalkSessionEntity
-import com.giwa.strideup.data.remote.ClaimRequest
-import com.giwa.strideup.data.remote.ClaimResult
-import com.giwa.strideup.data.remote.ClaimSubmitter
-import com.giwa.strideup.data.remote.SignedClaim
+import com.giwa.strideup.data.remote.ServerResult
+import com.giwa.strideup.data.remote.SessionRecorded
 import com.giwa.strideup.data.repo.ClaimRepository
+import com.giwa.strideup.data.repo.SessionRecorder
 import com.giwa.strideup.domain.RunTrack
 import com.giwa.strideup.domain.TrackPoint
 import kotlinx.coroutines.flow.Flow
@@ -62,14 +61,14 @@ class ClaimUploadTest {
         }
     }
 
-    private class FakeSubmitter(
+    private class FakeRecorder(
         override val isConfigured: Boolean = true,
-        private val answer: (ClaimRequest) -> ClaimResult,
-    ) : ClaimSubmitter {
-        val seen = mutableListOf<ClaimRequest>()
-        override suspend fun submit(request: ClaimRequest): ClaimResult {
-            seen += request
-            return answer(request)
+        private val answer: (WalkSessionEntity) -> ServerResult<SessionRecorded>,
+    ) : SessionRecorder {
+        val seen = mutableListOf<WalkSessionEntity>()
+        override suspend fun record(session: WalkSessionEntity): ServerResult<SessionRecorded> {
+            seen += session
+            return answer(session)
         }
     }
 
@@ -108,32 +107,26 @@ class ClaimUploadTest {
         uploadState = state.name,
     )
 
-    private val signedAnswer: (ClaimRequest) -> ClaimResult = {
-        ClaimResult.Signed(
-            claim = SignedClaim(
-                runner = it.runner,
-                sessionHash = "0xabc",
-                amount = "20000000000000000000",
-                day = 7,
-                deadline = 1_700_000_900L,
+    private val okAnswer: (WalkSessionEntity) -> ServerResult<SessionRecorded> = {
+        ServerResult.Ok(
+            SessionRecorded(
+                sessionId = 7,
+                verdict = "CLEAN",
+                pointsAwarded = 24.64,
+                balance = 24.64,
             ),
-            signature = "0xsig",
-            verdict = "CLEAN",
         )
     }
 
-    private fun repo(
-        dao: FakeDao,
-        submitter: ClaimSubmitter,
-        runner: String = "0x1111111111111111111111111111111111111111",
-    ) = ClaimRepository(dao, submitter, runnerAddress = { runner }, now = { 42L })
+    private fun repo(dao: FakeDao, recorder: SessionRecorder) =
+        ClaimRepository(dao, recorder, now = { 42L })
 
     // ── 시작도 못 하는 경우 ──────────────────────────────────────────────
 
     @Test
     fun `서버 주소가 없으면 시도하지 않고 세션을 그대로 둔다`() = runBlocking {
         val dao = FakeDao(listOf(session(1)))
-        val run = repo(dao, FakeSubmitter(isConfigured = false) { signedAnswer(it) }).uploadPending()
+        val run = repo(dao, FakeRecorder(isConfigured = false) { okAnswer(it) }).uploadPending()
 
         assertNotNull("이유를 말해 줘야 한다", run.blockedBy)
         assertEquals(UploadState.PENDING.name, dao.rows.getValue(1L).uploadState)
@@ -141,48 +134,45 @@ class ClaimUploadTest {
     }
 
     @Test
-    fun `지갑이 없으면 세션을 쌓아 둔다 - 나중에 지갑을 만들면 살아 있어야 한다`() = runBlocking {
+    fun `다시 로그인이 필요하면 대기열을 건드리지 않고 물러난다`() = runBlocking {
+        // 여기서 세션을 실패로 찍으면 시도 횟수만 오른다. 사용자가 로그인하면
+        // 그대로 다시 올라가야 한다.
         val dao = FakeDao(listOf(session(1)))
-        val submitter = FakeSubmitter { signedAnswer(it) }
-        val run = repo(dao, submitter, runner = "").uploadPending()
+        val run = repo(dao, FakeRecorder { ServerResult.SignInRequired("로그인이 만료되었습니다") })
+            .uploadPending()
 
         assertNotNull(run.blockedBy)
-        assertTrue("보내지 않아야 한다", submitter.seen.isEmpty())
         assertEquals(UploadState.PENDING.name, dao.rows.getValue(1L).uploadState)
+        assertEquals(0, dao.rows.getValue(1L).uploadAttempts)
     }
 
     // ── 정상 경로 ───────────────────────────────────────────────────────
 
     @Test
-    fun `서명을 받으면 청구서를 통째로 보관한다`() = runBlocking {
+    fun `서버가 기록하면 서버가 정한 금액으로 덮는다`() = runBlocking {
         val dao = FakeDao(listOf(session(1)))
-        val run = repo(dao, FakeSubmitter { signedAnswer(it) }).uploadPending()
+        val run = repo(dao, FakeRecorder { okAnswer(it) }).uploadPending()
 
         assertEquals(1, run.signed)
         val row = dao.rows.getValue(1L)
         assertEquals(UploadState.SIGNED.name, row.uploadState)
-        assertEquals("0xsig", row.claimSignature)
-        assertEquals("0xabc", row.claimSessionHash)
-        // 지급액은 18자리라 문자열로 온다. 숫자로 바꾸면 값이 깨진다.
-        assertEquals("20000000000000000000", row.claimAmount)
-        assertEquals(7L, row.claimDay)
-        assertEquals(1_700_000_900L, row.claimDeadline)
         assertEquals("CLEAN", row.verdict)
+        // 앱이 화면에 보여준 값이 아니라 서버가 계산한 값이 남아야 한다.
+        assertEquals("24.64", row.claimAmount)
         assertEquals("", row.uploadError)
     }
 
     @Test
     fun `정산 시점에 저장해 둔 부스트와 파티 인원을 그대로 보낸다`() = runBlocking {
         val dao = FakeDao(listOf(session(1)))
-        val submitter = FakeSubmitter { signedAnswer(it) }
-        repo(dao, submitter).uploadPending()
+        val recorder = FakeRecorder { okAnswer(it) }
+        repo(dao, recorder).uploadPending()
 
-        val sent = submitter.seen.single()
+        val sent = recorder.seen.single()
         // 지금 신고 있는 신발이 아니라 그때 신고 있던 신발의 값이어야 한다.
         assertEquals(1_200, sent.boostBps)
         assertEquals(2, sent.partySize)
         assertEquals(2_000, sent.steps)
-        assertEquals(2, sent.track.size)
     }
 
     @Test
@@ -194,12 +184,12 @@ class ClaimUploadTest {
                 session(3, startedAt = 2_000_000_000_000L),
             ),
         )
-        val submitter = FakeSubmitter { signedAnswer(it) }
-        repo(dao, submitter).uploadPending()
+        val recorder = FakeRecorder { okAnswer(it) }
+        repo(dao, recorder).uploadPending()
 
         assertEquals(
             listOf(1_000_000_000_000L, 2_000_000_000_000L, 3_000_000_000_000L),
-            submitter.seen.map { it.startedAt },
+            recorder.seen.map { it.startedAt },
         )
     }
 
@@ -208,13 +198,12 @@ class ClaimUploadTest {
     @Test
     fun `서버가 거절하면 다시 보내지 않는다`() = runBlocking {
         val dao = FakeDao(listOf(session(1)))
-        val run = repo(dao, FakeSubmitter { ClaimResult.Rejected("러닝으로 확인되지 않았습니다", "VOID") })
+        val run = repo(dao, FakeRecorder { ServerResult.Rejected("러닝으로 확인되지 않았습니다") })
             .uploadPending()
 
         assertEquals(1, run.rejected)
         val row = dao.rows.getValue(1L)
         assertEquals(UploadState.REJECTED.name, row.uploadState)
-        assertEquals("VOID", row.verdict)
         assertEquals("러닝으로 확인되지 않았습니다", row.uploadError)
         assertTrue("거절된 세션은 대기열에서 빠져야 한다", dao.pendingUploads(10).isEmpty())
     }
@@ -222,7 +211,7 @@ class ClaimUploadTest {
     @Test
     fun `통신이 끊기면 다시 시도할 수 있게 남겨 둔다`() = runBlocking {
         val dao = FakeDao(listOf(session(1)))
-        val run = repo(dao, FakeSubmitter { ClaimResult.Retry("통신 실패") }).uploadPending()
+        val run = repo(dao, FakeRecorder { ServerResult.Retry("통신 실패") }).uploadPending()
 
         assertEquals(1, run.failed)
         assertTrue("일꾼이 다시 깨어나야 한다", run.shouldRetry)
@@ -236,40 +225,28 @@ class ClaimUploadTest {
     fun `한 번 끊기면 남은 세션은 건드리지 않는다`() = runBlocking {
         // 연달아 보내봐야 다 실패한다. 시도 횟수만 축내고 배터리를 태운다.
         val dao = FakeDao((1L..5L).map { session(it, startedAt = 1_000_000_000_000L + it) })
-        val submitter = FakeSubmitter { ClaimResult.Retry("통신 실패") }
-        val run = repo(dao, submitter).uploadPending()
+        val recorder = FakeRecorder { ServerResult.Retry("통신 실패") }
+        val run = repo(dao, recorder).uploadPending()
 
-        assertEquals("한 번만 시도해야 한다", 1, submitter.seen.size)
+        assertEquals("한 번만 시도해야 한다", 1, recorder.seen.size)
         assertEquals(1, run.failed)
         assertEquals(4, dao.rows.values.count { it.uploadState == UploadState.PENDING.name })
     }
 
     @Test
-    fun `경로가 모자란 세션은 보내지 않고 거절로 끝낸다`() = runBlocking {
-        // 서버는 좌표 2개 이상을 요구한다. 보내봐야 400이다.
-        val dao = FakeDao(listOf(session(1, track = RunTrack.encode(listOf(TrackPoint(37.5, 127.0, 1L))))))
-        val submitter = FakeSubmitter { signedAnswer(it) }
-        val run = repo(dao, submitter).uploadPending()
-
-        assertTrue("보내지 않아야 한다", submitter.seen.isEmpty())
-        assertEquals(1, run.rejected)
-        assertEquals(UploadState.REJECTED.name, dao.rows.getValue(1L).uploadState)
-    }
-
-    @Test
     fun `이미 서명받은 세션은 다시 보내지 않는다`() = runBlocking {
         val dao = FakeDao(listOf(session(1, state = UploadState.SIGNED)))
-        val submitter = FakeSubmitter { signedAnswer(it) }
-        val run = repo(dao, submitter).uploadPending()
+        val recorder = FakeRecorder { okAnswer(it) }
+        val run = repo(dao, recorder).uploadPending()
 
-        assertTrue(submitter.seen.isEmpty())
+        assertTrue(recorder.seen.isEmpty())
         assertEquals(0, run.signed)
     }
 
     @Test
     fun `실패했던 세션은 다음 차례에 다시 집는다`() = runBlocking {
         val dao = FakeDao(listOf(session(1, state = UploadState.FAILED)))
-        val run = repo(dao, FakeSubmitter { signedAnswer(it) }).uploadPending()
+        val run = repo(dao, FakeRecorder { okAnswer(it) }).uploadPending()
 
         assertEquals(1, run.signed)
         assertEquals(UploadState.SIGNED.name, dao.rows.getValue(1L).uploadState)

@@ -45,6 +45,7 @@ class UserPrefs(private val context: Context) {
         val ACCOUNTED_STEPS = longPreferencesKey("accounted_steps")
         val ACCOUNTED_DAY = longPreferencesKey("accounted_day")
         val RUNNER_ADDRESS = stringPreferencesKey("runner_address")
+        val AUTH_SESSION = stringPreferencesKey("auth_session")
     }
 
     val dailyGoal: Flow<Int> = context.dataStore.data.map { it[Keys.DAILY_GOAL] ?: DEFAULT_GOAL }
@@ -85,6 +86,22 @@ class UserPrefs(private val context: Context) {
 
     suspend fun setRunnerAddress(address: String) {
         context.dataStore.edit { it[Keys.RUNNER_ADDRESS] = address.trim() }
+    }
+
+    // ── 로그인 세션 ──────────────────────────────────────────
+    //
+    // 서버가 준 출입증을 그대로 담아 둔다. 앱을 껐다 켜도 로그인이 유지되어야
+    // 하고, 유지되지 않으면 그 사람의 서버 기록에 다시 닿지 못한다.
+
+    suspend fun authSessionJson(): String =
+        context.dataStore.data.map { it[Keys.AUTH_SESSION] ?: "" }.first()
+
+    suspend fun setAuthSessionJson(json: String) {
+        context.dataStore.edit { it[Keys.AUTH_SESSION] = json }
+    }
+
+    suspend fun clearAuthSession() {
+        context.dataStore.edit { it.remove(Keys.AUTH_SESSION) }
     }
 
     /** 앱 언어 태그. 빈 문자열이면 기기 설정을 따른다 */

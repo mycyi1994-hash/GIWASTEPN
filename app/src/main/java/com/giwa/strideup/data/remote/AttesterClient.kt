@@ -1,3 +1,12 @@
+// ⚠️ v2(온체인)용 — 지금은 쓰이지 않는다.
+//
+// v1 은 오프체인 포인트라 서명된 청구서가 필요 없다. 세션은 Supabase 의
+// record_session() 으로 가고, 그 경로는 StepUpServer 가 맡는다.
+//
+// 이 파일과 ClaimApi.kt 는 온체인으로 갈 때 그대로 깨워 쓴다. 규격이 서버와
+// 어긋나지 않는지는 attester/test/app-payload.test.js 가 계속 확인한다 —
+// 안 쓰는 동안 조용히 썩는 것을 막기 위해서다.
+// 계획: docs/LAUNCH-PLAN.md §9.5
 package com.giwa.strideup.data.remote
 
 import java.io.IOException
