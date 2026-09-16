@@ -1,4 +1,7 @@
 {
+  "_note": "테스트넷 데모 배포입니다. 컨트랙트가 실제로 배포되고 동작한다는 기록으로만 의미가 있습니다. 이 배포의 키는 보관되어 있지 않아 소유자·역할 주소를 변경할 수 없고, 운영되지도 않습니다. 메인넷은 역할별로 키를 나눠 새로 배포합니다 — docs/LAUNCH-PLAN.md §9.5 참고.",
+  "_noteEn": "Testnet demo deployment. It stands as evidence that these contracts deploy and work; it is not operated. The keys for this deployment are not retained, so ownership and role addresses cannot be changed. Mainnet will be a fresh deployment with separated, retained keys - see docs/LAUNCH-PLAN.md section 9.5.",
+  "_keysRetained": false,
   "network": "giwaSepolia",
   "chainId": 91342,
   "deployedAt": "2026-07-31",
@@ -11,7 +14,9 @@
   "contracts": {
     "SUPToken": {
       "address": "0xb052A8f6A5034747902b6d6787bbfF31A9006c1B",
-      "args": ["0xe96a75e86e25BF4c3d56b17ECfad5aEe39046FF7"]
+      "args": [
+        "0xe96a75e86e25BF4c3d56b17ECfad5aEe39046FF7"
+      ]
     },
     "SneakerNFT": {
       "address": "0x8174f905d86438ac8922c85d3A48604BabEFc960",
@@ -31,7 +36,9 @@
     },
     "CourseRegistry": {
       "address": "0x6c815DF0d8a5CA7CA0487D1AC2f96c0fEC588542",
-      "args": ["0xe96a75e86e25BF4c3d56b17ECfad5aEe39046FF7"]
+      "args": [
+        "0xe96a75e86e25BF4c3d56b17ECfad5aEe39046FF7"
+      ]
     }
   }
 }
