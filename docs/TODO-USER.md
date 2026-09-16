@@ -1,145 +1,48 @@
 <div align="center">
 
-# 지금 직접 하셔야 하는 것 — 순서대로
+# 직접 하셔야 하는 것 — 출시까지
 
-**2026-07-31 기준 · 앱 v1.13.0**
+**2026-09-16 기준 · 앱 v1.15.1 · [정식 출시 계획](LAUNCH-PLAN.md) Phase 0 진행 중**
 
-앞의 것을 끝내야 뒤의 것이 됩니다. **위에서부터 하나씩** 내려오세요.
+코드로 되는 일은 제가 합니다. 이 문서에는 **계정·결제·법률처럼 본인 확인이 필요해
+제가 대신할 수 없는 일**만 적습니다.
 
 </div>
 
 ---
 
-## 한눈에 보기
+## 지금 해야 하는 것 (Phase 0)
 
 | 순서 | 할 일 | 소요 | 이걸 안 하면 |
 |:--:|---|:--:|---|
-| **1** | GitHub 로그인 | 3분 | 아무것도 못 함 |
-| **2** | 기본 브랜치 변경 | 1분 | 심사자가 **11일 전 옛 앱**을 봄 |
-| **3** | 저장소 공개 전환 | 2분 | **3·7·8·9·10번이 전부 404** |
-| **4** | 공개 확인 (시크릿 모드) | 1분 | 깨진 링크를 제출하게 됨 |
-| **5** | 답변 복붙 (3·4·7·8·9·10번) | 10분 | — |
-| ~~**6**~~ | ~~컨트랙트 배포~~ ✅ **2026-07-31 완료** · 남은 건 소스 검증 | 5분 | 9번 링크에 `#code`가 안 붙음 |
-| **7** | 데모 영상 촬영 | 2~3시간 | 8번이 APK 링크만 남음 |
-| **8** | 나머지 문항(1·2·5·6·11·12) 캡처 전달 | 5분 | 제출 완료 불가 |
+| **1** | [컨트랙트 소스 검증](#1-컨트랙트-소스-검증) | 10분 | 익스플로러에서 코드를 못 봄 — "배포했다"는 주장만 남음 |
+| **2** | [어테스터 배포](#2-어테스터-배포-cloudflare) | 15분 | 러닝 증명 서명이 안 됨 → Phase 2 전체가 막힘 |
+| **3** | [Google Play 개발자 등록](#3-google-play-개발자-등록) | 30분 + 심사 최대 2일 | 스토어 출시 자체가 불가 |
+| **4** | [업로드 키 생성 + GitHub Secrets 등록](#4-업로드-키-생성) | 20분 | CI가 릴리즈 AAB를 못 만듦 |
+| **5** | [법률 검토 착수](#5-법률-검토-착수) | 상담 예약 | 출시 국가·출금 허용 여부를 못 정함 |
 
-> **1~5번(약 17분)만 끝내면 6개 문항을 제출할 수 있습니다.**
-> 6·7번은 점수를 올리는 작업이고, 8번은 저에게 넘기시면 됩니다.
+> **1·2번이 가장 급합니다.** 나머지 개발(Phase 1)은 3·4·5번 없이도 진행됩니다.
 
 ---
 
-# 1단계 · GitHub 로그인
+## ✅ 이미 끝난 것
 
-전에 404가 떴던 건 저장소가 없어서가 아니라, **비공개 저장소를 로그인 없이 열어서**입니다.
-GitHub은 권한 없는 사람에게 "권한 없음" 대신 일부러 404를 보여줍니다.
-
-1. 주소창에 **`github.com/login`** 입력
-2. **Username or email**: `mycyi1994-hash` 또는 가입 이메일
-3. **Password** 입력 → **Sign in**
-4. 화면 **오른쪽 맨 위 동그란 아바타** 클릭 → 맨 위에 **`mycyi1994-hash`** 가 보이는지 확인
-
-**비밀번호를 모르시면** → 로그인 화면의 **Forgot password?** → 이메일 입력 → 메일로 온 링크에서 재설정
-
-**다른 아이디로 로그인되어 있으면** → 그 계정에서 **Sign out** 하고 다시 1번부터
-
-✅ **확인:** `https://github.com/mycyi1994-hash/GIWASTEPN` 이 열리면 성공
-
----
-
-# 2단계 · 기본 브랜치 변경
-
-> ⚠️ **이게 3단계보다 먼저입니다.** 지금 기본 브랜치가
-> `claude/android-app-development-rq17u9` 로 잡혀 있는데, **7월 20일에 멈춘 옛날 코드**입니다.
-> 이대로 공개하면 심사자가 저장소를 열었을 때 옛 README와 옛 앱을 봅니다.
-
-1. `https://github.com/mycyi1994-hash/GIWASTEPN` 접속
-2. 상단 **⚙ Settings** 탭 클릭
-3. 왼쪽 메뉴 **General** (기본 선택되어 있음)
-4. 스크롤 내려 **Default branch** 항목 찾기
-5. 오른쪽 **⇄** (두 화살표) 아이콘 클릭
-6. 드롭다운에서 **`claude/work-history-pjm57c`** 선택
-7. **Update** → 경고창에서 **I understand, update the default branch**
-
-✅ **확인:** 저장소 첫 화면 좌측 상단 브랜치 버튼이 `claude/work-history-pjm57c` 로 바뀜
-
----
-
-# 3단계 · 저장소 공개 전환
-
-1. 같은 **Settings → General** 화면에서 **맨 아래까지** 스크롤
-2. 빨간 테두리 **Danger Zone** 박스
-3. **Change repository visibility** 줄의 **Change visibility** 버튼
-4. **Make public** 선택 → **I want to make this repository public**
-5. 확인창에 **`mycyi1994-hash/GIWASTEPN`** 을 그대로 입력
-6. **I understand, make this repository public**
-
-### 공개해도 위험하지 않은 이유
-
-| 걱정 | 실제 |
+| 항목 | 확인 |
 |---|---|
-| `app/debug.keystore` 가 커밋되어 있는데? | 안드로이드 **표준 디버그 키**(비밀번호 `android`)입니다. 배포 권한이 없고, README에 그 이유를 적어놨습니다 |
-| API 키·개인키가 들어있나? | **하나도 없습니다.** 배포용 개인키는 `.env`에만 들어가고 `.gitignore` 처리되어 있습니다 |
-| 코드를 베껴가면? | 그랜트 심사는 **공개 저장소를 요구합니다.** 비공개면 심사 자체가 안 됩니다 |
+| GitHub 저장소 **공개 전환** | `github.com/mycyi1994-hash/GIWASTEPN` 누구나 열림 |
+| **기본 브랜치** 정리 | `claude/work-history-pjm57c` |
+| **컨트랙트 배포** (GIWA Sepolia 91342) | 4종 배포 + 리워드 풀 5,000만 SUP — [기록](../contracts/deployments/giwaSepolia.json) |
+| APK 자동 빌드·배포 | 푸시마다 `apk-dist` 브랜치 갱신 |
 
 ---
 
-# 4단계 · 공개 확인 (건너뛰지 마세요)
+# 1. 컨트랙트 소스 검증
 
-**시크릿 모드**(Ctrl+Shift+N / Mac은 Cmd+Shift+N)로 아래 3개를 엽니다.
-로그인 안 된 상태에서 열려야 심사자도 볼 수 있습니다.
+배포는 끝났지만 익스플로러에 **소스 코드가 안 올라가 있습니다.** 지금은 바이트코드만
+보이는 상태라, 보는 사람이 컨트랙트가 무슨 일을 하는지 확인할 수 없습니다.
 
-| 확인 | 주소 | 성공 기준 |
-|---|---|---|
-| 저장소 | `github.com/mycyi1994-hash/GIWASTEPN` | **StepUp** 제목의 README + 스크린샷 6장 |
-| APK | `github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk` | 다운로드 시작 |
-| 문서 | `github.com/mycyi1994-hash/GIWASTEPN/blob/claude/work-history-pjm57c/docs/ONEPAGER.md` | 문서가 보임 |
-
-하나라도 404면 **2~3단계를 다시** 하세요.
-
----
-
-# 5단계 · 답변 복붙
-
-**[`docs/APPLICATION.md`](APPLICATION.md)** 를 열어두고 회색 블록을 그대로 복사하시면 됩니다.
-
-| 문항 | 어떤 답 | 비고 |
-|---|---|---|
-| **3/12** Team Introduction | **직접 만든 팀 소개 파일 링크** (구글 드라이브 등) | 실명은 저장소에 안 올립니다 |
-| **4/12** Motivation for Applying | 지원 동기 본문 | 영어 499자 |
-| **7/12** Pitch Deck | `PITCH.md` 링크 | |
-| **8/12** Project Link | APK 링크 (+영상) | **영상 없으면 그 줄만 지우세요** |
-| **9/12** Verified Contract | 소스 저장소 + 43 테스트 | 6단계 후 교체 |
-| **10/12** Docs / One-Pager | `ONEPAGER.md` + `TOKENOMICS.md` | |
-
-**영어판과 한국어판이 둘 다 있습니다. 영어판을 권합니다** — 폼 자체가 영어이고 심사자가 한국어를 못 읽을 수 있습니다.
-
-> 💡 붙여넣은 뒤 폼 우측 아래 **글자 수 표시(예: 496/500)** 가 빨갛지 않은지 확인하세요.
-> 전부 500자 안에 맞춰뒀지만, 임의로 문장을 더하시면 넘칠 수 있습니다.
-
----
-
-# 6단계 · 컨트랙트 배포 + 검증
-
-> 여기서부터는 **PC에서 터미널**을 쓰셔야 합니다. 9번 문항 점수를 크게 올립니다.
-> 자세한 안내: **[`contracts/README.md`](../contracts/README.md)**
-
-### 6-1. 배포 전용 지갑 만들기
-
-**기존 지갑을 쓰지 마세요.** MetaMask에서 새 계정을 만듭니다.
-
-1. MetaMask → 계정 목록 → **계정 추가** → **새 계정 추가**
-2. 이름을 "StepUp 배포용" 으로 지정
-3. 계정 메뉴 **⋮** → **계정 세부 정보** → **개인 키 표시** → 비밀번호 입력 → 복사
-
-> 🔐 **이 개인키를 저에게 보내지 마세요.** 채팅·스크린샷·이슈 전부 포함입니다.
-> 다음 단계에서 만들 `.env` 파일에만 들어갑니다.
-
-### 6-2. `.env` 만들기
-
-> ⚠️ **`-b` 를 빼먹으면 안 됩니다.** 저장소 기본 브랜치는 아직 옛 버전이라
-> `contracts/` 폴더가 없습니다. 그냥 `git clone` 하면 다음 줄에서
-> "지정된 경로를 찾을 수 없습니다" 가 납니다.
-> (0단계에서 기본 브랜치를 바꾸면 이 주의사항은 없어집니다.)
+> 💻 **PC에서 터미널**이 필요합니다. (제 작업 환경에서는 GIWA 익스플로러로
+> 나가는 네트워크가 막혀 있어 대신 실행할 수 없습니다.)
 
 **Windows (명령 프롬프트)**
 
@@ -147,8 +50,8 @@ GitHub은 권한 없는 사람에게 "권한 없음" 대신 일부러 404를 보
 cd C:\stepup
 git clone -b claude/work-history-pjm57c https://github.com/mycyi1994-hash/GIWASTEPN.git work
 cd C:\stepup\work\contracts
-copy .env.example .env
-notepad .env
+npm install
+npm run verify:giwa
 ```
 
 **macOS · Linux**
@@ -156,108 +59,151 @@ notepad .env
 ```bash
 git clone -b claude/work-history-pjm57c https://github.com/mycyi1994-hash/GIWASTEPN.git work
 cd work/contracts
-cp .env.example .env
-```
-
-`.env` 를 메모장으로 열어 `DEPLOYER_PRIVATE_KEY=` 뒤에 복사한 키를 붙여넣고 저장합니다.
-나머지 항목은 그대로 두세요.
-
-### 6-3. 가스비 받기
-
-1. **네트워크 추가** — `https://chainlist.org/chain/91342` 접속 →
-   **Connect Wallet** → **Add to MetaMask**
-2. **테스트 ETH 받기** — `https://faucet.giwa.io` 에서 6-1의 지갑 주소 입력
-3. MetaMask에서 잔액이 **0보다 큰지** 확인
-
-> 파우셋이 Ethereum Sepolia ETH를 요구하면, 공개 Sepolia 파우셋에서 먼저 받은 뒤
-> `https://bridge.giwa.io` 로 GIWA Sepolia에 브리지하세요.
-
-### 6-4. 배포
-
-```bash
 npm install
-npm run deploy:giwa
-```
-
-성공하면 컨트랙트 주소 4개가 나오고, 리워드 풀에 5,000만 SUP가 들어갑니다.
-
-**가스가 없으면** 이렇게 멈춥니다 → 6-3으로 돌아가세요.
-```
-Error: 배포 계정에 가스가 없습니다. https://faucet.giwa.io 에서 테스트 ETH를 받으세요.
-```
-
-### 6-5. 소스 검증
-
-```bash
 npm run verify:giwa
 ```
 
-마지막에 **9번 문항에 붙여넣을 링크 4개**가 출력됩니다.
-GIWA 익스플로러는 Blockscout이라 **API 키가 필요 없습니다.**
+- **개인키가 필요 없습니다.** 검증은 읽기 작업이고, GIWA 익스플로러는 Blockscout이라
+  API 키도 필요 없습니다.
+- 성공하면 컨트랙트 4종의 익스플로러 링크가 출력됩니다. 각 주소 페이지에 **`Code` 탭**이
+  생기면 끝난 겁니다.
+- 자동 검증이 실패하면 `npm run verify:blockscout` 이 `verification/` 폴더에 수동 업로드용
+  파일을 뽑아 줍니다. 자세한 내용은 [`contracts/README.md`](../contracts/README.md) Step 5.
 
-### 6-6. 배포 기록 커밋
+**막히면 터미널에 나온 에러 메시지를 그대로 보내주세요.**
+
+---
+
+# 2. 어테스터 배포 (Cloudflare)
+
+러닝이 진짜인지 판정하고 서명하는 서비스입니다. 코드와 테스트는 끝났고 **배포만**
+남았습니다. 무료 티어로 하루 10만 요청까지 됩니다.
+
+### 2-1. 서명 전용 지갑 만들기
+
+**배포에 쓴 지갑을 재사용하지 마세요.** MetaMask에서 새 계정을 하나 더 만듭니다.
+
+1. MetaMask → 계정 목록 → **계정 추가** → **새 계정 추가**
+2. 이름을 "StepUp 어테스터"로 지정
+3. **계정 세부 정보 → 개인 키 표시** → 복사
+
+> 🔐 **이 개인키를 저에게 보내지 마세요.** 채팅·스크린샷·이슈 전부 포함입니다.
+> Cloudflare 시크릿에만 들어갑니다.
+
+### 2-2. 배포
 
 ```bash
-cd ..
-git add contracts/deployments/giwaSepolia.json
-git commit -m "chore: record GIWA Sepolia deployment"
-git push
+cd work/attester
+npm install
+npx wrangler login          # 브라우저가 열립니다
+npx wrangler secret put ATTESTER_PRIVATE_KEY
+# 프롬프트에 2-1에서 복사한 키를 붙여넣기 (화면에 안 보이는 게 정상입니다)
+npx wrangler deploy
 ```
 
-### 6-7. 9번 답변 교체
+배포되면 `https://stepup-attester.<계정>.workers.dev` 주소가 나옵니다.
 
-`docs/APPLICATION.md` 맨 아래 **"배포가 끝나면 9/12를 이걸로 교체하세요"** 템플릿에
-주소 4개를 넣어 다시 붙여넣습니다.
+### 2-3. 확인
 
-> ⚠️ 주소 4개만 약 270자를 먹습니다. **글자 수를 꼭 다시 확인**하세요.
+```bash
+curl https://stepup-attester.<계정>.workers.dev/health
+```
 
-**막히면 에러 메시지만 복사해서 보내주세요.** 개인키는 빼고요.
+`"ok": true` 와 어테스터 주소가 나오면 성공입니다. **그 주소를 저에게 알려주세요**
+(주소는 공개 정보라 안전합니다 — 개인키가 아닙니다).
+
+### 2-4. 컨트랙트에 어테스터 등록
+
+배포 지갑으로 `RewardDistributor.setAttester(<2-3의 주소>)` 를 호출해야 서명이
+받아들여집니다. 2-3 주소를 주시면 실행 스크립트를 만들어 드리겠습니다.
 
 ---
 
-# 7단계 · 데모 영상 촬영
+# 3. Google Play 개발자 등록
 
-전체 대본: **[`docs/DEMO.md`](DEMO.md)** — 컷 9개, 2분 30초, 자막만(내레이션 불필요)
+1. `https://play.google.com/console` 접속 → Google 계정으로 로그인
+2. **개발자 계정 만들기** → 개인 또는 사업자 선택
+   - **개인 계정은 출시 전 20명 테스터 × 14일 비공개 테스트가 의무**입니다 (2023년 정책).
+     Phase 3 클로즈드 베타가 이 요건을 겸합니다.
+   - 사업자 계정은 이 요건이 없지만 사업자등록번호·D-U-N-S 번호가 필요합니다.
+3. **등록비 $25** (1회, 평생) 카드 결제
+4. 신원 확인 — 신분증 제출, 심사 최대 2일
+5. 승인되면 **앱 만들기** → 이름 `StepUp`, 기본 언어 한국어, 무료 앱
 
-### 핵심만 요약
+> 💡 3번은 지금 시작해 두시는 게 좋습니다. 심사에 며칠 걸리고, 그동안 개발은 계속됩니다.
 
-| | 내용 |
+---
+
+# 4. 업로드 키 생성
+
+CI가 릴리즈 AAB에 서명하려면 키가 필요합니다. **이 키를 잃어버리면 앱 업데이트를
+영원히 못 올립니다.** 반드시 백업하세요.
+
+### 4-1. 키 만들기
+
+```bash
+keytool -genkeypair -v \
+  -keystore stepup-upload.jks \
+  -keyalg RSA -keysize 4096 -validity 10000 \
+  -alias stepup-upload
+```
+
+비밀번호를 묻습니다. **비밀번호와 `stepup-upload.jks` 파일을 비밀번호 관리자에
+백업**하세요. 저장소에는 절대 커밋하지 않습니다.
+
+### 4-2. GitHub Secrets에 등록
+
+키 파일을 base64로 바꿉니다.
+
+```bash
+# macOS · Linux
+base64 -i stepup-upload.jks | tr -d '\n' > keystore.b64
+# Windows PowerShell
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("stepup-upload.jks")) > keystore.b64
+```
+
+`github.com/mycyi1994-hash/GIWASTEPN` → **Settings → Secrets and variables → Actions**
+→ **New repository secret** 로 4개를 등록합니다.
+
+| 이름 | 값 |
 |---|---|
-| **가장 중요한 것** | **실외에서 걸으면서** GPS 경로가 그려지는 장면. 이게 목업으로 위조 불가능한 유일한 증거입니다 |
-| 촬영 방법 | 안드로이드 **화면 녹화** (빠른 설정 패널 → 화면 녹화 타일) |
-| 나눠 찍기 | **A세션**: 실외 5~8분 걷기 / **B세션**: 실내에서 나머지 화면 |
-| 편집 | CapCut 또는 VLLO (무료). 자막만 얹으면 됩니다 |
-| 업로드 | YouTube → **공개 상태 `일부 공개(Unlisted)`** ← `비공개`는 절대 안 됩니다 |
+| `RELEASE_KEYSTORE_BASE64` | `keystore.b64` 파일 내용 전체 |
+| `RELEASE_KEYSTORE_PASSWORD` | 4-1의 키스토어 비밀번호 |
+| `RELEASE_KEY_ALIAS` | `stepup-upload` |
+| `RELEASE_KEY_PASSWORD` | 4-1의 키 비밀번호 (같게 했다면 동일) |
 
-### 촬영 전 반드시
+등록하면 CI가 자동으로 서명된 AAB를 만듭니다. **시크릿이 없으면 그 단계는 조용히
+건너뛰므로**, 지금 당장 안 하셔도 다른 빌드는 정상 동작합니다.
 
-- [ ] **방해 금지 모드 ON** (알림이 뜨면 다시 찍어야 합니다)
-- [ ] **스니커즈 1개 민팅 + 코스 1개 저장** (빈 계정이면 전부 0이라 초라합니다)
-- [ ] 화면 밝기 최대, 배터리 50% 이상
-- [ ] 개활지에서 촬영 (건물 사이 ❌ — GPS가 안 잡힙니다)
-
-### 마지막 카드 문구 (그대로 쓰세요)
-
-```
-✅ App: shipped, installable APK
-✅ Contracts: written, 43 tests passing
-⏳ Next: deploy on GIWA Sepolia (chain 91342)
-```
-
-> ⚠️ **"Live on GIWA" 같은 문구는 쓰지 마세요.** 심사자가 익스플로러에서
-> 확인하는 순간 프로젝트 전체 신뢰가 무너집니다.
-
-**시간이 없으면 60초 축약본**도 `DEMO.md`에 있습니다. 축약본으로도 8번은 통과합니다.
+> Play Console에서 **Play App Signing**을 켜면 구글이 배포 키를 따로 관리합니다.
+> 이 업로드 키는 "구글에 올릴 때 쓰는 열쇠"일 뿐이라, 최악의 경우 재발급이 가능합니다.
 
 ---
 
-# 8단계 · 나머지 문항 캡처 보내주기
+# 5. 법률 검토 착수
 
-아직 **1, 2, 5, 6, 11, 12번**은 화면을 못 봐서 못 썼습니다.
-폼에서 그 화면들을 캡처해서 보내주시면, 지금까지와 같은 형식으로 써 드립니다.
+**가장 먼저 답이 나와야 하는 질문입니다.** 답에 따라 Phase 2 이후 설계가 바뀝니다.
 
-- 영어판 + 한국어판
-- 글자 수 검증 (제한의 75~100%)
+### 변호사에게 물어볼 것
+
+1. **SUP 토큰이 국내에서 어떤 지위인가** — 가상자산이용자보호법 적용 대상인지
+2. **P2E 판정 리스크** — 걸음으로 토큰을 벌고 NFT 뽑기가 있는 피트니스 앱이
+   게임산업법상 게임물로 분류될 수 있는지. 분류되면 국내 출금은 사실상 불가합니다.
+3. **위치기반서비스사업 신고** — GPS 러닝 기록 수집이 신고 대상인지
+4. **1차 출시 국가를 어디로 해야 하는가** — 한국 / 일본 / EU(MiCA) / 미국은 취급이 전부 다릅니다
+
+### 검토 결과에 따른 갈림길
+
+| 결론 | 대응 |
+|---|---|
+| 국내 출금 가능 | 계획대로 진행 |
+| 국내 출금 불가 | **투트랙** — 국내는 출금 없는 빌드(지금 구조 그대로 완결됨), 허용 국가부터 온체인 활성화 |
+
+앱이 이미 "지갑 없이도 완전히 플레이되는" 구조라 두 번째 결론이 나와도 출시가
+막히지는 않습니다. **다만 그 사실을 알고 설계해야 하므로 지금 물어보셔야 합니다.**
+
+> ⚖️ 저는 변호사가 아니고, 이 문서의 어떤 내용도 법률 자문이 아닙니다.
+> 블록체인·핀테크를 다뤄 본 로펌에 상담하세요.
 
 ---
 
@@ -265,20 +211,20 @@ git push
 
 | 증상 | 원인 / 해결 |
 |---|---|
-| GitHub 404 | 로그인 안 됨 또는 아직 비공개 → 1~3단계 |
-| 시크릿 모드에서만 404 | 아직 비공개 → 3단계 |
-| 저장소는 열리는데 옛날 화면 | 기본 브랜치 안 바꿈 → 2단계 |
-| 문서 링크 404 | 브랜치 이름이 바뀜 → 링크의 `claude/work-history-pjm57c` 부분 확인 |
-| `npm run deploy:giwa` 가스 에러 | 파우셋에서 ETH 못 받음 → 6-3 |
+| `npm run verify:giwa` 실패 | 에러 메시지 그대로 보내주세요. 수동 업로드 경로는 `npm run verify:blockscout` |
+| `wrangler login` 이 안 열림 | `npx wrangler login --browser=false` 로 나온 URL을 직접 붙여넣기 |
+| `/health` 가 `"ok": false` | 시크릿 등록 누락 → 2-2의 `wrangler secret put` 다시 |
 | APK "앱이 설치되지 않았습니다" | 다른 서명 버전이 이미 설치됨 → 기존 StepUp 삭제 후 재설치 |
-| 폼 글자 수 초과 | 문장을 더하셨을 가능성 → `APPLICATION.md` 원문 그대로 사용 |
+| Play Console 신원 확인 반려 | 신분증 사진의 네 모서리가 다 보이게, 빛 반사 없이 재촬영 |
+| GitHub Actions 빨간불 | Actions 탭 → 실패한 잡 → 로그를 그대로 보내주세요 |
 
-**에러가 나면 메시지를 그대로 복사해서 보내주세요.** 단, **개인키가 들어간 줄은 빼고** 보내주셔야 합니다.
+**에러가 나면 메시지를 그대로 복사해서 보내주세요.** 단, **개인키가 들어간 줄은 빼고**
+보내주셔야 합니다.
 
 ---
 
 <div align="center">
 
-**1~5단계 = 약 17분.** 거기까지만 하셔도 6개 문항이 제출 가능합니다.
+전체 계획 · [정식 출시 계획](LAUNCH-PLAN.md) · [컨트랙트 가이드](../contracts/README.md) · [어테스터](../attester/README.md)
 
 </div>

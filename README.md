@@ -36,7 +36,7 @@ that behaviour to a token economy that GIWA can settle.
 | **Platform** | Native Android (Kotlin + Jetpack Compose) |
 | **Chain** | GIWA (target settlement layer for SUP and sneaker NFTs) |
 | **Status** | Working app, installable APK, **60+ screens shipped**. On-chain settlement is the next milestone — see the [roadmap](#-roadmap). |
-| **Scale today** | 76 Kotlin source files · 648 localized strings × 4 languages · 44 sneaker NFT designs · 100 achievements · 60 runner levels |
+| **Scale today** | 79 Kotlin source files · 666 localized strings × 4 languages · 44 sneaker NFT designs · 100 achievements · 60 runner levels |
 
 ### The problem
 
@@ -177,7 +177,7 @@ actually covered.
 
 ### Localization
 
-Korean · English · 简体中文 · 日本語 — **648 strings**, fully translated.
+Korean · English · 简体中文 · 日本語 — **666 strings**, fully translated.
 Follows the system language by default, and on Android 13+ the in-app
 **language setting** (`localeConfig`) can override it per-app. Every user-facing
 string is localized; only proper nouns (StepUp, SUP, GIWA) stay fixed.
@@ -362,12 +362,16 @@ fingerprint matches this keystore.
 - [x] Course system — create, select, share, distance-scaled completion rewards
 - [x] Localization — Korean / English / Chinese / Japanese, in-app language setting
 - [x] **Contracts written and tested** — `SUPToken` (ERC-20), `SneakerNFT` (ERC-721), `RewardDistributor`, `CourseRegistry` — see [`contracts/`](contracts/)
-- [ ] **Deploy and source-verify on GIWA Sepolia** (chain ID 91342)
-- [ ] **Wallet connect + on-chain SUP withdrawal**
+- [x] **Deployed on GIWA Sepolia** (chain ID 91342) — 4 contracts live since 2026-07-31, reward pool funded with 50,000,000 SUP ([addresses](#-contracts))
+- [ ] Source-verify the deployed contracts on the GIWA explorer
+- [ ] Real Google sign-in and account sync (today's sign-in is a local demo)
 - [ ] Backend for community, ranking and course sharing (currently local + seeded)
+- [ ] **Wallet + on-chain SUP withdrawal** — the app still settles entirely on-device
 - [ ] Sneaker NFT marketplace (trade / rent)
 - [ ] Health Connect integration
 - [ ] Anti-cheat — GPS plausibility, cadence sanity, server-side run proof
+
+The full path from here to a Play Store release — architecture, design decisions, phases and exit criteria — is in **[docs/LAUNCH-PLAN.md](docs/LAUNCH-PLAN.md)**.
 
 ---
 
@@ -410,7 +414,7 @@ StepUp은 매일의 걷기와 달리기를 온체인 리워드 루프로 바꿉�
 | **플랫폼** | 네이티브 안드로이드 (Kotlin + Jetpack Compose) |
 | **체인** | GIWA (SUP·스니커즈 NFT의 정산 레이어) |
 | **현재 상태** | 동작하는 앱, 설치 가능한 APK, **60개 이상 화면 완성**. 온체인 정산이 다음 마일스톤입니다 — [로드맵](#-로드맵) 참고 |
-| **규모** | Kotlin 76개 파일 · 문자열 648개 × 4개 언어 · 스니커즈 NFT 44종 · 업적 100종 · 러너 레벨 60단계 |
+| **규모** | Kotlin 79개 파일 · 문자열 666개 × 4개 언어 · 스니커즈 NFT 44종 · 업적 100종 · 러너 레벨 60단계 |
 
 ### 문제
 
@@ -551,7 +555,7 @@ APK를 다시 빌드해 [`apk-dist`](../../tree/apk-dist) 브랜치에 강제 �
 
 ### 다국어
 
-한국어 · English · 简体中文 · 日本語 — **문자열 648개** 전부 번역했습니다.
+한국어 · English · 简体中文 · 日本語 — **문자열 666개** 전부 번역했습니다.
 기본은 시스템 언어를 따르고, Android 13+에서는 앱 내 **언어 설정**
 (`localeConfig`)으로 앱만 따로 바꿀 수 있습니다. 고유명사(StepUp, SUP, GIWA)를
 제외한 모든 노출 문자열이 현지화되어 있습니다.
@@ -712,12 +716,16 @@ CI는 매 빌드마다 APK의 SHA-256 인증서 지문이 이 키스토어와 �
 - [x] 코스 시스템 — 만들기·선택·공유, 거리별 정량 완주 보상
 - [x] 다국어 — 한국어/영어/중국어/일본어, 앱 내 언어 설정
 - [x] **컨트랙트 작성·테스트 완료** — `SUPToken`(ERC-20), `SneakerNFT`(ERC-721), `RewardDistributor`, `CourseRegistry` — [`contracts/`](contracts/)
-- [ ] **GIWA Sepolia 배포 및 소스 검증** (체인 ID 91342)
-- [ ] **지갑 연결 + 온체인 SUP 출금**
+- [x] **GIWA Sepolia 배포 완료** (체인 ID 91342) — 2026-07-31 컨트랙트 4종 배포, 리워드 풀 5,000만 SUP 충전 ([주소](#-컨트랙트))
+- [ ] 배포된 컨트랙트 익스플로러 소스 검증
+- [ ] 실제 구글 로그인 및 계정 동기화 (현재 로그인은 로컬 데모)
 - [ ] 커뮤니티·랭킹·코스 공유 백엔드 (현재는 로컬 + 시드 데이터)
+- [ ] **지갑 + 온체인 SUP 출금** — 앱은 아직 전부 기기 안에서 정산합니다
 - [ ] 스니커즈 NFT 마켓 (거래 / 임대)
 - [ ] Health Connect 연동
 - [ ] 어뷰징 방지 — GPS 타당성, 케이던스 정합성, 서버 측 러닝 증명
+
+여기서 스토어 정식 출시까지의 전체 경로 — 아키텍처, 설계 결정, 단계별 계획과 완료 기준 — 는 **[docs/LAUNCH-PLAN.md](docs/LAUNCH-PLAN.md)** 에 있습니다.
 
 ---
 
