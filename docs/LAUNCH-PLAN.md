@@ -339,6 +339,6 @@
 
 <div align="center">
 
-관련 문서 · [README](../README.md) · [토크노믹스](TOKENOMICS.md) · [컨트랙트](../contracts/README.md) · [어테스터](../attester/README.md) · [TODO](TODO-USER.md)
+관련 문서 · [README](../README.md) · [토크노믹스](TOKENOMICS.md) · [컨트랙트](../contracts/README.md) · [어테스터](../attester/README.md) · [릴리즈 서명](RELEASE-SIGNING.md)
 
 </div>

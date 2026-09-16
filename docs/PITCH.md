@@ -7,7 +7,7 @@
 
 [English](#slide-1--title) · [한국어 ↓](#한국어)
 
-**[⬇️ Install the APK](https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk)** · [Repository](https://github.com/mycyi1994-hash/GIWASTEPN) · [One-Pager](ONEPAGER.md) · [Tokenomics](TOKENOMICS.md)
+**[⬇️ Install the APK](https://github.com/mycyi1994-hash/GIWASTEPN/raw/apk-dist/StepUp-debug.apk)** · [Repository](https://github.com/mycyi1994-hash/GIWASTEPN) · [One-Pager](ONEPAGER.md) · [Architecture](ARCHITECTURE.md) · [Tokenomics](TOKENOMICS.md)
 
 </div>
 
@@ -82,7 +82,7 @@ Three commitments that fall out of that:
 | | |
 |---|---|
 | 76 | Kotlin source files |
-| 648 | localized strings × ko / en / zh / ja |
+| 665 | localized strings × ko / en / zh / ja |
 | 44 | sneaker NFT designs |
 | 100 | achievements across 13 categories |
 | 60 | runner levels (≈2,914.6 km to max) |
@@ -369,7 +369,7 @@ reward loop that already runs onto GIWA.
 | | |
 |---|---|
 | 76 | Kotlin 소스 파일 |
-| 648 | 현지화 문자열 × ko / en / zh / ja |
+| 665 | 현지화 문자열 × ko / en / zh / ja |
 | 44 | 스니커즈 NFT 디자인 |
 | 100 | 13개 카테고리 업적 |
 | 60 | 러너 레벨 (만렙까지 약 2,914.6 km) |

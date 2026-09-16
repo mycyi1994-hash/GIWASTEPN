@@ -15,7 +15,7 @@ Walk or run in the real world, earn **SUP**, and grow a collection of sneaker NF
 
 **[⬇️ Download the APK](#-download--try-it)** · [Screenshots](#-screenshots) · [Build from source](#-build-from-source) · [한국어 문서 ↓](#한국어)
 
-📄 **[One-Pager](docs/ONEPAGER.md)** · 💰 **[Tokenomics](docs/TOKENOMICS.md)** · 🎤 **[Pitch Deck](docs/StepUp-PitchDeck.pdf)** · ⛓️ **[Contracts](contracts/)** · 🎬 **[Demo script](docs/DEMO.md)** · 📝 **[Application sheet](docs/APPLICATION.md)** · ✅ **[TODO](docs/TODO-USER.md)** · 🌐 **[Landing page](web/)** · 🔏 **[Attester](attester/)** · 🚀 **[Launch plan](docs/LAUNCH-PLAN.md)**
+📄 **[One-Pager](docs/ONEPAGER.md)** · 🏗️ **[Architecture](docs/ARCHITECTURE.md)** ([PDF](docs/StepUp-Architecture.pdf)) · 💰 **[Tokenomics](docs/TOKENOMICS.md)** · 🎤 **[Pitch Deck](docs/PITCH.md)** ([PDF](docs/StepUp-PitchDeck.pdf)) · ⛓️ **[Contracts](contracts/)** · 🌐 **[Landing page](web/)** · 🔏 **[Attester](attester/)** · 🚀 **[Launch plan](docs/LAUNCH-PLAN.md)**
 
 </div>
 
@@ -36,7 +36,7 @@ that behaviour to a token economy that GIWA can settle.
 | **Platform** | Native Android (Kotlin + Jetpack Compose) |
 | **Chain** | GIWA (target settlement layer for SUP and sneaker NFTs) |
 | **Status** | Working app, installable APK, **60+ screens shipped**. On-chain settlement is the next milestone — see the [roadmap](#-roadmap). |
-| **Scale today** | 79 Kotlin source files · 666 localized strings × 4 languages · 44 sneaker NFT designs · 100 achievements · 60 runner levels |
+| **Scale today** | 81 Kotlin source files · 666 localized strings × 4 languages · 44 sneaker NFT designs · 100 achievements · 60 runner levels |
 
 ### The problem
 
@@ -395,7 +395,7 @@ The full path from here to a Play Store release — architecture, design decisio
 
 **[⬇️ APK 내려받기](#-apk-내려받기)** · [스크린샷](#-스크린샷) · [소스 빌드](#-소스에서-빌드하기)
 
-📄 **[원페이저](docs/ONEPAGER.md)** · 💰 **[토크노믹스](docs/TOKENOMICS.md)** · 🎤 **[피치덱 PDF](docs/StepUp-PitchDeck-KO.pdf)** · ⛓️ **[컨트랙트](contracts/)** · 🎬 **[데모 대본](docs/DEMO.md)** · 📝 **[지원서 완본](docs/APPLICATION.md)** · ✅ **[할 일 가이드](docs/TODO-USER.md)** · 🌐 **[랜딩 페이지](web/)** · 🔏 **[어테스터](attester/)** · 🚀 **[정식 출시 계획](docs/LAUNCH-PLAN.md)**
+📄 **[원페이저](docs/ONEPAGER.md)** · 🏗️ **[기술 아키텍처](docs/ARCHITECTURE.md)** ([영문 PDF](docs/StepUp-Architecture.pdf)) · 💰 **[토크노믹스](docs/TOKENOMICS.md)** · 🎤 **[피치덱](docs/PITCH.md)** ([한국어 PDF](docs/StepUp-PitchDeck-KO.pdf)) · ⛓️ **[컨트랙트](contracts/)** · 🌐 **[랜딩 페이지](web/)** · 🔏 **[어테스터](attester/)** · 🚀 **[정식 출시 계획](docs/LAUNCH-PLAN.md)**
 
 ---
 
@@ -414,7 +414,7 @@ StepUp은 매일의 걷기와 달리기를 온체인 리워드 루프로 바꿉�
 | **플랫폼** | 네이티브 안드로이드 (Kotlin + Jetpack Compose) |
 | **체인** | GIWA (SUP·스니커즈 NFT의 정산 레이어) |
 | **현재 상태** | 동작하는 앱, 설치 가능한 APK, **60개 이상 화면 완성**. 온체인 정산이 다음 마일스톤입니다 — [로드맵](#-로드맵) 참고 |
-| **규모** | Kotlin 79개 파일 · 문자열 666개 × 4개 언어 · 스니커즈 NFT 44종 · 업적 100종 · 러너 레벨 60단계 |
+| **규모** | Kotlin 81개 파일 · 문자열 666개 × 4개 언어 · 스니커즈 NFT 44종 · 업적 100종 · 러너 레벨 60단계 |
 
 ### 문제
 
