@@ -19,16 +19,13 @@ interface AuthSessionStore {
  * 지금 누구로 로그인해 있는지를 관리한다.
  *
  * 하는 일은 하나다 — **요청할 때마다 쓸 수 있는 출입증을 내준다.**
- * 그 과정에서 세 가지를 알아서 처리한다.
  *
- *  1. 아직 계정이 없으면 익명 계정을 만든다
- *  2. 출입증이 곧 만료되면 미리 갱신한다
- *  3. 갱신마저 거절되면 (예: 오래 안 써서 만료) 익명 계정을 다시 만든다
+ * 로그인 수단은 구글 하나뿐이라 계정을 대신 만들어 줄 방법이 없다. 세션이
+ * 없으면 사용자가 직접 로그인해야 한다.
  *
- * 3번이 중요하다. 갱신 실패를 그냥 오류로 넘기면 사용자는 이유도 모른 채
- * 로그아웃되고, 서버에 있던 기록에 다시 닿지 못한다. 다만 **구글을 붙인
- * 계정은 다시 만들지 않는다** — 그건 진짜 로그아웃이고, 익명 계정을 새로
- * 만들어 주면 남의 기록처럼 텅 빈 화면을 보게 된다.
+ * 갱신 실패를 네트워크 문제와 자격 만료로 갈라 두는 것이 중요하다. 지하철에서
+ * 끊긴 것을 로그아웃으로 처리하면, 밖에 나왔을 때 이유도 모른 채 로그인
+ * 화면을 다시 보게 된다.
  */
 class SessionHolder(
     private val auth: SupabaseAuth,
@@ -40,13 +37,11 @@ class SessionHolder(
     // 무효가 되어 그 요청부터 로그아웃된다. 한 번에 하나만 들어가게 한다.
     private val mutex = Mutex()
 
-    /** 쓸 수 있는 출입증. 없으면 만들고, 만료가 가까우면 갱신한다. */
+    /** 쓸 수 있는 출입증. 만료가 가까우면 갱신한다. */
     suspend fun accessToken(): TokenResult = mutex.withLock {
         val current = store.load()
+            ?: return@withLock TokenResult.SignInRequired("로그인이 필요합니다")
 
-        if (current == null) {
-            return@withLock createAnonymous()
-        }
         if (!current.needsRefresh(now())) {
             return@withLock TokenResult.Ok(current.accessToken, current.user?.id)
         }
@@ -61,23 +56,17 @@ class SessionHolder(
                 TokenResult.Ok(merged.accessToken, merged.user?.id)
             }
 
-            is AuthResult.Rejected -> {
-                if (current.user?.isAnonymous == false) {
-                    // 구글을 붙인 계정이다. 다시 로그인하게 해야 한다 —
-                    // 새 익명 계정을 만들어 주면 남의 기록처럼 빈 화면을 본다.
-                    TokenResult.SignInRequired(refreshed.reason)
-                } else {
-                    store.clear()
-                    createAnonymous()
-                }
-            }
+            // 자격이 만료됐다. 다시 로그인하게 한다. 저장된 세션은 지우지
+            // 않는다 — 네트워크가 잠깐 이상해 400 이 온 경우까지 지워 버리면
+            // 멀쩡한 세션을 잃는다. 로그인에 성공하면 어차피 덮어써진다.
+            is AuthResult.Rejected -> TokenResult.SignInRequired(refreshed.reason)
 
             is AuthResult.Retry -> TokenResult.Unavailable(refreshed.reason)
         }
     }
 
-    /** 구글 계정을 붙인다. 성공하면 계정은 그대로고 신원만 추가된다. */
-    suspend fun linkGoogle(idToken: String, nonce: String? = null): TokenResult = mutex.withLock {
+    /** 구글로 로그인한다. */
+    suspend fun signInWithGoogle(idToken: String, nonce: String? = null): TokenResult = mutex.withLock {
         when (val result = auth.signInWithGoogle(idToken, nonce)) {
             is AuthResult.Ok -> {
                 val session = result.session
@@ -91,18 +80,11 @@ class SessionHolder(
 
     suspend fun currentUserId(): String? = store.load()?.user?.id
 
-    suspend fun isAnonymous(): Boolean = store.load()?.user?.isAnonymous ?: true
+    /** 로그인한 적이 있는가. 첫 화면을 로그인으로 띄울지 정하는 근거다. */
+    suspend fun isSignedIn(): Boolean = store.load() != null
 
-    private suspend fun createAnonymous(): TokenResult =
-        when (val created = auth.signInAnonymously()) {
-            is AuthResult.Ok -> {
-                store.save(created.session)
-                TokenResult.Ok(created.session.accessToken, created.session.user?.id)
-            }
-            // 익명 로그인이 대시보드에서 꺼져 있으면 여기로 온다.
-            is AuthResult.Rejected -> TokenResult.SignInRequired(created.reason)
-            is AuthResult.Retry -> TokenResult.Unavailable(created.reason)
-        }
+    /** 로그아웃. 저장된 세션을 지운다. */
+    suspend fun signOut() = mutex.withLock { store.clear() }
 }
 
 sealed interface TokenResult {
