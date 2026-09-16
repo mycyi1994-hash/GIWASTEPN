@@ -31,11 +31,17 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      # 컴파일 오류는 Gradle 스택트레이스 수백 줄에 파묻힌다. 출력을 남겨 두고
+      # 실패했을 때 정작 읽어야 할 'e:' 줄만 뽑아 요약에 올린다.
       - name: Unit tests
-        run: ./gradlew :app:testDebugUnitTest --stacktrace
+        run: |
+          set -o pipefail
+          ./gradlew :app:testDebugUnitTest --stacktrace 2>&1 | tee -a build-output.log
 
       - name: Build debug APK
-        run: ./gradlew :app:assembleDebug --stacktrace
+        run: |
+          set -o pipefail
+          ./gradlew :app:assembleDebug --stacktrace 2>&1 | tee -a build-output.log
 
       # 고정 키스토어로 서명됐는지 확인한다. 지문이 빌드마다 달라지면
       # 기기에 이미 설치된 앱을 덮어쓸 수 없다(INSTALL_FAILED_UPDATE_INCOMPATIBLE).
@@ -58,7 +64,32 @@ jobs:
       # 서명 자격이 없어도 빌드 자체는 되어야 한다 — 난독화 문제를 출시
       # 직전이 아니라 지금 발견하는 것이 목적이다.
       - name: Build release (unsigned, R8 on)
-        run: ./gradlew :app:assembleRelease --stacktrace
+        run: |
+          set -o pipefail
+          ./gradlew :app:assembleRelease --stacktrace 2>&1 | tee -a build-output.log
+
+      # 실패 원인을 한눈에. 스택트레이스가 아니라 컴파일러가 가리킨 줄을 본다.
+      - name: Surface compiler errors
+        if: failure()
+        run: |
+          {
+            echo "## 컴파일 오류"
+            echo
+            echo '```'
+            grep -E "^e: |^w: .*error|FAILED$|^> Task .* FAILED" build-output.log | head -40 \
+              || echo "(컴파일 오류 줄을 찾지 못했습니다 — 전체 로그를 확인하세요)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "───────── 컴파일 오류 ─────────"
+          grep -E "^e: " build-output.log | head -40 || true
+
+      - name: Upload build log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output-log
+          path: build-output.log
+          retention-days: 7
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
