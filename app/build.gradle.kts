@@ -46,6 +46,26 @@ android {
             "ATTESTER_URL",
             "\"${secret("ATTESTER_URL", "stepupAttesterUrl") ?: ""}\"",
         )
+
+        // 서버(Supabase) 주소와 공개 키.
+        //
+        // 이 두 값은 **공개되어도 되는 값**이다. APK 를 뜯으면 어차피 나오고,
+        // 애초에 앱에 넣으라고 발급되는 키다. 실제 보호는 서버의 행 단위 보안
+        // 규칙(supabase/migrations/)이 한다 — 이 키만으로는 남의 데이터를 볼 수
+        // 없고, SUP 원장에는 쓰지도 못한다.
+        //
+        // 절대 여기 넣으면 안 되는 것: sb_secret_ 로 시작하는 키. 그건 모든
+        // 보안 규칙을 무시한다.
+        buildConfigField(
+            "String",
+            "SUPABASE_URL",
+            "\"${secret("SUPABASE_URL", "stepupSupabaseUrl") ?: "https://pupjzcmybuoyhzfwrsdf.supabase.co"}\"",
+        )
+        buildConfigField(
+            "String",
+            "SUPABASE_KEY",
+            "\"${secret("SUPABASE_KEY", "stepupSupabaseKey") ?: "sb_publishable_jt74AKM32zdqnJlsFHEo2g_MNHa-WRO"}\"",
+        )
     }
 
     signingConfigs {
