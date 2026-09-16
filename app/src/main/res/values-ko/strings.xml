@@ -435,6 +435,13 @@
     <string name="rank_my_position">내 순위</string>
     <string name="rank_total_runners">이번 주 러너 %1$d명 중</string>
     <string name="ranking_teaser">전체 %1$d위 · %2$s SUP</string>
+    <string name="ranking_teaser_unknown">내 순위 보기 · %1$s SUP</string>
+    <string name="rank_loading">순위를 불러오는 중…</string>
+    <string name="rank_offline">연결이 없어 순위를 가져오지 못했습니다.</string>
+    <string name="rank_sign_in">다시 로그인하면 순위가 보입니다.</string>
+    <string name="rank_failed">순위를 가져오지 못했습니다.</string>
+    <string name="rank_retry">다시 시도</string>
+    <string name="rank_no_record">아직 기록이 없습니다. 한 번 달리면 순위에 오릅니다.</string>
     <string name="rank_faction_title">종족 순위</string>
     <string name="rank_faction_body">달린 거리는 그때 신고 있던 신발의 종족에 쌓입니다. 내가 1등이 아니어도 우리 종족은 1등일 수 있어요.</string>
     <string name="rank_faction_km">누적 %1$s km</string>

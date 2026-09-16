@@ -12,6 +12,7 @@ import com.stepup.android.data.remote.SupabaseAuth
 import com.stepup.android.data.repo.BoostRepository
 import com.stepup.android.data.repo.ClaimRepository
 import com.stepup.android.data.repo.PrefsAuthSessionStore
+import com.stepup.android.data.repo.RankingRepository
 import com.stepup.android.data.repo.ServerSessionRecorder
 import com.stepup.android.data.repo.CommunityRepository
 import com.stepup.android.data.repo.CourseRepository
@@ -54,6 +55,9 @@ object ServiceLocator {
         private set
 
     lateinit var claimRepository: ClaimRepository
+
+    /** 순위표 — 유일하게 남의 기록이 필요한 화면이라 서버가 계산해 준다 */
+    lateinit var rankingRepository: RankingRepository
         private set
 
     /** 지금 누구로 로그인해 있는지. 화면이 로그인 상태를 물을 때 쓴다. */
@@ -86,12 +90,12 @@ object ServiceLocator {
             auth = SupabaseAuth(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_KEY),
             store = PrefsAuthSessionStore(userPrefs),
         )
+        val server = StepUpServer(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_KEY, sessionHolder)
         claimRepository = ClaimRepository(
             sessionDao = database.walkSessionDao(),
-            recorder = ServerSessionRecorder(
-                StepUpServer(BuildConfig.SUPABASE_URL, BuildConfig.SUPABASE_KEY, sessionHolder),
-            ),
+            recorder = ServerSessionRecorder(server),
         )
+        rankingRepository = RankingRepository(server)
         stepTracker = StepTracker(app, userPrefs) { day ->
             database.stepDao().byDay(day)?.steps ?: 0
         }

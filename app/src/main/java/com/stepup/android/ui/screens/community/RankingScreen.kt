@@ -21,10 +21,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -33,18 +34,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.stepup.android.R
-import com.stepup.android.domain.FactionLeaderboard
+import com.stepup.android.data.repo.FactionRankingState
+import com.stepup.android.data.repo.RankingProblem
+import com.stepup.android.data.repo.RankingState
 import com.stepup.android.domain.FactionRank
-import com.stepup.android.domain.Leaderboard
 import com.stepup.android.domain.RankBoard
 import com.stepup.android.domain.RankEntry
 import com.stepup.android.ui.components.DarkIconButton
 import com.stepup.android.ui.components.GlowCard
+import com.stepup.android.ui.components.quietClickable
 import com.stepup.android.ui.theme.CarbonHigh
 import com.stepup.android.ui.theme.Night
 import com.stepup.android.ui.theme.Silver
@@ -53,34 +57,34 @@ import com.stepup.android.ui.theme.Snow
 import com.stepup.android.ui.theme.Volt
 
 /**
- * 랭킹 — 이번 주 걸음 수와 누적 SUP 두 가지 기준.
+ * 랭킹.
  *
- * 내 실적은 실제 데이터에서 오고, 나머지 러너는 고정 시드로 만들어 순위가 흔들리지 않는다.
+ * 줄 세우는 축은 넷이다 — 쾌속·지구력·적립, 그리고 종족.
+ *
+ * **여기 보이는 사람은 전부 실제 사용자다.** 예전에는 상대 15명이 코드에
+ * 박혀 있었다. 그러면 "당신은 3등입니다"는 거짓말이 된다. 지금은 서버가
+ * 계산하고, 못 가져오면 지어내지 않고 못 가져왔다고 말한다.
  */
 @Composable
 fun RankingScreen(
     onBack: () -> Unit = {},
     viewModel: CommunityViewModel = viewModel(factory = CommunityViewModel.Factory),
 ) {
-    val balance by viewModel.balance.collectAsStateWithLifecycle()
-    val topSpeed by viewModel.topSpeedKmh.collectAsStateWithLifecycle()
-    val activeSec by viewModel.totalActiveSec.collectAsStateWithLifecycle()
-    val factionKm by viewModel.factionKm.collectAsStateWithLifecycle()
-    val myFaction by viewModel.myFaction.collectAsStateWithLifecycle()
     var boardIndex by rememberSaveable { mutableIntStateOf(0) }
 
     val personalBoards = RankBoard.entries
     val isFactionTab = boardIndex >= personalBoards.size
     val board = personalBoards[boardIndex.coerceIn(0, personalBoards.lastIndex)]
     val meLabel = stringResource(R.string.rank_me)
-    val entries = remember(board, topSpeed, activeSec, balance, meLabel) {
-        Leaderboard.build(board, meLabel, topSpeed, activeSec, balance)
+
+    val ranking by viewModel.ranking.collectAsStateWithLifecycle()
+    val factionRanking by viewModel.factionRanking.collectAsStateWithLifecycle()
+
+    // 탭을 옮길 때마다 그 부문을 받아 온다. 이미 받아 둔 부문은 다시 묻지
+    // 않는다 — 같은 답을 받으려고 네트워크를 쓸 이유가 없다.
+    LaunchedEffect(boardIndex) {
+        if (isFactionTab) viewModel.loadFactionRanking() else viewModel.loadRanking(board, meLabel)
     }
-    val factions = remember(factionKm, myFaction) {
-        FactionLeaderboard.build(factionKm, myFaction)
-    }
-    val me = entries.first { it.isMe }
-    val podium = entries.take(3)
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -140,13 +144,44 @@ fun RankingScreen(
                     )
                 }
             }
-            items(factions, key = { it.faction.id }) { row -> FactionRow(row) }
+            when (val state = factionRanking) {
+                is FactionRankingState.Loading -> item { RankingNotice(R.string.rank_loading) }
+                is FactionRankingState.Failed -> item {
+                    RankingNotice(state.problem.message()) { viewModel.loadFactionRanking(force = true) }
+                }
+                is FactionRankingState.Ready ->
+                    items(state.rows, key = { it.faction.id }) { row -> FactionRow(row) }
+            }
             return@LazyColumn
         }
 
-        item { Podium(podium, board) }
+        val ready = ranking as? RankingState.Ready
+        if (ready == null) {
+            item {
+                val state = ranking
+                if (state is RankingState.Failed) {
+                    RankingNotice(state.problem.message()) {
+                        viewModel.loadRanking(board, meLabel, force = true)
+                    }
+                } else {
+                    RankingNotice(R.string.rank_loading)
+                }
+            }
+            return@LazyColumn
+        }
 
-        item {
+        val entries = ready.entries
+        val me = ready.me
+
+        // 시상대는 3명이 모여야 성립한다. 아직 두 명뿐일 때 빈 자리를 세워
+        // 두면 순위표가 아니라 공사장처럼 보인다.
+        if (entries.size >= 3) item { Podium(entries.take(3), board) }
+
+        if (me == null) {
+            // 순위에 오르려면 한 번은 뛰어야 한다. 0으로 채운 줄을 만들어
+            // "전체 1명 중 1등"이라고 하는 것보다 이렇게 말하는 편이 낫다.
+            item { RankingNotice(R.string.rank_no_record) }
+        } else item {
             GlowCard(accent = true, contentPadding = PaddingValues(16.dp), spacing = 4.dp) {
                 Text(
                     text = stringResource(R.string.rank_my_position),
@@ -177,7 +212,7 @@ fun RankingScreen(
                 Text(
                     text = stringResource(
                         R.string.rank_total_runners,
-                        entries.size,
+                        ready.totalRunners,
                     ),
                     fontSize = 11.sp,
                     color = Silver,
@@ -185,10 +220,49 @@ fun RankingScreen(
             }
         }
 
-        items(entries, key = { it.name }) { entry ->
+        items(entries, key = { it.rank }) { entry ->
             RankRow(entry = entry, board = board)
         }
     }
+}
+
+/**
+ * 순위 대신 보여 줄 한 줄.
+ *
+ * 비워 두면 사용자는 화면이 고장 난 줄 안다. 왜 비었는지 말하고, 다시
+ * 해 볼 수 있는 것이면 누를 자리를 준다.
+ */
+@Composable
+private fun RankingNotice(@StringRes message: Int, onRetry: (() -> Unit)? = null) {
+    GlowCard(contentPadding = PaddingValues(18.dp), spacing = 8.dp) {
+        Text(
+            text = stringResource(message),
+            style = MaterialTheme.typography.bodyMedium,
+            color = Silver,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        if (onRetry != null) {
+            Text(
+                text = stringResource(R.string.rank_retry),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                color = Volt,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .quietClickable(onRetry)
+                    .padding(vertical = 6.dp),
+            )
+        }
+    }
+}
+
+@StringRes
+private fun RankingProblem.message(): Int = when (this) {
+    RankingProblem.OFFLINE -> R.string.rank_offline
+    RankingProblem.SIGN_IN_REQUIRED -> R.string.rank_sign_in
+    RankingProblem.REJECTED -> R.string.rank_failed
 }
 
 @Composable

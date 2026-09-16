@@ -29,6 +29,34 @@ data class SessionRecorded(
 @Serializable
 private data class BalanceRow(val balance: Double)
 
+/**
+ * 순위표 한 줄.
+ *
+ * `total` 은 받은 줄 수가 아니라 **순위에 오른 전체 인원**이다. 서버는 상위
+ * 몇 명과 내 줄만 보내므로, 받은 줄을 세면 "21명 중 47등" 같은 말이 된다.
+ */
+@Serializable
+data class LeaderboardRow(
+    val rank: Int,
+    @SerialName("user_id") val userId: String,
+    val name: String,
+    val monogram: String,
+    @SerialName("top_speed_kmh") val topSpeedKmh: Double,
+    @SerialName("active_sec") val activeSec: Long,
+    val sup: Double,
+    @SerialName("is_me") val isMe: Boolean,
+    val total: Int,
+)
+
+/** 종족 순위 한 줄 */
+@Serializable
+data class FactionRankRow(
+    val faction: String,
+    val km: Double,
+    @SerialName("my_km") val myKm: Double,
+    val runners: Int,
+)
+
 /** 서버 호출의 결말 */
 sealed interface ServerResult<out T> {
     data class Ok<T>(val value: T) : ServerResult<T>
@@ -100,6 +128,30 @@ class StepUpServer(
             json.decodeFromString<List<SessionRecorded>>(text).firstOrNull()
         }
     }
+
+    /**
+     * 개인 순위표.
+     *
+     * 상위 [limit] 명과 **내 줄**이 함께 온다. 상위만 받으면 300등인 사람은
+     * 자기 자리를 영영 모르고, 그러면 순위표는 남의 이야기가 된다.
+     *
+     * @param board TOP_SPEED · LONGEST_TIME · TOTAL_SUP
+     */
+    suspend fun leaderboard(board: String, limit: Int = 20): ServerResult<List<LeaderboardRow>> {
+        val body = jsonBody {
+            put("p_board", board)
+            put("p_limit", limit)
+        }
+        return authed { token ->
+            http.post("$restUrl/rpc/leaderboard", body, headers(token))
+        }.map { text -> json.decodeFromString<List<LeaderboardRow>>(text) }
+    }
+
+    /** 종족 순위. 아무도 안 뛴 종족도 0으로 온다. */
+    suspend fun factionLeaderboard(): ServerResult<List<FactionRankRow>> =
+        authed { token ->
+            http.post("$restUrl/rpc/faction_leaderboard", "{}", headers(token))
+        }.map { text -> json.decodeFromString<List<FactionRankRow>>(text) }
 
     /** 지금 잔고. 서버 원장의 합이다. */
     suspend fun balance(): ServerResult<Double> =

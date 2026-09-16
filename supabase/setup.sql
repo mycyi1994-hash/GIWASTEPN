@@ -1423,7 +1423,10 @@ returns table (
   top_speed_kmh double precision,
   active_sec bigint,
   sup numeric,
-  is_me boolean
+  is_me boolean,
+  -- 순위에 오른 전체 인원. "300명 중 47등"의 300 이다. 상위 몇 명만 받으면
+  -- 앱은 이 수를 알 방법이 없어서, 받은 줄 수를 전체인 양 보여주게 된다.
+  total int
 )
 language sql
 stable
@@ -1436,6 +1439,7 @@ as $$
   ranked as (
     select
       s.*,
+      count(*) over ()::int as total,
       rank() over (
         order by
           case (select kind from board)
@@ -1460,7 +1464,8 @@ as $$
     r.top_speed_kmh,
     r.active_sec,
     r.sup,
-    r.user_id = auth.uid()
+    r.user_id = auth.uid(),
+    r.total
   from ranked r
   where r.rnk <= greatest(coalesce(p_limit, 20), 1)
      or r.user_id = auth.uid()

@@ -540,6 +540,9 @@ begin
   perform pg_temp.ok(
     (select count(*) from public.leaderboard('LONGEST_TIME', 20)) >= 1,
     '누적 시간 순위도 나온다');
+
+  select * into r from public.leaderboard('TOP_SPEED', 20) where is_me;
+  perform pg_temp.ok(r.total = 1, '전체 인원이 함께 온다 ("N명 중 몇 등"의 N)');
 end $$;
 
 do $$
@@ -565,6 +568,9 @@ begin
   perform pg_temp.ok(
     (select count(*) from public.leaderboard('TOP_SPEED', 1) where is_me) = 1,
     '상위 1명만 받아도 내 줄은 함께 온다');
+  perform pg_temp.ok(
+    (select max(total) from public.leaderboard('TOP_SPEED', 1)) = 2,
+    '한 줄만 받아도 전체 인원은 2명으로 나온다');
 end $$;
 
 reset role;

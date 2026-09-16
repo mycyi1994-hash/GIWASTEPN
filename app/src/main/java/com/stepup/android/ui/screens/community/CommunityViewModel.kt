@@ -4,19 +4,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.stepup.android.data.prefs.UserPrefs
 import com.stepup.android.data.repo.SneakerRepository
-import com.stepup.android.data.local.WalkSessionDao
-import com.stepup.android.domain.Faction
 import com.stepup.android.core.ServiceLocator
 import com.stepup.android.data.repo.CommunityRepository
 import com.stepup.android.data.repo.Crew
 import com.stepup.android.data.repo.CrewRepository
+import com.stepup.android.data.repo.FactionRankingState
+import com.stepup.android.data.repo.RankingRepository
+import com.stepup.android.data.repo.RankingState
 import com.stepup.android.data.repo.RewardRepository
 import com.stepup.android.domain.CommentThread
 import com.stepup.android.domain.Post
 import com.stepup.android.domain.PostCategory
+import com.stepup.android.domain.RankBoard
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -30,10 +33,9 @@ enum class CommunityTab { BOARD, CREW }
 class CommunityViewModel(
     private val crewRepository: CrewRepository,
     private val communityRepository: CommunityRepository,
+    private val rankingRepository: RankingRepository,
     rewardRepository: RewardRepository,
-    userPrefs: UserPrefs,
-    sneakerRepository: SneakerRepository,
-    walkSessionDao: WalkSessionDao,
+    private val sneakerRepository: SneakerRepository,
 ) : ViewModel() {
 
     val crews: StateFlow<List<Crew>> = crewRepository.crews
@@ -50,22 +52,55 @@ class CommunityViewModel(
     val balance: StateFlow<Double> = rewardRepository.balance
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0.0)
 
-    /** 역대 최고 속도(km/h) — 러닝 판정을 통과한 구간에서만 기록된다 */
-    val topSpeedKmh: StateFlow<Double> = userPrefs.topSpeedKmh
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0.0)
+    // ── 순위표 ──────────────────────────────────────────────────────
+    //
+    // 서버에서 가져온다. 예전에는 상대 15명이 코드에 박혀 있었고, 그러면
+    // "당신은 3등입니다"가 거짓말이 된다.
+    //
+    // 부문별로 받아 두고 다시 쓴다. 탭을 오갈 때마다 다시 물으면 같은 답을
+    // 받으려고 네트워크를 쓰는 셈이다.
 
-    /** 러닝에 쓴 누적 시간(초). 무효 판정된 세션은 0초로 기록돼 여기 안 들어온다. */
-    val totalActiveSec: StateFlow<Long> = walkSessionDao.observeDurationSince(0L)
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0L)
+    private val boards = MutableStateFlow<Map<RankBoard, RankingState>>(emptyMap())
 
-    /** 종족별 내 누적 거리(km) */
-    val factionKm: StateFlow<Map<Faction, Double>> = userPrefs.factionKm
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyMap())
+    private val selectedBoard = MutableStateFlow(RankBoard.TOP_SPEED)
 
-    /** 지금 신고 있는 신발의 종족 — 종족 랭킹에서 "우리 편"을 표시한다 */
-    val myFaction: StateFlow<Faction?> = sneakerRepository.equipped
-        .map { it?.faction }
+    /** 지금 보고 있는 부문의 순위 */
+    val ranking: StateFlow<RankingState> =
+        combine(selectedBoard, boards) { board, cache -> cache[board] ?: RankingState.Loading }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), RankingState.Loading)
+
+    private val _factionRanking = MutableStateFlow<FactionRankingState>(FactionRankingState.Loading)
+    val factionRanking: StateFlow<FactionRankingState> = _factionRanking
+
+    /**
+     * 커뮤니티 첫 화면의 "내 순위" 미리보기. 아직 모르면 null 이다.
+     *
+     * 적립 부문을 쓴다 — 세 부문 중 누구에게나 값이 있는 축이다.
+     */
+    val mySupRank: StateFlow<Int?> = boards
+        .map { (it[RankBoard.TOTAL_SUP] as? RankingState.Ready)?.me?.rank }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    /**
+     * @param meLabel 내 줄에 붙일 이름. 화면의 문자열 자원에서 온다.
+     * @param force 이미 받아 둔 부문도 다시 받는다 (당겨서 새로고침)
+     */
+    fun loadRanking(board: RankBoard, meLabel: String, force: Boolean = false) {
+        selectedBoard.value = board
+        if (!force && boards.value[board] is RankingState.Ready) return
+        viewModelScope.launch {
+            boards.value = boards.value + (board to RankingState.Loading)
+            boards.value = boards.value + (board to rankingRepository.personal(board, meLabel))
+        }
+    }
+
+    fun loadFactionRanking(force: Boolean = false) {
+        if (!force && _factionRanking.value is FactionRankingState.Ready) return
+        viewModelScope.launch {
+            _factionRanking.value = FactionRankingState.Loading
+            _factionRanking.value = rankingRepository.factions(sneakerRepository.equipped.first()?.faction)
+        }
+    }
 
     /** 선택된 세그먼트 — 탭을 오갔다 와도 유지된다 */
     val tab = MutableStateFlow(CommunityTab.BOARD)
@@ -170,10 +205,9 @@ class CommunityViewModel(
                 CommunityViewModel(
                     ServiceLocator.crewRepository,
                     ServiceLocator.communityRepository,
+                    ServiceLocator.rankingRepository,
                     ServiceLocator.rewardRepository,
-                    ServiceLocator.userPrefs,
                     ServiceLocator.sneakerRepository,
-                    ServiceLocator.database.walkSessionDao(),
                 )
             }
         }

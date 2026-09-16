@@ -30,6 +30,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,7 +50,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.stepup.android.R
 import com.stepup.android.data.repo.Crew
-import com.stepup.android.domain.Leaderboard
 import com.stepup.android.domain.Post
 import com.stepup.android.domain.PostCategory
 import com.stepup.android.domain.RankBoard
@@ -178,15 +178,12 @@ private fun BoardTab(
     val balance by viewModel.balance.collectAsStateWithLifecycle()
     var query by rememberSaveable { mutableStateOf("") }
 
+    // 티저는 적립 랭킹을 보여준다 — 세 부문 중 누구에게나 값이 있는 축이다.
+    // 서버에서 오므로 아직 모를 수 있고, 그때는 등수 대신 "내 순위 보기"라고 한다.
+    // 모르는 등수를 지어내면 들어가 보는 순간 다른 숫자가 나온다.
     val meLabel = stringResource(R.string.rank_me)
-    val topSpeed by viewModel.topSpeedKmh.collectAsStateWithLifecycle()
-    val activeSec by viewModel.totalActiveSec.collectAsStateWithLifecycle()
-    // 티저는 적립 랭킹을 보여준다 — 세 부문 중 누구에게나 값이 있는 축이다
-    val myRank = remember(topSpeed, activeSec, balance, meLabel) {
-        Leaderboard.build(RankBoard.TOTAL_SUP, meLabel, topSpeed, activeSec, balance)
-            .first { it.isMe }
-            .rank
-    }
+    val myRank by viewModel.mySupRank.collectAsStateWithLifecycle()
+    LaunchedEffect(Unit) { viewModel.loadRanking(RankBoard.TOTAL_SUP, meLabel) }
 
     val visible = remember(posts, filter, query) { filterPosts(posts, filter, query) }
     val flashWindow = remember(posts, query) {
@@ -392,7 +389,7 @@ private fun FlashRunWindow(
 }
 
 @Composable
-private fun RankingTeaser(rank: Int, balance: Double, onClick: () -> Unit) {
+private fun RankingTeaser(rank: Int?, balance: Double, onClick: () -> Unit) {
     GlowCard(
         modifier = Modifier
             .quietClickable(onClick)
@@ -427,11 +424,11 @@ private fun RankingTeaser(rank: Int, balance: Double, onClick: () -> Unit) {
                     color = Snow,
                 )
                 Text(
-                    text = stringResource(
-                        R.string.ranking_teaser,
-                        rank,
-                        "%,.0f".format(balance),
-                    ),
+                    text = if (rank == null) {
+                        stringResource(R.string.ranking_teaser_unknown, "%,.0f".format(balance))
+                    } else {
+                        stringResource(R.string.ranking_teaser, rank, "%,.0f".format(balance))
+                    },
                     fontSize = 11.sp,
                     color = Silver,
                 )

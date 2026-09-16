@@ -437,6 +437,13 @@
     <string name="rank_my_position">MY POSITION</string>
     <string name="rank_total_runners">out of %1$d runners this week</string>
     <string name="ranking_teaser">You\'re #%1$d · %2$s SUP</string>
+    <string name="ranking_teaser_unknown">See where you stand · %1$s SUP</string>
+    <string name="rank_loading">Loading the leaderboard…</string>
+    <string name="rank_offline">No connection — couldn\'t load the leaderboard.</string>
+    <string name="rank_sign_in">Sign in again to see the leaderboard.</string>
+    <string name="rank_failed">Couldn\'t load the leaderboard.</string>
+    <string name="rank_retry">Try again</string>
+    <string name="rank_no_record">No runs yet. One run puts you on the board.</string>
     <string name="rank_faction_title">Faction standings</string>
     <string name="rank_faction_body">Every kilometre you run counts for the faction of the sneaker you had on. You may not be #1 — your faction still can be.</string>
     <string name="rank_faction_km">%1$s km total</string>

@@ -436,6 +436,13 @@
     <string name="rank_my_position">自分の順位</string>
     <string name="rank_total_runners">今週のランナー %1$d 人中</string>
     <string name="ranking_teaser">%1$d 位 · %2$s SUP</string>
+    <string name="ranking_teaser_unknown">自分の順位を見る · %1$s SUP</string>
+    <string name="rank_loading">ランキングを読み込み中…</string>
+    <string name="rank_offline">接続がなく、ランキングを取得できませんでした。</string>
+    <string name="rank_sign_in">もう一度ログインするとランキングが表示されます。</string>
+    <string name="rank_failed">ランキングを取得できませんでした。</string>
+    <string name="rank_retry">再試行</string>
+    <string name="rank_no_record">まだ記録がありません。一度走ればランキングに載ります。</string>
     <string name="rank_faction_title">種族ランキング</string>
     <string name="rank_faction_body">走った距離は、その時履いていたシューズの種族に加算されます。あなたが1位でなくても、種族は1位になれます。</string>
     <string name="rank_faction_km">累計 %1$s km</string>

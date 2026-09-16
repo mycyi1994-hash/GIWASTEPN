@@ -435,6 +435,13 @@
     <string name="rank_my_position">我的排名</string>
     <string name="rank_total_runners">本周共 %1$d 位跑者</string>
     <string name="ranking_teaser">第 %1$d 名 · %2$s SUP</string>
+    <string name="ranking_teaser_unknown">查看我的排名 · %1$s SUP</string>
+    <string name="rank_loading">正在加载排行榜…</string>
+    <string name="rank_offline">没有网络连接，无法加载排行榜。</string>
+    <string name="rank_sign_in">重新登录后即可查看排行榜。</string>
+    <string name="rank_failed">无法加载排行榜。</string>
+    <string name="rank_retry">重试</string>
+    <string name="rank_no_record">还没有记录。跑一次就会上榜。</string>
     <string name="rank_faction_title">族群排行</string>
     <string name="rank_faction_body">你跑的每一公里都会计入当时所穿鞋子的族群。即使你不是第一，你的族群也可能是。</string>
     <string name="rank_faction_km">累计 %1$s km</string>
