@@ -16,6 +16,7 @@ import com.giwa.strideup.domain.RewardEconomy
 import com.giwa.strideup.domain.SessionReward
 import com.giwa.strideup.domain.Sneaker
 import java.time.LocalDate
+import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 
@@ -99,6 +100,19 @@ class RewardRepository(
      * 러닝 세션 종료 정산.
      * 착용 스니커즈의 효율·착화감, 파티 인원, 활성 XP 부스터를 모두 반영한다.
      */
+    /**
+     * 지금 신고 있는 스니커즈의 적립 부스트를 bps로 돌려준다. 1780 = +17.8%.
+     *
+     * 앱은 배율(1.178)로 계산하지만 컨트랙트와 어테스터는 bps 정수를 쓴다.
+     * 소수 배율을 그대로 체인에 보낼 수 없으니 여기서 한 번만 변환해 둔다.
+     * 신발이 없으면 레벨 기반 배율이 대신 쓰이고, 그것도 없으면 0이다.
+     */
+    suspend fun equippedBoostBps(): Int {
+        val multiplier = sneakerDao.equippedNow()?.toDomain()?.earningMultiplier
+            ?: RewardEconomy.sneakerMultiplier(prefs.sneakerLevel.first())
+        return ((multiplier - 1.0) * 10_000).roundToInt().coerceAtLeast(0)
+    }
+
     suspend fun settleSession(steps: Int, partySize: Int = 1): SessionReward {
         val today = LocalDate.now().toEpochDay()
         val energyRemaining = prefs.currentEnergy(today)

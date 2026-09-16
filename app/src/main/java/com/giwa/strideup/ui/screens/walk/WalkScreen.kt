@@ -233,7 +233,7 @@ fun RunScreen(
             CourseChallengeCard(
                 course = course,
                 sessionKm = distanceKm,
-                liveTrack = session.track,
+                liveTrack = session.geoTrack,
                 gpsFix = session.gpsFix,
                 elevationM = elevationM,
                 goalKm = goalKm,

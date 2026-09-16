@@ -50,8 +50,12 @@ object ServiceLocator {
         val app = context.applicationContext
         appContext = app
         database = Room.databaseBuilder(app, AppDatabase::class.java, "strideup.db")
-            // 스키마가 확장되는 개발 단계 — 마이그레이션 실패로 앱이 죽는 것보다
-            // 로컬 데모 데이터를 다시 만드는 편이 안전하다.
+            // 버전 7부터는 실제 마이그레이션을 쓴다. 러닝 기록이 SUP 청구의
+            // 근거가 되는 순간부터, 스키마를 고쳤다고 사용자 기록을 지우는 것은
+            // 개발 편의가 아니라 데이터 손실이다.
+            .addMigrations(*AppDatabase.MIGRATIONS)
+            // 마이그레이션 경로가 없는 옛 버전(6 미만)에서 올라오는 경우의
+            // 안전망. 여기 걸리면 데모 데이터만 다시 만들어진다.
             .fallbackToDestructiveMigration()
             .build()
         userPrefs = UserPrefs(app)

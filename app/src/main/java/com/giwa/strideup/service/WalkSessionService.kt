@@ -25,9 +25,12 @@ import com.giwa.strideup.domain.Faction
 import com.giwa.strideup.domain.GeoPoint
 import com.giwa.strideup.domain.RewardEconomy
 import com.giwa.strideup.domain.RunIntegrity
+import com.giwa.strideup.domain.RunTrack
 import com.giwa.strideup.domain.RunVerdict
+import com.giwa.strideup.domain.TrackPoint
 import com.giwa.strideup.domain.haversineMeters
 import com.giwa.strideup.domain.simplify
+import com.giwa.strideup.domain.toGeoPoints
 import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -67,8 +70,13 @@ data class WalkSessionState(
      * 러닝 중 화면을 나갔다 돌아와도 랩이 사라지거나 꼬이지 않는다.
      */
     val laps: List<RunLap> = emptyList(),
-    /** GPS로 기록한 이번 세션의 실제 경로 — 사람 속도로 인정된 구간만 담긴다 */
-    val track: List<GeoPoint> = emptyList(),
+    /**
+     * GPS로 기록한 이번 세션의 실제 경로 — 사람 속도로 인정된 구간만 담긴다.
+     *
+     * 좌표마다 시각이 붙어 있다. 시각이 없으면 구간 속도를 다시 계산할 수 없고,
+     * 그러면 이 세션이 사람이 뛴 것인지 서버가 판정할 방법이 없다.
+     */
+    val track: List<TrackPoint> = emptyList(),
     /** 최근에 GPS 좌표를 받았는지 (지도 카드 GPS 배지) */
     val gpsFix: Boolean = false,
     /** GPS로 잰 유효 거리(km). 속도 상한을 넘긴 구간은 빠져 있다. */
@@ -84,6 +92,9 @@ data class WalkSessionState(
     val lastTopSpeedKmh: Double = 0.0,
     val lastGpsKm: Double = 0.0,
 ) {
+    /** 지도에 그리거나 코스로 저장할 때 쓰는 모양만 남긴 경로 */
+    val geoTrack: List<GeoPoint> get() = track.toGeoPoints()
+
     /** 러닝 중 실시간 판정 — 화면에 경고 배지를 띄우는 근거 */
     val liveVerdict: RunVerdict
         get() = RunIntegrity.verdict(validSegments, flaggedSegments, steps, elapsedSec)
@@ -131,10 +142,11 @@ class WalkSessionService : Service() {
                     )
                 }
                 val track = current.track
-                val moved = track.isEmpty() || haversineMeters(track.last(), p) >= 8.0
+                val moved = track.isEmpty() ||
+                    haversineMeters(track.last().toGeoPoint(), p) >= 8.0
                 val counted = prev != null && meters >= RunIntegrity.MIN_SEGMENT_METERS
                 current.copy(
-                    track = if (moved) track + p else track,
+                    track = if (moved) track + TrackPoint(p.lat, p.lng, now) else track,
                     gpsFix = true,
                     gpsKm = if (counted) current.gpsKm + meters / 1000 else current.gpsKm,
                     validSegments = if (counted) current.validSegments + 1 else current.validSegments,
@@ -323,6 +335,9 @@ class WalkSessionService : Service() {
                 ServiceLocator.stepRepository.todaySteps.value,
             )
 
+            // 부스트는 정산 **전에** 읽는다. 정산이 신발이나 크루 상태를 건드릴
+            // 수 있으므로, 청구서에 적힐 값은 적립을 계산할 때 쓴 값이어야 한다.
+            val boostBps = ServiceLocator.rewardRepository.equippedBoostBps()
             val reward = ServiceLocator.rewardRepository.settleSession(creditedSteps, settleSize)
             ServiceLocator.database.walkSessionDao().insert(
                 WalkSessionEntity(
@@ -333,6 +348,12 @@ class WalkSessionService : Service() {
                     distanceMeters = RewardEconomy.distanceMeters(creditedSteps),
                     calories = RewardEconomy.calories(creditedSteps),
                     pointsEarned = reward.points,
+                    // 경로는 판정에 쓰이므로 화면용으로 솎아내기 전 원본을 남긴다.
+                    // 점을 걷어내면 그만큼 구간이 길어져 서버가 다시 계산할
+                    // 속도가 실제와 달라진다.
+                    track = RunTrack.encode(session.track),
+                    boostBps = boostBps,
+                    partySize = settleSize,
                 )
             )
             if (verdict.isRewardable) {
@@ -359,7 +380,7 @@ class WalkSessionService : Service() {
             }
             // 방금 달린 트랙을 남겨 "코스 만들기"의 재료로 쓴다
             if (session.track.size >= 2) {
-                lastTrack.value = session.track.simplify()
+                lastTrack.value = session.geoTrack.simplify()
             }
             _state.value = WalkSessionState(
                 lastRewardPoints = reward.points,

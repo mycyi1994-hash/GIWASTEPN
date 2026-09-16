@@ -2,6 +2,8 @@ package com.giwa.strideup.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [
@@ -18,7 +20,7 @@ import androidx.room.RoomDatabase
         CourseEntity::class,
         NotificationEntity::class,
     ],
-    version = 6,
+    version = 7,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -34,4 +36,27 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun commentDao(): CommentDao
     abstract fun courseDao(): CourseDao
     abstract fun notificationDao(): NotificationDao
+
+    companion object {
+        /**
+         * 러닝 세션에 GPS 경로와 정산 시점 값을 더한다.
+         *
+         * 여기서부터는 스키마가 바뀌어도 기록을 버리지 않는다. 지금까지는
+         * 데모 데이터뿐이라 새로 만들어도 그만이었지만, 이 열에 담기는 경로는
+         * 곧 SUP 청구의 근거가 된다 — 사용자의 러닝 기록을 개발 편의로
+         * 지우는 일은 여기서 끝낸다.
+         *
+         * 기존 행은 경로를 알 수 없으므로 빈 값으로 남는다. 청구 대상이
+         * 아니었던 세션이니 그것이 사실에 맞다.
+         */
+        val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE walk_sessions ADD COLUMN track TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE walk_sessions ADD COLUMN boostBps INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE walk_sessions ADD COLUMN partySize INTEGER NOT NULL DEFAULT 1")
+            }
+        }
+
+        val MIGRATIONS = arrayOf(MIGRATION_6_7)
+    }
 }

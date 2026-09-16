@@ -23,6 +23,27 @@ data class WalkSessionEntity(
     val distanceMeters: Double,
     val calories: Double,
     val pointsEarned: Double,
+    /**
+     * 이번 세션에 실제로 지나간 GPS 경로. `RunTrack.encode`가 만든 문자열이고,
+     * 좌표마다 시각이 붙어 있다.
+     *
+     * 합계(거리·칼로리)만으로는 "사람이 뛴 것인가"를 판정할 수 없다. 구간
+     * 속도를 다시 계산하려면 원본 좌표와 시각이 있어야 하고, 판정할 수 없는
+     * 세션은 온체인으로 청구할 수 없다. GPS 권한이 없거나 신호를 못 받은
+     * 세션은 빈 문자열이다.
+     */
+    val track: String = "",
+    /**
+     * 정산 시점 스니커즈 부스트(bps). 1780 = +17.8%.
+     *
+     * 나중에 다시 계산할 수 없어서 같이 남긴다 — 사용자는 신발을 갈아신고
+     * 강화하고 팔기도 한다. 청구서에 적힐 값은 **그때** 신고 있던 신발의 것이다.
+     */
+    val boostBps: Int = 0,
+    /**
+     * 정산 시점 파티 인원. 같은 이유로 지금 남겨야 한다 — 크루 상태는 변한다.
+     */
+    val partySize: Int = 1,
 )
 
 /** SUP 포인트 적립/사용 원장. amount 양수 = 적립, 음수 = 사용 */
