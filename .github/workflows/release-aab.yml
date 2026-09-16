@@ -10,8 +10,6 @@ name: Release AAB
 on:
   push:
     tags: ["v*"]
-    # TEMP: 파이프라인 1회 검증용. 확인 후 이 두 줄은 제거한다.
-    branches: ["claude/quirky-rubin-dwm6yv"]
   workflow_dispatch:
 
 permissions:
