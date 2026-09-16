@@ -2,7 +2,10 @@ name: Build APK
 
 on:
   push:
-    branches: ["claude/work-history-pjm57c"]
+    branches:
+      - "claude/**"
+      - "main"
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -51,6 +54,12 @@ jobs:
           fi
           echo "✓ 서명 일치 — 이전 빌드 위에 업데이트 설치 가능"
 
+      # R8이 켜져 있으므로 release 빌드가 컴파일되는지 매 푸시마다 확인한다.
+      # 서명 자격이 없어도 빌드 자체는 되어야 한다 — 난독화 문제를 출시
+      # 직전이 아니라 지금 발견하는 것이 목적이다.
+      - name: Build release (unsigned, R8 on)
+        run: ./gradlew :app:assembleRelease --stacktrace
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
@@ -58,7 +67,10 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
 
       # 컨테이너/사용자가 git으로 바로 받아갈 수 있도록 APK를 배포 전용 브랜치에 커밋한다.
+      # 배포 브랜치는 하나여야 한다. 개발 브랜치 푸시가 apk-dist를 덮어쓰면
+      # README의 다운로드 링크가 검증되지 않은 빌드를 가리키게 된다.
       - name: Publish APK to apk-dist branch
+        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
