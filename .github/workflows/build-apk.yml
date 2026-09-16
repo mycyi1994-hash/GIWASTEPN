@@ -33,6 +33,11 @@ jobs:
 
       # 컴파일 오류는 Gradle 스택트레이스 수백 줄에 파묻힌다. 출력을 남겨 두고
       # 실패했을 때 정작 읽어야 할 'e:' 줄만 뽑아 요약에 올린다.
+      # 안드로이드 리소스 문법은 빌드 7분을 쓴 뒤에야 터진다. 1초에 끝나는
+      # 검사를 앞에 둬서 그 7분을 아낀다.
+      - name: Check string resources
+        run: python3 scripts/check-strings.py
+
       - name: Unit tests
         run: |
           set -o pipefail
