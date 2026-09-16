@@ -41,6 +41,32 @@ interface WalkSessionDao {
 
     @Query("SELECT COALESCE(SUM(durationSec), 0) FROM walk_sessions WHERE startedAt >= :fromMillis")
     fun observeDurationSince(fromMillis: Long): Flow<Long>
+
+    /**
+     * 아직 서버에 올리지 못한 세션을 오래된 것부터 준다.
+     *
+     * 오래된 순인 것은 `RewardDistributor` 의 청구 창이 7일이기 때문이다.
+     * 최신 것부터 처리하면 창을 넘긴 세션이 영영 청구되지 않는다.
+     *
+     * 경로가 없는 세션은 거른다 — 서버가 판정할 수 없어 반드시 거절당한다.
+     */
+    @Query(
+        """
+        SELECT * FROM walk_sessions
+         WHERE uploadState IN ('PENDING', 'FAILED')
+           AND track != ''
+           AND steps > 0
+         ORDER BY startedAt ASC
+         LIMIT :limit
+        """,
+    )
+    suspend fun pendingUploads(limit: Int): List<WalkSessionEntity>
+
+    @Query("SELECT COUNT(*) FROM walk_sessions WHERE uploadState IN ('PENDING', 'FAILED') AND track != ''")
+    fun observePendingUploadCount(): Flow<Int>
+
+    @Update
+    suspend fun update(session: WalkSessionEntity)
 }
 
 @Dao

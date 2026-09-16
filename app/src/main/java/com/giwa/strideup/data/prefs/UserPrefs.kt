@@ -44,6 +44,7 @@ class UserPrefs(private val context: Context) {
         val FACTION_KM = stringPreferencesKey("faction_km")
         val ACCOUNTED_STEPS = longPreferencesKey("accounted_steps")
         val ACCOUNTED_DAY = longPreferencesKey("accounted_day")
+        val RUNNER_ADDRESS = stringPreferencesKey("runner_address")
     }
 
     val dailyGoal: Flow<Int> = context.dataStore.data.map { it[Keys.DAILY_GOAL] ?: DEFAULT_GOAL }
@@ -72,6 +73,18 @@ class UserPrefs(private val context: Context) {
 
     suspend fun setLoginMethod(method: String) {
         context.dataStore.edit { it[Keys.LOGIN_METHOD] = method }
+    }
+
+    /**
+     * 보상을 받을 지갑 주소. 지갑 기능이 붙기 전에는 비어 있다.
+     *
+     * 비어 있으면 세션은 올라가지 않고 기기에 쌓인다. 나중에 지갑을 만들었을
+     * 때 그동안 뛴 기록이 살아 있어야 하기 때문이다.
+     */
+    val runnerAddress: Flow<String> = context.dataStore.data.map { it[Keys.RUNNER_ADDRESS] ?: "" }
+
+    suspend fun setRunnerAddress(address: String) {
+        context.dataStore.edit { it[Keys.RUNNER_ADDRESS] = address.trim() }
     }
 
     /** 앱 언어 태그. 빈 문자열이면 기기 설정을 따른다 */

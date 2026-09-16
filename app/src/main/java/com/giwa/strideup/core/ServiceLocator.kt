@@ -2,9 +2,12 @@ package com.giwa.strideup.core
 
 import android.content.Context
 import androidx.room.Room
+import com.giwa.strideup.BuildConfig
 import com.giwa.strideup.data.local.AppDatabase
 import com.giwa.strideup.data.prefs.UserPrefs
+import com.giwa.strideup.data.remote.AttesterClient
 import com.giwa.strideup.data.repo.BoostRepository
+import com.giwa.strideup.data.repo.ClaimRepository
 import com.giwa.strideup.data.repo.CommunityRepository
 import com.giwa.strideup.data.repo.CourseRepository
 import com.giwa.strideup.data.repo.CrewRepository
@@ -14,6 +17,7 @@ import com.giwa.strideup.data.repo.RewardRepository
 import com.giwa.strideup.data.repo.SneakerRepository
 import com.giwa.strideup.data.repo.StepRepository
 import com.giwa.strideup.sensor.StepTracker
+import kotlinx.coroutines.flow.first
 
 /** 간단한 수동 DI 컨테이너. Application.onCreate에서 [init]을 호출한다. */
 object ServiceLocator {
@@ -45,6 +49,9 @@ object ServiceLocator {
     lateinit var notificationRepository: NotificationRepository
         private set
 
+    lateinit var claimRepository: ClaimRepository
+        private set
+
     fun init(context: Context) {
         if (this::database.isInitialized) return
         val app = context.applicationContext
@@ -59,6 +66,11 @@ object ServiceLocator {
             .fallbackToDestructiveMigration()
             .build()
         userPrefs = UserPrefs(app)
+        claimRepository = ClaimRepository(
+            sessionDao = database.walkSessionDao(),
+            client = AttesterClient(BuildConfig.ATTESTER_URL),
+            runnerAddress = { userPrefs.runnerAddress.first() },
+        )
         stepTracker = StepTracker(app, userPrefs) { day ->
             database.stepDao().byDay(day)?.steps ?: 0
         }

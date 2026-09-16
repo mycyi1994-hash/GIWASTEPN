@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 // 릴리즈 서명 자격 — 환경변수(CI) 또는 ~/.gradle/gradle.properties(로컬)에서 읽는다.
@@ -36,6 +37,15 @@ android {
         targetSdk = 35
         versionCode = 23
         versionName = "1.15.1"
+
+        // 러닝 증명을 받을 서버 주소. 배포 전에는 비어 있고, 비어 있으면 앱은
+        // 업로드를 시도하지 않고 세션을 대기열에 쌓아 둔다.
+        // 로컬에서 바꾸려면 ~/.gradle/gradle.properties 에 stepupAttesterUrl 를 둔다.
+        buildConfigField(
+            "String",
+            "ATTESTER_URL",
+            "\"${secret("ATTESTER_URL", "stepupAttesterUrl") ?: ""}\"",
+        )
     }
 
     signingConfigs {
@@ -146,6 +156,8 @@ dependencies {
 
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.work.runtime.ktx)
 
     testImplementation(libs.junit)
     debugImplementation(libs.androidx.compose.ui.tooling)

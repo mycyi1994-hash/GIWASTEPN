@@ -44,7 +44,52 @@ data class WalkSessionEntity(
      * 정산 시점 파티 인원. 같은 이유로 지금 남겨야 한다 — 크루 상태는 변한다.
      */
     val partySize: Int = 1,
+    /**
+     * 서버 업로드 상태. [UploadState] 의 이름 문자열이 들어간다.
+     *
+     * 러닝은 지하철이나 산에서도 끝난다. 그 자리에서 못 올린 세션을 버리지
+     * 않고 여기에 표시해 두었다가 연결이 돌아오면 다시 시도한다.
+     */
+    val uploadState: String = UploadState.PENDING.name,
+    /** 마지막 시도 시각. 다시 시도할 때까지 얼마나 기다릴지 정하는 근거다. */
+    val uploadAttemptedAt: Long = 0,
+    /** 지금까지 시도한 횟수 */
+    val uploadAttempts: Int = 0,
+    /** 실패했다면 그 이유 — 사용자에게 보여주고, 버그를 쫓을 때 읽는다 */
+    val uploadError: String = "",
+    /** 서버가 내린 판정 (CLEAN · FLAGGED · VOID) */
+    val verdict: String = "",
+    /** 서버가 서명한 청구서 — 체인에 제출할 때 그대로 쓴다 */
+    val claimSignature: String = "",
+    val claimSessionHash: String = "",
+    /** 지급액(wei 문자열). 18자리라 Long 에 담기지 않는다. */
+    val claimAmount: String = "",
+    val claimDay: Long = 0,
+    /** 이 서명이 유효한 마지막 시각 (epoch 초) */
+    val claimDeadline: Long = 0,
 )
+
+/**
+ * 세션 하나가 서버까지 가는 길.
+ *
+ * [REJECTED] 와 [FAILED] 를 나눠 두는 것이 핵심이다. 서버가 "이건 러닝이
+ * 아니다"라고 판정한 것과, 지하철이라 못 보낸 것은 전혀 다른 일이다. 앞의
+ * 것을 계속 재시도하면 배터리를 태우고, 뒤의 것을 포기하면 사용자가 정당하게
+ * 뛴 기록을 잃는다.
+ */
+enum class UploadState {
+    /** 아직 안 올렸다 */
+    PENDING,
+
+    /** 서명을 받았다. 체인 제출만 남았다. */
+    SIGNED,
+
+    /** 서버가 거절했다. 다시 보내도 같은 답이 온다. */
+    REJECTED,
+
+    /** 보내다 실패했다. 나중에 다시 시도한다. */
+    FAILED,
+}
 
 /** SUP 포인트 적립/사용 원장. amount 양수 = 적립, 음수 = 사용 */
 @Entity(tableName = "rewards")

@@ -20,7 +20,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         CourseEntity::class,
         NotificationEntity::class,
     ],
-    version = 7,
+    version = 8,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -57,6 +57,38 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-        val MIGRATIONS = arrayOf(MIGRATION_6_7)
+        /**
+         * 세션에 서버 업로드 상태를 더한다.
+         *
+         * 기존 행은 PENDING 이 아니라 REJECTED 로 둔다. 그 세션들에는 GPS
+         * 경로가 없어서(마이그레이션 6→7 참고) 서버가 판정할 수 없다. PENDING
+         * 으로 두면 업로드 일꾼이 영원히 거절당할 요청을 계속 보낸다.
+         */
+        val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "ALTER TABLE walk_sessions ADD COLUMN uploadState TEXT NOT NULL DEFAULT 'PENDING'",
+                )
+                db.execSQL("ALTER TABLE walk_sessions ADD COLUMN uploadAttemptedAt INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE walk_sessions ADD COLUMN uploadAttempts INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE walk_sessions ADD COLUMN uploadError TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE walk_sessions ADD COLUMN verdict TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE walk_sessions ADD COLUMN claimSignature TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE walk_sessions ADD COLUMN claimSessionHash TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE walk_sessions ADD COLUMN claimAmount TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE walk_sessions ADD COLUMN claimDay INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE walk_sessions ADD COLUMN claimDeadline INTEGER NOT NULL DEFAULT 0")
+                db.execSQL(
+                    """
+                    UPDATE walk_sessions
+                       SET uploadState = 'REJECTED',
+                           uploadError = '경로가 기록되기 전의 세션입니다'
+                     WHERE track = ''
+                    """.trimIndent(),
+                )
+            }
+        }
+
+        val MIGRATIONS = arrayOf(MIGRATION_6_7, MIGRATION_7_8)
     }
 }

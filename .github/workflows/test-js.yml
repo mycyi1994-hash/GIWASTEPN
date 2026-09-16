@@ -1,0 +1,58 @@
+# 컨트랙트와 어테스터 테스트.
+#
+# 안드로이드 빌드(build-apk.yml)와 따로 두는 것은 서로 상관없이 깨지기
+# 때문이다. 앱 빌드가 7분 걸리는 동안 컨트랙트 테스트 결과를 못 보는 것도
+# 이유고, 한쪽이 빨간불일 때 다른 쪽이 멀쩡한지 한눈에 보이는 편이 낫다.
+#
+# 특히 attester/test/app-payload.test.js 는 앱이 보내는 본문을 서버가 읽을 수
+# 있는지 확인한다. 이게 자동으로 돌지 않으면 앱과 서버가 조용히 어긋난다.
+name: Test contracts & attester
+
+on:
+  push:
+    branches:
+      - "claude/**"
+      - "main"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: test-js-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      # 한쪽이 실패해도 다른 쪽 결과를 봐야 어디가 문제인지 안다.
+      fail-fast: false
+      matrix:
+        include:
+          - name: contracts
+            dir: contracts
+          - name: attester
+            dir: attester
+    name: ${{ matrix.name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: ${{ matrix.dir }}/package-lock.json
+
+      # package-lock.json 을 그대로 쓴다. npm install 은 잠금을 갱신해 버려서
+      # CI가 개발자와 다른 버전을 테스트하게 된다.
+      - name: Install
+        working-directory: ${{ matrix.dir }}
+        run: npm ci
+
+      - name: Test
+        working-directory: ${{ matrix.dir }}
+        run: npm test

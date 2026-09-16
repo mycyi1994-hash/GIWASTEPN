@@ -31,6 +31,7 @@ import com.giwa.strideup.domain.TrackPoint
 import com.giwa.strideup.domain.haversineMeters
 import com.giwa.strideup.domain.simplify
 import com.giwa.strideup.domain.toGeoPoints
+import com.giwa.strideup.sync.SessionUploadWorker
 import java.time.LocalDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -382,6 +383,10 @@ class WalkSessionService : Service() {
             if (session.track.size >= 2) {
                 lastTrack.value = session.geoTrack.simplify()
             }
+            // 증명 서버로 올릴 차례를 잡아 둔다. 여기서 직접 보내지 않는 것은
+            // 러닝이 끝나는 곳에 신호가 있다는 보장이 없기 때문이다 —
+            // 일꾼이 연결이 돌아올 때까지 기다렸다 보낸다.
+            SessionUploadWorker.schedule(this@WalkSessionService)
             _state.value = WalkSessionState(
                 lastRewardPoints = reward.points,
                 lastRewardedSteps = reward.rewardedSteps,
