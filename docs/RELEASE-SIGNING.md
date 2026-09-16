@@ -51,4 +51,4 @@ base64 -i stepup-upload.jks | tr -d '\n' > keystore.b64
 ---
 
 디버그 빌드에 쓰는 `app/debug.keystore`는 의도적으로 저장소에 포함돼 있습니다 —
-배경은 [README](../README.md#저장소에-포함된-debug-키스토어에-대해) 참고.
+배경은 [README.ko.md](../README.ko.md#저장소에-포함된-debug-키스토어에-대해) 참고.
