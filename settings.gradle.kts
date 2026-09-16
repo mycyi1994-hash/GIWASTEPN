@@ -20,5 +20,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "StrideUp"
+rootProject.name = "StepUp"
 include(":app")

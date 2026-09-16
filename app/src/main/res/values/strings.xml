@@ -180,7 +180,7 @@
     <string name="event_step_surge">Step Surge</string>
     <string name="event_step_surge_desc">Hit %1$s steps this week</string>
     <string name="event_refer">Refer &amp; Earn</string>
-    <string name="event_refer_desc">Invite 3 friends to join StrideUp</string>
+    <string name="event_refer_desc">Invite 3 friends to join StepUp</string>
     <string name="event_night_quest">Night Runner Quest</string>
     <string name="event_night_quest_desc">Run 20 km after 8 PM</string>
     <string name="events_view_progress">Progress</string>
@@ -189,8 +189,8 @@
     <string name="events_claimed">CLAIMED</string>
     <string name="toast_claimed">+%1$s SUP claimed!</string>
     <string name="toast_not_finished">Not finished yet — keep going!</string>
-    <string name="invite_subject">Join me on StrideUp</string>
-    <string name="invite_text">I\'m earning SUP just by walking on StrideUp. Come run with me!</string>
+    <string name="invite_subject">Join me on StepUp</string>
+    <string name="invite_text">I\'m earning SUP just by walking on StepUp. Come run with me!</string>
 
     <!-- Notifications -->
     <string name="notif_title">Notifications</string>

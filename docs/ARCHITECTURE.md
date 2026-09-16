@@ -70,10 +70,10 @@ belongs on chain where it cannot.
 | Language / UI | Kotlin 2.0.21, Jetpack Compose + Material 3, Navigation Compose | `app/` |
 | SDK | minSdk 26 · targetSdk 35 · compileSdk 35 · JVM target 17 | [`app/build.gradle.kts`](../app/build.gradle.kts) |
 | Pattern | MVVM + Repository, `StateFlow` end to end, no `LiveData` | `ui/screens/*/…ViewModel.kt` |
-| DI | Manual — one `object ServiceLocator`, wired in `Application.onCreate` | [`core/ServiceLocator.kt`](../app/src/main/java/com/giwa/strideup/core/ServiceLocator.kt) |
-| Persistence | Room 2.6.1 via KSP — `strideup.db`, **schema v6, 12 entities, 12 DAOs** | [`data/local/`](../app/src/main/java/com/giwa/strideup/data/local/) |
+| DI | Manual — one `object ServiceLocator`, wired in `Application.onCreate` | [`core/ServiceLocator.kt`](../app/src/main/java/com/stepup/android/core/ServiceLocator.kt) |
+| Persistence | Room 2.6.1 via KSP — `strideup.db`, **schema v6, 12 entities, 12 DAOs** | [`data/local/`](../app/src/main/java/com/stepup/android/data/local/) |
 | Settings | DataStore (`UserPrefs`) — step baselines, energy and streak, locale, daily goal, selected course | `data/prefs/UserPrefs.kt` |
-| Domain | Pure Kotlin objects, no Android imports, unit-tested | [`domain/`](../app/src/main/java/com/giwa/strideup/domain/) |
+| Domain | Pure Kotlin objects, no Android imports, unit-tested | [`domain/`](../app/src/main/java/com/stepup/android/domain/) |
 | i18n | 665 strings × ko / en / zh / ja + `localeConfig` in-app override | `res/values*/strings.xml` |
 
 **Why manual DI.** One `object` with a dozen `lateinit` fields replaces Hilt's
@@ -97,7 +97,7 @@ crashing on a bad migration. It comes out when the schema freezes.
 
 ### 3.1 Steps
 
-[`sensor/StepTracker.kt`](../app/src/main/java/com/giwa/strideup/sensor/StepTracker.kt)
+[`sensor/StepTracker.kt`](../app/src/main/java/com/stepup/android/sensor/StepTracker.kt)
 wraps `TYPE_STEP_COUNTER`, which reports *cumulative steps since boot*. That raw
 value is useless on its own; three corrections make it a day counter:
 
@@ -115,7 +115,7 @@ trusts emissions after the first real sensor event, which is what stopped
 
 ### 3.2 GPS and the run session
 
-[`service/WalkSessionService.kt`](../app/src/main/java/com/giwa/strideup/service/WalkSessionService.kt)
+[`service/WalkSessionService.kt`](../app/src/main/java/com/stepup/android/service/WalkSessionService.kt)
 is a foreground service typed `health|location`, so a run survives screen-off and
 app switching.
 
@@ -140,7 +140,7 @@ kilometre plus a manual lap button.
 
 ## 4. Run integrity — proving it was a run
 
-[`domain/RunIntegrity.kt`](../app/src/main/java/com/giwa/strideup/domain/RunIntegrity.kt).
+[`domain/RunIntegrity.kt`](../app/src/main/java/com/stepup/android/domain/RunIntegrity.kt).
 A step sensor cannot tell a runner from a phone rattling in a car, so GPS
 segment speed is judged alongside it. Two layers plus one independent axis:
 
@@ -160,7 +160,7 @@ covered by unit tests that run in CI.
 
 ## 5. Reward economy
 
-[`domain/RewardEconomy.kt`](../app/src/main/java/com/giwa/strideup/domain/RewardEconomy.kt)
+[`domain/RewardEconomy.kt`](../app/src/main/java/com/stepup/android/domain/RewardEconomy.kt)
 — pure functions, no Android, unit-tested.
 
 ```
@@ -443,10 +443,10 @@ StepUp은 세 개의 층으로 나뉘고, **그 나눔 자체가 설계**입니�
 | 언어 / UI | Kotlin 2.0.21, Jetpack Compose + Material 3, Navigation Compose | `app/` |
 | SDK | minSdk 26 · targetSdk 35 · compileSdk 35 · JVM 17 | [`app/build.gradle.kts`](../app/build.gradle.kts) |
 | 패턴 | MVVM + Repository, 전 구간 `StateFlow`, `LiveData` 미사용 | `ui/screens/*/…ViewModel.kt` |
-| DI | 수동 — `object ServiceLocator` 하나를 `Application.onCreate`에서 초기화 | [`core/ServiceLocator.kt`](../app/src/main/java/com/giwa/strideup/core/ServiceLocator.kt) |
-| 저장소 | Room 2.6.1 (KSP) — `strideup.db`, **스키마 v6, 엔티티 12개, DAO 12개** | [`data/local/`](../app/src/main/java/com/giwa/strideup/data/local/) |
+| DI | 수동 — `object ServiceLocator` 하나를 `Application.onCreate`에서 초기화 | [`core/ServiceLocator.kt`](../app/src/main/java/com/stepup/android/core/ServiceLocator.kt) |
+| 저장소 | Room 2.6.1 (KSP) — `strideup.db`, **스키마 v6, 엔티티 12개, DAO 12개** | [`data/local/`](../app/src/main/java/com/stepup/android/data/local/) |
 | 설정 | DataStore(`UserPrefs`) — 걸음 기준점, 에너지·스트릭, 언어, 일일 목표, 선택한 코스 | `data/prefs/UserPrefs.kt` |
-| 도메인 | 순수 Kotlin, 안드로이드 의존 없음, 단위 테스트 대상 | [`domain/`](../app/src/main/java/com/giwa/strideup/domain/) |
+| 도메인 | 순수 Kotlin, 안드로이드 의존 없음, 단위 테스트 대상 | [`domain/`](../app/src/main/java/com/stepup/android/domain/) |
 | 다국어 | 문자열 665개 × ko / en / zh / ja + `localeConfig` 앱 내 언어 변경 | `res/values*/strings.xml` |
 
 **왜 수동 DI인가.** `lateinit` 필드 열몇 개짜리 `object` 하나가 Hilt의 애너테이션
@@ -470,7 +470,7 @@ StepUp은 세 개의 층으로 나뉘고, **그 나눔 자체가 설계**입니�
 
 ### 3.1 걸음
 
-[`sensor/StepTracker.kt`](../app/src/main/java/com/giwa/strideup/sensor/StepTracker.kt)는
+[`sensor/StepTracker.kt`](../app/src/main/java/com/stepup/android/sensor/StepTracker.kt)는
 `TYPE_STEP_COUNTER`를 감쌉니다. 이 센서는 **부팅 이후 누적 걸음**을 주기 때문에
 그대로는 쓸 수 없고, 세 가지 보정을 거쳐야 "오늘 걸음"이 됩니다.
 
@@ -487,7 +487,7 @@ StepUp은 세 개의 층으로 나뉘고, **그 나눔 자체가 설계**입니�
 
 ### 3.2 GPS와 러닝 세션
 
-[`service/WalkSessionService.kt`](../app/src/main/java/com/giwa/strideup/service/WalkSessionService.kt)는
+[`service/WalkSessionService.kt`](../app/src/main/java/com/stepup/android/service/WalkSessionService.kt)는
 `health|location` 타입의 포그라운드 서비스라, 화면을 끄거나 앱을 전환해도 러닝이
 살아 있습니다.
 
@@ -510,7 +510,7 @@ StepUp은 세 개의 층으로 나뉘고, **그 나눔 자체가 설계**입니�
 
 ## 4. 러닝 판정 — "정말 뛰었는가"
 
-[`domain/RunIntegrity.kt`](../app/src/main/java/com/giwa/strideup/domain/RunIntegrity.kt).
+[`domain/RunIntegrity.kt`](../app/src/main/java/com/stepup/android/domain/RunIntegrity.kt).
 걸음 센서만으로는 달리는 사람과 차 안에서 흔들리는 폰을 구분할 수 없으므로 GPS
 구간 속도를 함께 봅니다. 두 층 + 독립된 한 축입니다.
 
@@ -530,7 +530,7 @@ StepUp은 세 개의 층으로 나뉘고, **그 나눔 자체가 설계**입니�
 
 ## 5. 리워드 이코노미
 
-[`domain/RewardEconomy.kt`](../app/src/main/java/com/giwa/strideup/domain/RewardEconomy.kt)
+[`domain/RewardEconomy.kt`](../app/src/main/java/com/stepup/android/domain/RewardEconomy.kt)
 — 순수 함수, 안드로이드 의존 없음, 단위 테스트 대상.
 
 ```

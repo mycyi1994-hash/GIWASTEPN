@@ -179,7 +179,7 @@
     <string name="event_step_surge">ステップサージ</string>
     <string name="event_step_surge_desc">今週%1$s歩を達成しよう</string>
     <string name="event_refer">招待して稼ごう</string>
-    <string name="event_refer_desc">友達3人をStrideUpに招待しよう</string>
+    <string name="event_refer_desc">友達3人をStepUpに招待しよう</string>
     <string name="event_night_quest">ナイトランナークエスト</string>
     <string name="event_night_quest_desc">20時以降に20 km走ろう</string>
     <string name="events_view_progress">進捗</string>
@@ -188,8 +188,8 @@
     <string name="events_claimed">受取済み</string>
     <string name="toast_claimed">+%1$s SUP を受け取りました！</string>
     <string name="toast_not_finished">まだ達成していません — あともう少し！</string>
-    <string name="invite_subject">StrideUpで一緒に走ろう</string>
-    <string name="invite_text">StrideUpなら歩くだけでSUPが貯まるよ。一緒に走ろう！</string>
+    <string name="invite_subject">StepUpで一緒に走ろう</string>
+    <string name="invite_text">StepUpなら歩くだけでSUPが貯まるよ。一緒に走ろう！</string>
 
     <!-- Notifications -->
     <string name="notif_title">通知</string>

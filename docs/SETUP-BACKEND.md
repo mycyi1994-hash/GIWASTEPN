@@ -86,7 +86,7 @@
 ## 먼저 — 왜 이걸 해야 하나요?
 
 앱에 "Google로 로그인" 버튼을 넣으려면, **구글에 미리 신고를 해야 합니다.**
-"com.giwa.strideup 이라는 앱이 구글 로그인을 쓸 겁니다"라고요.
+"com.stepup.android 이라는 앱이 구글 로그인을 쓸 겁니다"라고요.
 
 신고하지 않으면 구글이 로그인 요청을 거절합니다. 그래서 필요한 작업입니다.
 
@@ -94,7 +94,7 @@
 
 | 구글의 질문 | 우리 답 |
 |---|---|
-| "어떤 앱인가요?" | `com.giwa.strideup` · 지문 `34:ED:...` |
+| "어떤 앱인가요?" | `com.stepup.android` · 지문 `34:ED:...` |
 | "로그인 결과를 어디로 보낼까요?" | Supabase 주소 |
 
 그래서 **등록을 두 번** 합니다. 하나는 앱용, 하나는 Supabase용입니다.
@@ -195,7 +195,7 @@ https://pupjzcmybuoyhzfwrsdf.supabase.co/auth/v1/callback
 | 칸 | 넣을 값 |
 |---|---|
 | 이름 | `StepUp Android` |
-| **패키지 이름** | `com.giwa.strideup` |
+| **패키지 이름** | `com.stepup.android` |
 | **SHA-1 인증서 디지털 지문** | 아래 값 |
 
 ```
@@ -204,8 +204,8 @@ https://pupjzcmybuoyhzfwrsdf.supabase.co/auth/v1/callback
 
 4. **만들기**
 
-> **SHA-1 이 뭔가요?** 앱마다 붙는 지문입니다. 다른 사람이 `com.giwa.strideup`
-> 이라는 이름으로 가짜 앱을 만들어도, 지문이 달라서 구글 로그인을 못 씁니다.
+> **SHA-1 이 뭔가요?** 앱마다 붙는 지문입니다. 다른 사람이 `com.stepup.android`
+> 라는 이름으로 가짜 앱을 만들어도, 지문이 달라서 구글 로그인을 못 씁니다.
 >
 > 위 값은 저장소에 들어 있는 **개발용 키**의 지문이라 공개해도 안전합니다.
 > 나중에 Play 스토어에 올릴 때는 구글이 주는 **다른 지문**을 하나 더 등록해야

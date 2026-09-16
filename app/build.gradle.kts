@@ -28,11 +28,11 @@ val releaseSigningReady =
         file(releaseStorePath).exists()
 
 android {
-    namespace = "com.giwa.strideup"
+    namespace = "com.stepup.android"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.giwa.strideup"
+        applicationId = "com.stepup.android"
         minSdk = 26
         targetSdk = 35
         versionCode = 23

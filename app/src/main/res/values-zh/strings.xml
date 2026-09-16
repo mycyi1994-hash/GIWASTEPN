@@ -178,7 +178,7 @@
     <string name="event_step_surge">步数狂飙</string>
     <string name="event_step_surge_desc">本周跑满 %1$s 步</string>
     <string name="event_refer">邀请好友赚奖励</string>
-    <string name="event_refer_desc">邀请 3 位好友加入 StrideUp</string>
+    <string name="event_refer_desc">邀请 3 位好友加入 StepUp</string>
     <string name="event_night_quest">夜跑者任务</string>
     <string name="event_night_quest_desc">晚上 8 点后跑够 20 km</string>
     <string name="events_view_progress">进度</string>
@@ -187,8 +187,8 @@
     <string name="events_claimed">已领取</string>
     <string name="toast_claimed">已领取 +%1$s SUP！</string>
     <string name="toast_not_finished">还没完成 —— 再加把劲！</string>
-    <string name="invite_subject">来 StrideUp 一起跑</string>
-    <string name="invite_text">我在 StrideUp 上走走路就能赚 SUP，一起来跑吧！</string>
+    <string name="invite_subject">来 StepUp 一起跑</string>
+    <string name="invite_text">我在 StepUp 上走走路就能赚 SUP，一起来跑吧！</string>
 
     <!-- Notifications -->
     <string name="notif_title">通知</string>

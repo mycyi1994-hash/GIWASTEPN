@@ -282,7 +282,7 @@ Deployment is a six-step walkthrough (wallet → faucet → deploy → verify) i
 ### Project structure
 
 ```
-app/src/main/java/com/giwa/strideup/
+app/src/main/java/com/stepup/android/
 ├── core/            # ServiceLocator (manual DI), AppLocale
 ├── data/
 │   ├── local/       # Room entities, DAOs, database (v6)

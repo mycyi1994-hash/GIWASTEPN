@@ -21,12 +21,12 @@
 # ── Room ────────────────────────────────────────────────────────────
 # Room은 consumer 규칙으로 생성 클래스를 지키지만, 엔티티는 DB 컬럼명이
 # 필드명에서 나오므로 이름이 바뀌면 안 된다.
--keep class com.giwa.strideup.data.local.** { *; }
+-keep class com.stepup.android.data.local.** { *; }
 
 # ── 안드로이드 컴포넌트 ─────────────────────────────────────────────
 # 매니페스트에 이름으로 적힌 클래스는 매니페스트 병합이 지켜 주지만,
 # Intent(this, X::class.java) 로만 참조되는 서비스는 명시해 둔다.
--keep class com.giwa.strideup.service.WalkSessionService { *; }
+-keep class com.stepup.android.service.WalkSessionService { *; }
 
 # ── Compose ─────────────────────────────────────────────────────────
 # Compose 컴파일러/런타임은 자체 consumer 규칙을 제공한다. 추가 keep 불필요.

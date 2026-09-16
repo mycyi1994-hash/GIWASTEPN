@@ -32,7 +32,7 @@
     </queries>
 
     <application
-        android:name=".StrideUpApp"
+        android:name=".StepUpApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -41,7 +41,7 @@
         android:localeConfig="@xml/locales_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.StrideUp">
+        android:theme="@style/Theme.StepUp">
 
         <activity
             android:name=".MainActivity"

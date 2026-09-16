@@ -178,7 +178,7 @@
     <string name="event_step_surge">스텝 서지</string>
     <string name="event_step_surge_desc">이번 주 %1$s걸음 달성하기</string>
     <string name="event_refer">친구 초대</string>
-    <string name="event_refer_desc">친구 3명을 StrideUp에 초대하세요</string>
+    <string name="event_refer_desc">친구 3명을 StepUp에 초대하세요</string>
     <string name="event_night_quest">나이트 러너 퀘스트</string>
     <string name="event_night_quest_desc">저녁 8시 이후 20km 달리기</string>
     <string name="events_view_progress">진행 상황</string>
@@ -187,8 +187,8 @@
     <string name="events_claimed">수령 완료</string>
     <string name="toast_claimed">+%1$s SUP 받았어요!</string>
     <string name="toast_not_finished">아직 달성 전이에요 — 조금만 더!</string>
-    <string name="invite_subject">StrideUp에서 같이 달려요</string>
-    <string name="invite_text">걷기만 해도 SUP가 쌓이는 StrideUp, 같이 해요!</string>
+    <string name="invite_subject">StepUp에서 같이 달려요</string>
+    <string name="invite_text">걷기만 해도 SUP가 쌓이는 StepUp, 같이 해요!</string>
 
     <!-- Notifications -->
     <string name="notif_title">알림</string>
