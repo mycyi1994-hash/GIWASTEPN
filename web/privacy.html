@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>개인정보처리방침 — StepUp</title>
+<meta name="description" content="StepUp 안드로이드 앱의 개인정보처리방침. 걸음 수와 GPS 기록은 기기에만 저장되며 서버로 전송되지 않습니다.">
+<meta name="robots" content="index,follow">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+<link rel="stylesheet" href="legal.css">
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="index.html">Step<em>Up</em></a>
+  <ul>
+    <li><a href="index.html">홈</a></li>
+    <li><a href="privacy.html">개인정보</a></li>
+    <li><a href="terms.html">이용약관</a></li>
+  </ul>
+</div></nav>
+
+<header><div class="wrap">
+  <h1>개인정보처리방침</h1>
+  <div class="meta">StepUp (안드로이드) · 앱 버전 1.15.1 · 시행일 2026-09-16</div>
+  <div class="lang"><a class="on" href="#ko">한국어</a><a href="#en">English</a></div>
+</div></header>
+
+<main><div class="wrap">
+
+<section id="ko">
+
+<div class="note">
+  <p><strong>한 줄 요약.</strong> StepUp은 계정도 서버도 없습니다. 걸음 수와 러닝 GPS 기록은
+  <strong>휴대폰 안에만</strong> 저장되고, 저희에게 전송되지 않습니다. 앱을 삭제하면 전부 사라집니다.</p>
+  <p>다만 러닝 화면의 지도 배경을 그리기 위해 <strong>OpenStreetMap 서버에 지도 이미지를 요청</strong>합니다.
+  이때 보고 계신 지역이 그 서버에 전달됩니다 (§3).</p>
+</div>
+
+<h2>1. 이 방침이 적용되는 범위</h2>
+<p>이 방침은 안드로이드 앱 <strong>StepUp</strong>(패키지명 <code>com.giwa.strideup</code>)에
+적용됩니다. 앱에서 링크로 이동하는 외부 서비스(구글 지도, GitHub 등)에는 각 서비스의
+방침이 적용됩니다.</p>
+
+<h2>2. 앱이 수집·처리하는 정보</h2>
+<p>아래 정보는 모두 <strong>휴대폰 내부 저장소</strong>(앱 전용 데이터베이스와 설정 파일)에만
+기록됩니다. 저희는 이 정보를 받지 않고, 볼 수 없습니다.</p>
+
+<table>
+  <tr><th>항목</th><th>수집 방법</th><th>쓰이는 곳</th><th>저장 위치</th></tr>
+  <tr>
+    <td><strong>걸음 수</strong></td>
+    <td>기기의 걸음 센서 (<code>TYPE_STEP_COUNTER</code>)<br>— 신체 활동 권한</td>
+    <td>일일 걸음, 목표 달성, SUP 적립, 연속 기록</td>
+    <td>기기 내부</td>
+  </tr>
+  <tr>
+    <td><strong>위치 (GPS 좌표)</strong></td>
+    <td>러닝 세션 중에만, 약 2.5초 간격<br>— 위치 권한</td>
+    <td>거리·속도·페이스 계산, 러닝 경로 그리기, 코스 저장</td>
+    <td>기기 내부</td>
+  </tr>
+  <tr>
+    <td><strong>러닝 기록</strong></td>
+    <td>세션 종료 시 자동 저장</td>
+    <td>기록 조회, 러너 레벨, 업적</td>
+    <td>기기 내부</td>
+  </tr>
+  <tr>
+    <td><strong>앱 내 활동</strong></td>
+    <td>앱 사용 중 입력</td>
+    <td>스니커즈 보유·강화, 게시글·댓글, 크루, 설정(언어·목표·아바타)</td>
+    <td>기기 내부</td>
+  </tr>
+</table>
+
+<div class="note">
+  <p><strong>수집하지 않는 것.</strong> 이름, 이메일, 전화번호, 주소, 생년월일,
+  연락처, 사진, 통화 기록, 광고 식별자(AAID), 기기 고유 식별자는 수집하지 않습니다.
+  광고 SDK와 분석 SDK(Firebase Analytics, Google Analytics 등)를 <strong>사용하지 않습니다.</strong></p>
+</div>
+
+<h3>위치 정보를 더 구체적으로</h3>
+<ul>
+  <li><strong>러닝을 시작한 동안에만</strong> 수집합니다. 러닝을 끝내면 위치 수신이 중단됩니다.</li>
+  <li>백그라운드 위치 권한(<code>ACCESS_BACKGROUND_LOCATION</code>)은 <strong>요청하지 않습니다.</strong>
+      러닝 중 화면을 꺼도 기록이 이어지는 것은 포그라운드 서비스(알림이 계속 표시되는 상태)로
+      동작하기 때문입니다.</li>
+  <li>권한을 거부해도 앱은 동작합니다. 걸음 수 적립은 되고, 경로 지도와 거리 측정만 안 됩니다.</li>
+</ul>
+
+<h2>3. 외부로 나가는 유일한 통신 — 지도 이미지</h2>
+<p>러닝 화면의 지도 배경을 그리기 위해, 앱은 <strong>OpenStreetMap 타일 서버</strong>
+(<code>tile.openstreetmap.org</code>)에 해당 지역의 지도 이미지를 요청합니다.</p>
+<ul>
+  <li>이 요청에는 <strong>보고 있는 지도 영역의 좌표와 IP 주소</strong>가 포함됩니다.
+      OpenStreetMap 재단이 자체 방침에 따라 서버 접속 기록을 남길 수 있습니다.</li>
+  <li>요청에는 앱 이름과 버전(<code>StepUp/1.15.1</code>)이 함께 전달됩니다.
+      이는 OpenStreetMap의 이용 규약이 요구하는 사항입니다.</li>
+  <li>이름·계정·러닝 기록 등 <strong>다른 정보는 일절 함께 보내지 않습니다.</strong></li>
+  <li>OpenStreetMap 재단의 방침:
+      <a href="https://wiki.osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noopener">wiki.osmfoundation.org/wiki/Privacy_Policy</a></li>
+</ul>
+<p>내려받은 지도 이미지는 데이터 사용량을 줄이기 위해 기기에 잠시 캐시됩니다.</p>
+
+<h3>사용자가 직접 누를 때만 일어나는 일</h3>
+<p>번개런 모임 장소의 <strong>"지도에서 보기"</strong> 같은 버튼을 누르면, 해당 좌표가
+구글 지도 앱(또는 브라우저)으로 전달됩니다. <strong>누르지 않으면 일어나지 않습니다.</strong>
+전달 이후에는 구글의 방침이 적용됩니다.</p>
+
+<h2>4. 제3자 제공·위탁</h2>
+<p>저희는 이용자의 정보를 서버로 수집하지 않으므로, <strong>제3자에게 제공하거나 처리를
+위탁하는 정보가 없습니다.</strong> §3의 지도 이미지 요청이 유일한 외부 통신입니다.</p>
+
+<h2>5. 보관 기간과 삭제</h2>
+<ul>
+  <li>정보는 <strong>이용자의 기기에</strong> 있고, 이용자가 지울 때까지 보관됩니다.</li>
+  <li><strong>앱을 삭제하면 모든 데이터가 함께 삭제됩니다.</strong>
+      (안드로이드 설정 → 애플리케이션 → StepUp → 저장공간 → <em>데이터 삭제</em>로도 초기화됩니다.)</li>
+  <li>저희 서버에 사본이 없으므로, <strong>삭제 후 복구는 불가능합니다.</strong></li>
+</ul>
+
+<h2>6. 이용자의 권리</h2>
+<p>데이터가 이용자 기기에만 있으므로, 열람·정정·삭제를 모두 직접 즉시 하실 수 있습니다.</p>
+<ul>
+  <li><strong>열람</strong> — 앱 안의 기록·프로필 화면</li>
+  <li><strong>삭제</strong> — 앱 삭제 또는 데이터 삭제 (§5)</li>
+  <li><strong>권한 철회</strong> — 안드로이드 설정 → 애플리케이션 → StepUp → 권한</li>
+</ul>
+<p>만 14세 미만 아동의 개인정보를 의도적으로 수집하지 않습니다.</p>
+
+<h2>7. 안전성 확보 조치</h2>
+<ul>
+  <li>앱 데이터는 안드로이드의 <strong>앱 샌드박스</strong>에 저장되어 다른 앱이 접근할 수 없습니다.</li>
+  <li>외부 통신(§3)은 <strong>HTTPS</strong>로만 이루어집니다.</li>
+  <li>수집하는 정보를 최소화하는 것이 가장 강력한 보호라고 보고, 서버를 두지 않는 설계를
+      유지하고 있습니다.</li>
+</ul>
+
+<h2>8. 앞으로의 변경 예정</h2>
+<div class="note">
+  <p><strong>지금은 서버가 없지만, 앞으로 생깁니다.</strong> 계정 로그인, 커뮤니티·랭킹 동기화,
+  블록체인 지갑과 SUP 출금 기능을 준비하고 있습니다. 그 기능이 실제로 들어가는 시점에
+  이 방침을 개정하고, 앱 안에서 다시 동의를 받겠습니다.</p>
+  <p>계획의 전체 내용은
+  <a href="https://github.com/mycyi1994-hash/GIWASTEPN/blob/claude/work-history-pjm57c/docs/LAUNCH-PLAN.md" target="_blank" rel="noopener">출시 계획 문서</a>에
+  공개되어 있습니다. <strong>아직 일어나지 않은 일을 이 방침에 미리 적지 않습니다.</strong></p>
+</div>
+
+<h2>9. 방침의 변경</h2>
+<p>이 방침이 바뀌면 시행일을 갱신하고, 중요한 변경은 앱 안에서 알립니다.
+이전 버전은 <a href="https://github.com/mycyi1994-hash/GIWASTEPN/commits/claude/work-history-pjm57c/web/privacy.html" target="_blank" rel="noopener">저장소 변경 이력</a>에서
+누구나 확인할 수 있습니다.</p>
+
+<h2>10. 문의</h2>
+<p>개인정보 관련 문의는
+<a href="https://github.com/mycyi1994-hash/GIWASTEPN/issues" target="_blank" rel="noopener">GitHub 이슈</a>로
+남겨 주세요. <em>(정식 출시 전까지의 임시 창구이며, 출시 시 전용 이메일 주소로 대체됩니다.)</em></p>
+
+</section>
+
+<hr style="border:0;border-top:1px solid var(--edge);margin:64px 0 0">
+
+<section id="en">
+<h2 style="margin-top:44px">Privacy Policy (English)</h2>
+<p style="color:var(--slate);font-size:13.5px">StepUp for Android · v1.15.1 · Effective 2026-09-16.
+The Korean text above is authoritative; this is a translation for convenience.</p>
+
+<div class="note">
+  <p><strong>In one line.</strong> StepUp has no accounts and no servers. Your step counts and
+  run GPS tracks stay <strong>on your phone</strong> and are never sent to us. Uninstalling the app
+  deletes all of it.</p>
+  <p>The one exception: to draw the map behind your run, the app <strong>requests map images from
+  OpenStreetMap</strong>, which tells that server roughly where you are looking (§3).</p>
+</div>
+
+<h3>1. Scope</h3>
+<p>This policy covers the Android app <strong>StepUp</strong> (<code>com.giwa.strideup</code>).
+External services you reach by tapping a link (Google Maps, GitHub) are governed by their own policies.</p>
+
+<h3>2. What the app collects</h3>
+<p>Everything below is written <strong>only to your phone's internal storage</strong>. We do not
+receive it and cannot see it.</p>
+<table>
+  <tr><th>Data</th><th>How</th><th>Used for</th><th>Stored</th></tr>
+  <tr><td><strong>Step count</strong></td><td>Device step sensor (<code>TYPE_STEP_COUNTER</code>), Physical activity permission</td><td>Daily steps, goals, SUP accrual, streaks</td><td>On device</td></tr>
+  <tr><td><strong>Location (GPS)</strong></td><td>During an active run only, roughly every 2.5s, Location permission</td><td>Distance, pace, route drawing, saved courses</td><td>On device</td></tr>
+  <tr><td><strong>Run history</strong></td><td>Saved when a session ends</td><td>History, runner level, achievements</td><td>On device</td></tr>
+  <tr><td><strong>In-app activity</strong></td><td>What you enter in the app</td><td>Sneakers, posts, crews, settings</td><td>On device</td></tr>
+</table>
+<p><strong>Not collected:</strong> name, email, phone number, address, date of birth, contacts,
+photos, advertising ID, or device identifiers. The app contains <strong>no advertising SDK and no
+analytics SDK.</strong></p>
+<p>Location is captured <strong>only while a run is active</strong>. The app does <strong>not</strong>
+request background location permission; runs continue with the screen off because they run as a
+foreground service with a persistent notification. Denying location still leaves the app usable —
+you lose route maps and distance, not step earning.</p>
+
+<h3>3. The only outbound traffic — map tiles</h3>
+<p>To draw the map behind your run, the app requests images from the
+<strong>OpenStreetMap tile server</strong> (<code>tile.openstreetmap.org</code>). Those requests
+include <strong>the coordinates of the map area being viewed and your IP address</strong>, plus the
+app name and version (<code>StepUp/1.15.1</code>), which OpenStreetMap's terms require. Nothing else
+is sent. See the
+<a href="https://wiki.osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noopener">OpenStreetMap Foundation privacy policy</a>.
+Downloaded tiles are cached briefly on the device to reduce data use.</p>
+<p>Tapping a "view on map" button hands those coordinates to Google Maps. That only happens when
+you tap it, and Google's policy applies from that point.</p>
+
+<h3>4. Sharing</h3>
+<p>We collect nothing on a server, so there is <strong>nothing to share with third parties or to
+process on our behalf.</strong> The map requests in §3 are the only outbound communication.</p>
+
+<h3>5. Retention and deletion</h3>
+<p>Your data lives on your device until you remove it. <strong>Uninstalling the app deletes
+everything</strong>, as does Settings → Apps → StepUp → Storage → Clear data. We hold no copy, so
+<strong>deletion is irreversible</strong>.</p>
+
+<h3>6. Your rights</h3>
+<p>Because the data is only on your device, you can view, correct and delete all of it yourself,
+immediately — in the app's history and profile screens, by uninstalling, or by revoking permissions
+in Android settings. We do not knowingly collect data from children under 14.</p>
+
+<h3>7. Security</h3>
+<p>App data sits in the Android app sandbox, unreachable by other apps. Outbound traffic (§3) is
+HTTPS only. We treat collecting less as the strongest protection available, and keep the
+no-server design deliberately.</p>
+
+<h3>8. What will change</h3>
+<p><strong>There is no server today, but there will be one.</strong> Account sign-in, community and
+ranking sync, a blockchain wallet and SUP withdrawal are in development. This policy will be revised
+and consent re-obtained in the app <em>before</em> those features ship. The full plan is public in the
+<a href="https://github.com/mycyi1994-hash/GIWASTEPN/blob/claude/work-history-pjm57c/docs/LAUNCH-PLAN.md" target="_blank" rel="noopener">launch plan</a>.
+We do not describe things here that have not happened yet.</p>
+
+<h3>9. Changes</h3>
+<p>If this policy changes we update the effective date and announce material changes in the app.
+Every prior version is visible in the
+<a href="https://github.com/mycyi1994-hash/GIWASTEPN/commits/claude/work-history-pjm57c/web/privacy.html" target="_blank" rel="noopener">repository history</a>.</p>
+
+<h3>10. Contact</h3>
+<p>Please open a
+<a href="https://github.com/mycyi1994-hash/GIWASTEPN/issues" target="_blank" rel="noopener">GitHub issue</a>.
+<em>(Interim channel before public release; a dedicated email address replaces it at launch.)</em></p>
+
+</section>
+
+</div></main>
+
+<footer><div class="wrap">
+  StepUp · <a href="index.html">홈</a> · <a href="terms.html">이용약관</a> ·
+  <a href="https://github.com/mycyi1994-hash/GIWASTEPN" target="_blank" rel="noopener">GitHub</a>
+</div></footer>
+
+</body>
+</html>

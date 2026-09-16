@@ -7,9 +7,18 @@
 
 ---
 
-## 먼저 — 이게 꼭 필요한가?
+> 📌 **2026-09 갱신 — 이제 선택이 아닙니다.**
+> Google Play는 등록 시 **공개적으로 접근 가능한 개인정보처리방침 URL**을 요구합니다.
+> `web/` 폴더에 [`privacy.html`](../web/privacy.html)·[`terms.html`](../web/terms.html)을
+> 넣어 뒀으니, 아래 절차대로 올리면 `https://<도메인>/privacy.html` 이 그 URL이 됩니다.
+> 도메인을 사고 싶지 않으시면 Cloudflare가 주는 무료 주소
+> (`stepup.pages.dev`)만으로도 Play Console 요건을 충족합니다 — 3단계까지만 하시면 됩니다.
 
-**필수는 아닙니다.** 8/12는 "working MVP 또는 데모 영상에 접근할 수 있는 URL"을
+---
+
+## 먼저 — 도메인이 꼭 필요한가?
+
+**도메인 구입은 필수가 아닙니다.** (무료 `*.pages.dev` 주소로도 됩니다.) 그랜트 지원서 8/12는 "working MVP 또는 데모 영상에 접근할 수 있는 URL"을
 요구하고, GitHub APK 링크로도 통과합니다.
 
 다만 도메인이 있으면 이런 차이가 납니다.
