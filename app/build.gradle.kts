@@ -47,39 +47,32 @@ android {
             "\"${secret("ATTESTER_URL", "stepupAttesterUrl") ?: ""}\"",
         )
 
-        // 서버(Supabase) 주소와 공개 키.
+        // ── 서버·로그인 설정 ────────────────────────────────────────
         //
-        // 이 두 값은 **공개되어도 되는 값**이다. APK 를 뜯으면 어차피 나오고,
-        // 애초에 앱에 넣으라고 발급되는 키다. 실제 보호는 서버의 행 단위 보안
-        // 규칙(supabase/migrations/)이 한다 — 이 키만으로는 남의 데이터를 볼 수
-        // 없고, SUP 원장에는 쓰지도 못한다.
+        // 아래 세 값은 **공개되어도 되는 값**이다. APK 를 뜯으면 어차피 나오고,
+        // 애초에 앱에 넣으라고 발급되는 값이다. 실제 보호는 서버의 행 단위
+        // 보안 규칙(supabase/migrations/)이 한다.
         //
-        // 절대 여기 넣으면 안 되는 것: sb_secret_ 로 시작하는 키. 그건 모든
-        // 보안 규칙을 무시한다.
-        buildConfigField(
-            "String",
-            "SUPABASE_URL",
-            "\"${secret("SUPABASE_URL", "stepupSupabaseUrl") ?: "https://pupjzcmybuoyhzfwrsdf.supabase.co"}\"",
-        )
-        // 구글 로그인에 쓰는 **웹** 클라이언트 ID.
+        // 절대 여기 넣으면 안 되는 것: sb_secret_ 로 시작하는 Supabase 키와
+        // GOCSPX- 로 시작하는 구글 보안 비밀. 둘 다 모든 검사를 건너뛴다.
         //
-        // 안드로이드 클라이언트 ID 가 아니다. 헷갈리기 쉬운데, 안드로이드 쪽은
-        // "이 앱이 진짜 맞다"를 구글이 확인하는 용도로 등록만 해 두고 코드에는
-        // 넣지 않는다. 앱이 받는 ID 토큰의 수신자(aud)는 웹 클라이언트 ID 이고,
-        // 서버는 그 값으로 토큰을 검증한다.
-        //
-        // 공개 값이다 — APK 를 뜯으면 나오고, 이것만으로는 아무것도 못 한다.
-        buildConfigField(
-            "String",
-            "GOOGLE_WEB_CLIENT_ID",
-            "\"${secret("GOOGLE_WEB_CLIENT_ID", "stepupGoogleWebClientId")
-                ?: "201996080239-8hrgea5hfe58ank2f6rbbqnkk5ek2mf3.apps.googleusercontent.com"}\"",
-        )
-        buildConfigField(
-            "String",
-            "SUPABASE_KEY",
-            "\"${secret("SUPABASE_KEY", "stepupSupabaseKey") ?: "sb_publishable_jt74AKM32zdqnJlsFHEo2g_MNHa-WRO"}\"",
-        )
+        // 값을 먼저 계산해 두는 이유는 buildConfigField 인자 안에서 계산하면
+        // 문자열 템플릿이 길어져 읽기도 어렵고 깨지기도 쉽기 때문이다.
+        val supabaseUrl = secret("SUPABASE_URL", "stepupSupabaseUrl")
+            ?: "https://pupjzcmybuoyhzfwrsdf.supabase.co"
+        val supabaseKey = secret("SUPABASE_KEY", "stepupSupabaseKey")
+            ?: "sb_publishable_jt74AKM32zdqnJlsFHEo2g_MNHa-WRO"
+
+        // 구글 로그인에는 **웹** 클라이언트 ID 를 쓴다. 안드로이드 클라이언트
+        // ID 가 아니다 — 그쪽은 "이 앱이 진짜 맞다"를 구글이 확인하는 용도로
+        // 등록만 해 두고 코드에는 넣지 않는다. 앱이 받는 ID 토큰의 수신자(aud)가
+        // 웹 클라이언트 ID 이고, 서버는 그 값으로 토큰을 검증한다.
+        val googleWebClientId = secret("GOOGLE_WEB_CLIENT_ID", "stepupGoogleWebClientId")
+            ?: "201996080239-8hrgea5hfe58ank2f6rbbqnkk5ek2mf3.apps.googleusercontent.com"
+
+        buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
+        buildConfigField("String", "SUPABASE_KEY", "\"$supabaseKey\"")
+        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
     }
 
     signingConfigs {

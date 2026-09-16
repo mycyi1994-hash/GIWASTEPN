@@ -76,20 +76,25 @@ jobs:
           path: build-output.log
           retention-days: 7
 
-      # 실패 원인을 한눈에. 스택트레이스가 아니라 컴파일러가 가리킨 줄을 본다.
-      - name: Surface compiler errors
+      # 실패 원인을 한눈에.
+      #
+      # 컴파일 오류만 잡으면 안 된다 — 의존성을 못 찾거나 설정이 잘못된 경우가
+      # 그만큼 흔하고, 그때는 'e:' 줄이 아예 없어서 로그가 비어 보인다.
+      # Gradle 이 실패를 설명하는 줄까지 같이 뽑는다.
+      - name: Surface build errors
         if: failure()
         run: |
+          PATTERN='^e: |^> Task .* FAILED|What went wrong|Could not (find|resolve|determine|create)|^Caused by|error: |Execution failed|Unresolved reference'
           {
-            echo "## 컴파일 오류"
+            echo "## 빌드 실패 원인"
             echo
             echo '```'
-            grep -E "^e: |^w: .*error|FAILED$|^> Task .* FAILED" build-output.log | head -40 \
-              || echo "(컴파일 오류 줄을 찾지 못했습니다 — 전체 로그를 확인하세요)"
+            grep -E "$PATTERN" build-output.log | head -40 \
+              || echo "(원인 줄을 찾지 못했습니다 — 아티팩트의 전체 로그를 확인하세요)"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-          echo "───────── 컴파일 오류 ─────────"
-          grep -E "^e: " build-output.log | head -40 || true
+          echo "───────── 빌드 실패 원인 ─────────"
+          grep -E "$PATTERN" build-output.log | head -40 || echo "(원인 줄 없음)"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
