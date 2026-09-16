@@ -252,14 +252,13 @@
 | ✅ | 릴리즈 서명 설정 + R8 | `assembleRelease`·`bundleRelease` 통과 | 환경변수 기반 서명, R8·리소스 축소 활성. 릴리즈 AAB 워크플로를 임시 트리거로 실제 실행해 검증(빈 환경변수로 설정 단계가 죽던 버그를 여기서 발견·수정). R8 매핑 파일 보존 확인 |
 | ✅ | 개인정보처리방침·이용약관 | 공개 URL로 게시 가능 | `web/privacy.html`·`web/terms.html` (한/영), 랜딩 푸터 링크 |
 | ✅ | 컨트랙트·어테스터 테스트 재확인 | 전부 통과 | 컨트랙트 43 · 어테스터 7 |
-| ⏳ | 소스 검증 (익스플로러) | 각 주소에 `#code` 탭 | 파일 준비 완료 — [수동 업로드용](../contracts/verification-giwa-sepolia/) 또는 `npm run verify:giwa`. **사용자 실행 필요** |
-| ⏳ | 어테스터 배포 | `/health` → `ok: true` | 코드·테스트 완료. Cloudflare 계정 필요 — **사용자 실행 필요** |
-| ⏳ | Play Console 등록 + 업로드 키 | AAB 내부 트랙 게시 | 파이프라인 준비 완료. 계정 등록·키 생성 — **사용자 실행 필요** |
+| ⏳ | 소스 검증 (익스플로러) | 각 주소에 `#code` 탭 | 파일 준비 완료 — [수동 업로드 안내](../contracts/verification-giwa-sepolia/) 또는 `npm run verify:giwa`. **사용자 실행 필요** |
+| ⏳ | 어테스터 배포 | `/health` → `ok: true` | 코드·테스트 완료. Cloudflare 계정 필요 — [배포 안내](../attester/README.md). **사용자 실행 필요** |
+| ⏳ | Play Console 등록 + 업로드 키 | AAB 내부 트랙 게시 | 파이프라인 준비·검증 완료 — [업로드 키 안내](RELEASE-SIGNING.md). 계정 등록은 **사용자 실행 필요** |
 | ⏳ | 법률 검토 착수 (§8) | 검토 범위·일정 확정 | **사용자 실행 필요** — 결과가 Phase 2 이후 설계를 결정 |
 
-> 남은 4개는 전부 계정·결제·법률처럼 본인 확인이 필요한 항목입니다. 절차는
-> [TODO-USER.md](TODO-USER.md)에 정리했습니다. **Phase 1은 이 4개를 기다리지 않고
-> 시작할 수 있습니다.**
+> 남은 4개는 전부 계정·결제·법률처럼 본인 확인이 필요한 항목입니다.
+> **Phase 1은 이 4개를 기다리지 않고 시작할 수 있습니다.**
 
 > ⚠️ **개발 환경 제약.** 이 저장소를 작업하는 컨테이너에서는 `dl.google.com`(안드로이드
 > Gradle 플러그인 저장소)과 `sepolia-explorer.giwa.io`가 네트워크 정책으로 차단돼 있어
@@ -353,6 +352,6 @@
 
 <div align="center">
 
-관련 문서 · [README](../README.md) · [토크노믹스](TOKENOMICS.md) · [컨트랙트](../contracts/README.md) · [어테스터](../attester/README.md) · [TODO](TODO-USER.md)
+관련 문서 · [README](../README.md) · [토크노믹스](TOKENOMICS.md) · [컨트랙트](../contracts/README.md) · [어테스터](../attester/README.md) · [릴리즈 서명](RELEASE-SIGNING.md)
 
 </div>

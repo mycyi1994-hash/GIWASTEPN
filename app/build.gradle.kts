@@ -118,7 +118,7 @@ tasks.matching {
                 logger.lifecycle(
                     "⚠️  릴리즈 서명 자격이 없어 서명하지 않고 빌드합니다. " +
                         "Play Console 업로드에는 쓸 수 없습니다. " +
-                        "설정 방법: docs/TODO-USER.md §4",
+                        "설정 방법: docs/RELEASE-SIGNING.md",
                 )
             }
         }
