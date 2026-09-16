@@ -8,19 +8,21 @@ Supabase(Postgres) 에 올릴 표와 권한 규칙입니다.
 
 ## 올리는 법
 
-Supabase 대시보드 → 왼쪽 **SQL Editor** → **New query** 에서
-`migrations/` 안의 파일을 **번호 순서대로** 하나씩 붙여넣고 **Run** 합니다.
+**[`setup.sql`](setup.sql) 하나만 붙여넣으면 됩니다.**
 
-```
-0001_profiles.sql   →  Run
-0002_activity.sql   →  Run
-0003_ledger.sql     →  Run
-```
+1. Supabase 대시보드 → 왼쪽 **SQL Editor** → **New query**
+2. `setup.sql` 전체를 복사해 붙여넣기
+3. **Run**
 
-순서가 중요합니다. 뒤 파일이 앞 파일의 표를 참조합니다.
+성공하면 마지막에 만들어진 표 4개가 출력되고, 왼쪽 **Table Editor** 에도
+`profiles`, `daily_steps`, `walk_sessions`, `sup_ledger` 가 보입니다.
 
-성공하면 **Table Editor** 에 `profiles`, `daily_steps`, `walk_sessions`,
-`sup_ledger` 네 개가 보입니다.
+> `setup.sql` 은 `migrations/` 의 파일들을 순서대로 이어 붙인 것입니다.
+> 전체가 하나의 트랜잭션이라 중간에 실패하면 아무것도 만들어지지 않습니다 —
+> 반쯤 만들어진 상태로 남지 않습니다.
+>
+> 스키마를 고칠 때는 `migrations/` 쪽을 고치고 `scripts/build-setup-sql.py` 로
+> 다시 만듭니다.
 
 ---
 
