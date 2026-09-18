@@ -478,8 +478,13 @@
     <string name="rank_board_time">耐力</string>
     <string name="rank_board_faction">族群</string>
     <string name="rank_board_sup">SUP 余额</string>
+    <string name="rank_board_crew">跑团</string>
+    <string name="rank_period_day">日榜</string>
+    <string name="rank_period_week">周榜</string>
+    <string name="rank_period_month">月榜</string>
+    <string name="rank_period_all">总榜</string>
     <string name="rank_my_position">我的排名</string>
-    <string name="rank_total_runners">本周共 %1$d 位跑者</string>
+    <string name="rank_total_runners">共 %1$d 位跑者</string>
     <string name="ranking_teaser">第 %1$d 名 · %2$s SUP</string>
     <string name="ranking_teaser_unknown">查看我的排名 · %1$s SUP</string>
     <string name="rank_loading">正在加载排行榜…</string>
@@ -493,6 +498,10 @@
     <string name="rank_faction_km">累计 %1$s km</string>
     <string name="rank_faction_my_km">我的贡献 · %1$s km</string>
     <string name="rank_faction_mine">我的族群</string>
+    <string name="rank_crew_title">跑团排名</string>
+    <string name="rank_crew_body">只统计跑团一起跑的距离，团员自己跑的不算 — 否则人多的跑团什么都不做就是第一。</string>
+    <string name="rank_crew_runs">跑团活动 %1$d 次</string>
+    <string name="rank_crew_empty">这个时间段还没有跑团活动。一起跑一次，排名就开始了。</string>
     <string name="run_flagged_title">速度校验</string>
     <string name="run_flagged_body">已剔除 %1$d 个路段 — 超出人类奔跑速度。</string>
     <string name="run_void_title">本次无效</string>

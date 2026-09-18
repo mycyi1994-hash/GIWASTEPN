@@ -15,9 +15,11 @@ import com.stepup.android.data.repo.RankingRepository
 import com.stepup.android.data.repo.RankingState
 import com.stepup.android.data.repo.RewardRepository
 import com.stepup.android.domain.CommentThread
+import com.stepup.android.domain.CrewRank
 import com.stepup.android.domain.Post
 import com.stepup.android.domain.PostCategory
 import com.stepup.android.domain.RankBoard
+import com.stepup.android.domain.RankPeriod
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -82,45 +84,104 @@ class CommunityViewModel(
     // 부문별로 받아 두고 다시 쓴다. 탭을 오갈 때마다 다시 물으면 같은 답을
     // 받으려고 네트워크를 쓰는 셈이다.
 
-    private val boards = MutableStateFlow<Map<RankBoard, RankingState>>(emptyMap())
+    /** 순위표 하나를 가리키는 열쇠 — 부문 하나에 기간 넷이라 둘이 함께 와야 한다 */
+    private data class BoardKey(val board: RankBoard, val period: RankPeriod)
+
+    private val boards = MutableStateFlow<Map<BoardKey, RankingState>>(emptyMap())
 
     private val selectedBoard = MutableStateFlow(RankBoard.TOP_SPEED)
 
-    /** 지금 보고 있는 부문의 순위 */
+    private val _period = MutableStateFlow(RankPeriod.ALL)
+
+    /** 지금 보고 있는 기간 */
+    val period: StateFlow<RankPeriod> = _period
+
+    /** 지금 보고 있는 부문·기간의 순위 */
     val ranking: StateFlow<RankingState> =
-        combine(selectedBoard, boards) { board, cache -> cache[board] ?: RankingState.Loading }
+        combine(selectedBoard, _period, boards) { board, period, cache ->
+            cache[BoardKey(board, period)] ?: RankingState.Loading
+        }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), RankingState.Loading)
 
-    private val _factionRanking = MutableStateFlow<FactionRankingState>(FactionRankingState.Loading)
-    val factionRanking: StateFlow<FactionRankingState> = _factionRanking
+    private val factionBoards = MutableStateFlow<Map<RankPeriod, FactionRankingState>>(emptyMap())
+
+    val factionRanking: StateFlow<FactionRankingState> =
+        combine(_period, factionBoards) { period, cache ->
+            cache[period] ?: FactionRankingState.Loading
+        }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5_000),
+                FactionRankingState.Loading,
+            )
+
+    // ── 크루 순위 ──────────────────────────────────────────────────
+    //
+    // 이것만 기기 안에서 계산한다. 크루와 크루 러닝이 아직 이 기기에만
+    // 있기 때문이다. 서버에 없는 것을 서버에 묻는 척할 수는 없다.
+
+    private val crewBoards = MutableStateFlow<Map<RankPeriod, List<CrewRank>>>(emptyMap())
+
+    /** 지금 기간의 크루 순위. 아직 세는 중이면 null 이다. */
+    val crewRanking: StateFlow<List<CrewRank>?> =
+        combine(_period, crewBoards) { period, cache -> cache[period] }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     /**
      * 커뮤니티 첫 화면의 "내 순위" 미리보기. 아직 모르면 null 이다.
      *
-     * 적립 부문을 쓴다 — 세 부문 중 누구에게나 값이 있는 축이다.
+     * 적립 부문 · 전체기간을 쓴다 — 세 부문 중 누구에게나 값이 있는 축이고,
+     * 미리보기 한 줄에 "최근 30일 기준"까지 붙일 자리는 없다.
      */
     val mySupRank: StateFlow<Int?> = boards
-        .map { (it[RankBoard.TOTAL_SUP] as? RankingState.Ready)?.me?.rank }
+        .map {
+            (it[BoardKey(RankBoard.TOTAL_SUP, RankPeriod.ALL)] as? RankingState.Ready)?.me?.rank
+        }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     /**
+     * 기간 탭. 보고 있던 부문은 그대로 두고 기간만 바꾼다.
+     *
+     * 여기서 불러오지는 않는다. 지금 어느 부문을 보고 있는지는 화면만 알고,
+     * 화면이 기간이 바뀐 것을 보고 그 부문 하나를 불러온다. 여기서 셋을 다
+     * 불러 두면 탭 한 번에 요청이 셋 나가고, 그중 둘은 아무도 안 본다.
+     */
+    fun selectPeriod(next: RankPeriod) {
+        _period.value = next
+    }
+
+    /**
      * @param meLabel 내 줄에 붙일 이름. 화면의 문자열 자원에서 온다.
-     * @param force 이미 받아 둔 부문도 다시 받는다 (당겨서 새로고침)
+     * @param force 이미 받아 둔 것도 다시 받는다 (당겨서 새로고침)
      */
     fun loadRanking(board: RankBoard, meLabel: String, force: Boolean = false) {
         selectedBoard.value = board
-        if (!force && boards.value[board] is RankingState.Ready) return
+        val key = BoardKey(board, _period.value)
+        if (!force && boards.value[key] is RankingState.Ready) return
         viewModelScope.launch {
-            boards.value = boards.value + (board to RankingState.Loading)
-            boards.value = boards.value + (board to rankingRepository.personal(board, meLabel))
+            boards.value = boards.value + (key to RankingState.Loading)
+            boards.value = boards.value +
+                (key to rankingRepository.personal(key.board, key.period, meLabel))
         }
     }
 
     fun loadFactionRanking(force: Boolean = false) {
-        if (!force && _factionRanking.value is FactionRankingState.Ready) return
+        val period = _period.value
+        if (!force && factionBoards.value[period] is FactionRankingState.Ready) return
         viewModelScope.launch {
-            _factionRanking.value = FactionRankingState.Loading
-            _factionRanking.value = rankingRepository.factions(sneakerRepository.equipped.first()?.faction)
+            factionBoards.value = factionBoards.value + (period to FactionRankingState.Loading)
+            val myFaction = sneakerRepository.equipped.first()?.faction
+            val next = rankingRepository.factions(myFaction, period)
+            factionBoards.value = factionBoards.value + (period to next)
+        }
+    }
+
+    fun loadCrewRanking(force: Boolean = false) {
+        val period = _period.value
+        if (!force && crewBoards.value.containsKey(period)) return
+        viewModelScope.launch {
+            crewBoards.value = crewBoards.value +
+                (period to crewRepository.ranking(period.sinceMillis()))
         }
     }
 

@@ -94,6 +94,7 @@ fun HomeScreen(
     onOpenNotifications: () -> Unit = {},
     onOpenLanguage: () -> Unit = {},
     onOpenProfile: () -> Unit = {},
+    onOpenAnalytics: () -> Unit = {},
     onOpenItems: () -> Unit = {},
     viewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory),
 ) {
@@ -147,7 +148,7 @@ fun HomeScreen(
 
         StepsHeroCard(
             state = state,
-            onOpenProfile = onOpenProfile,
+            onOpenProfile = onOpenAnalytics,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1.30f)
@@ -173,7 +174,7 @@ fun HomeScreen(
             )
             DistanceCard(
                 week = state.week,
-                onOpenProfile = onOpenProfile,
+                onOpenProfile = onOpenAnalytics,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(),
@@ -260,7 +261,17 @@ private fun GreetingRow(
             modifier = Modifier.quietClickable(onOpenProfile),
             contentDescription = stringResource(R.string.cd_profile),
         )
-        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(1.dp)) {
+        // 인사말 덩어리째 프로필로 가는 문이다. 아바타만 눌리게 두면
+        // 이름을 누른 사람은 아무 일도 안 일어나는 화면을 보게 된다 —
+        // 여기서 자기 이름을 부르고 있으니 누르면 자기 화면이 나와야 한다.
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .clip(RoundedCornerShape(12.dp))
+                .quietClickable(onOpenProfile)
+                .padding(vertical = 2.dp),
+            verticalArrangement = Arrangement.spacedBy(1.dp),
+        ) {
             Text(
                 text = stringResource(greetingRes),
                 fontSize = 11.sp,

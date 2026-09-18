@@ -559,6 +559,38 @@ begin
     '아무도 안 뛴 종족도 줄은 나온다');
 end $$;
 
+-- ── 기간 ──
+--
+-- 준비물의 러닝은 어제 10시에 있었다. 주간·월간 창에는 확실히 들어가고,
+-- 일간은 지금 몇 시냐에 따라 들쭉날쭉하므로 여기서 단정하지 않는다.
+do $$
+declare r record;
+begin
+  perform pg_temp.ok(
+    public.rank_period_start('ALL') = '-infinity'::timestamptz,
+    '전체기간의 시작은 -infinity 다 (어떤 시각과 비교해도 참)');
+  perform pg_temp.ok(
+    public.rank_period_start('WEEK') between now() - interval '7 days 1 minute'
+                                        and now() - interval '6 days 23 hours',
+    '주간은 최근 7일이다');
+  perform pg_temp.ok(
+    public.rank_period_start('없는기간') = '-infinity'::timestamptz,
+    '모르는 기간은 전체기간으로 친다');
+
+  select * into r from public.leaderboard('TOP_SPEED', 20, 'MONTH') where is_me;
+  perform pg_temp.ok(r.rank = 1, '월간 순위에도 어제 뛴 기록이 들어간다');
+  perform pg_temp.ok(r.top_speed_kmh between 11.5 and 12.5,
+    '기간을 좁혀도 속도는 경로에서 나온 값이다');
+
+  select * into r from public.leaderboard('TOTAL_SUP', 20, 'MONTH') where is_me;
+  perform pg_temp.ok(r.sup > 0, '월간 적립 순위에도 내 줄이 있다');
+
+  select * into r from public.faction_leaderboard('MONTH') where faction = 'FIRE';
+  perform pg_temp.ok(r.km > 0, '종족 순위도 기간을 받는다');
+  perform pg_temp.ok((select count(*) from public.faction_leaderboard('MONTH')) = 4,
+    '기간을 좁혀도 종족 네 줄은 그대로 나온다');
+end $$;
+
 -- 300등도 자기 줄이 보여야 한다
 call pg_temp.login('33333333-3333-3333-3333-333333333333');
 do $$

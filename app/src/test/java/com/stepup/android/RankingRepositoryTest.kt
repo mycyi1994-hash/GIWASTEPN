@@ -14,6 +14,7 @@ import com.stepup.android.data.repo.RankingRepository
 import com.stepup.android.data.repo.RankingState
 import com.stepup.android.domain.Faction
 import com.stepup.android.domain.RankBoard
+import com.stepup.android.domain.RankPeriod
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -84,7 +85,7 @@ class RankingRepositoryTest {
     fun `서버가 보낸 줄을 그대로 옮긴다`() = runBlocking {
         val http = FakeHttp(HttpResponse(200, twoRows))
 
-        val state = repo(http).personal(RankBoard.TOP_SPEED, meLabel = "나")
+        val state = repo(http).personal(RankBoard.TOP_SPEED, RankPeriod.ALL, meLabel = "나")
         val ready = state as RankingState.Ready
 
         assertEquals(2, ready.entries.size)
@@ -102,7 +103,7 @@ class RankingRepositoryTest {
         // 두 줄만 받았지만 순위에 오른 사람은 37명이다. 받은 줄을 세면
         // "2명 중 12등"이라는 말이 된다.
         val ready = repo(FakeHttp(HttpResponse(200, twoRows)))
-            .personal(RankBoard.TOP_SPEED, meLabel = "나") as RankingState.Ready
+            .personal(RankBoard.TOP_SPEED, RankPeriod.ALL, meLabel = "나") as RankingState.Ready
 
         assertEquals(37, ready.totalRunners)
     }
@@ -110,7 +111,7 @@ class RankingRepositoryTest {
     @Test
     fun `내 줄은 내 이름표로 바꿔 단다`() = runBlocking {
         val ready = repo(FakeHttp(HttpResponse(200, twoRows)))
-            .personal(RankBoard.TOP_SPEED, meLabel = "나") as RankingState.Ready
+            .personal(RankBoard.TOP_SPEED, RankPeriod.ALL, meLabel = "나") as RankingState.Ready
 
         val me = ready.me!!
         assertEquals(12, me.rank)
@@ -127,7 +128,7 @@ class RankingRepositoryTest {
         """.trimIndent()
 
         val ready = repo(FakeHttp(HttpResponse(200, onlyOthers)))
-            .personal(RankBoard.TOP_SPEED, meLabel = "나") as RankingState.Ready
+            .personal(RankBoard.TOP_SPEED, RankPeriod.ALL, meLabel = "나") as RankingState.Ready
 
         // 0 으로 채운 줄을 만들어 "1등"이라고 하지 않는다.
         assertNull(ready.me)
@@ -136,17 +137,29 @@ class RankingRepositoryTest {
     @Test
     fun `부문 이름을 서버가 아는 말로 보낸다`() = runBlocking {
         val http = FakeHttp(HttpResponse(200, "[]"))
-        repo(http).personal(RankBoard.LONGEST_TIME, meLabel = "나")
+        repo(http).personal(RankBoard.LONGEST_TIME, RankPeriod.WEEK, meLabel = "나")
 
         assertTrue(http.lastUrl.endsWith("/rpc/leaderboard"))
         assertTrue(http.lastBody, http.lastBody.contains(""""p_board":"LONGEST_TIME""""))
+        // 기간 이름이 어긋나면 서버는 조용히 전체기간으로 답한다 — 주간 탭이
+        // 전체기간을 보여 주는데 아무도 오류를 못 본다.
+        assertTrue(http.lastBody, http.lastBody.contains(""""p_period":"WEEK""""))
+    }
+
+    @Test
+    fun `종족 순위에도 기간이 함께 나간다`() = runBlocking {
+        val http = FakeHttp(HttpResponse(200, "[]"))
+        repo(http).factions(null, RankPeriod.MONTH)
+
+        assertTrue(http.lastUrl.endsWith("/rpc/faction_leaderboard"))
+        assertTrue(http.lastBody, http.lastBody.contains(""""p_period":"MONTH""""))
     }
 
     @Test
     fun `연결이 없으면 지어내지 않고 못 가져왔다고 한다`() = runBlocking {
         // status 0 은 요청이 나가지도 못한 경우다.
         val state = repo(FakeHttp(HttpResponse(0, "연결 없음")))
-            .personal(RankBoard.TOP_SPEED, meLabel = "나")
+            .personal(RankBoard.TOP_SPEED, RankPeriod.ALL, meLabel = "나")
 
         assertEquals(RankingState.Failed(RankingProblem.OFFLINE), state)
     }
@@ -154,7 +167,7 @@ class RankingRepositoryTest {
     @Test
     fun `서버가 바쁘면 나중에 다시 물을 일로 본다`() = runBlocking {
         val state = repo(FakeHttp(HttpResponse(503, """{"message":"바쁨"}""")))
-            .personal(RankBoard.TOP_SPEED, meLabel = "나")
+            .personal(RankBoard.TOP_SPEED, RankPeriod.ALL, meLabel = "나")
 
         assertEquals(RankingState.Failed(RankingProblem.OFFLINE), state)
     }
@@ -173,7 +186,7 @@ class RankingRepositoryTest {
         """.trimIndent()
 
         val ready = repo(FakeHttp(HttpResponse(200, rows)))
-            .factions(Faction.FIRE) as FactionRankingState.Ready
+            .factions(Faction.FIRE, RankPeriod.ALL) as FactionRankingState.Ready
 
         assertEquals(
             listOf(Faction.LIGHTNING, Faction.FIRE, Faction.WIND, Faction.WATER),
@@ -198,7 +211,7 @@ class RankingRepositoryTest {
         """.trimIndent()
 
         val ready = repo(FakeHttp(HttpResponse(200, rows)))
-            .factions(null) as FactionRankingState.Ready
+            .factions(null, RankPeriod.ALL) as FactionRankingState.Ready
 
         assertEquals(listOf(Faction.FIRE), ready.rows.map { it.faction })
         // 모르는 종족을 걸러 낸 자리가 비어 1등이 사라지면 안 된다.

@@ -73,7 +73,6 @@ import com.stepup.android.ui.components.SneakerCollectionCard
 import com.stepup.android.ui.components.SneakerFrame
 import com.stepup.android.ui.components.TokenCard
 import com.stepup.android.ui.components.VoltButton
-import com.stepup.android.ui.components.Wordmark
 import com.stepup.android.ui.components.fullLabel
 import com.stepup.android.ui.components.label
 import com.stepup.android.ui.components.quietClickable
@@ -133,22 +132,16 @@ fun ItemsScreen(
         contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 10.dp, bottom = 22.dp),
         verticalArrangement = Arrangement.spacedBy(15.dp),
     ) {
+        // 머리글 한 줄 — 제목이 로고 자리에 서고, 도감과 토큰이 그 맞은편에 선다.
+        //
+        // 로고를 뺀 것은 탭 하나에 이름이 둘 필요가 없어서다. 아래 탭 막대가
+        // 이미 "아이템"에 불을 켜 두었고, 그 위에 다시 STEPUP 이 있으면
+        // 정작 이 화면이 무엇인지는 셋째 줄에 가서야 나온다.
         item {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Wordmark(fontSize = 22.sp)
-                TokenCard(balance = balance)
-            }
-        }
-
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
             ) {
@@ -169,37 +162,26 @@ fun ItemsScreen(
                         color = Silver,
                     )
                 }
-                // 도감 입구. 제목과 같은 줄, 토큰 카드 바로 아래에 둔다.
-                // 보관함(가진 것)과 도감(전부)은 다른 질문에 답하므로 입구도 나눈다.
-                Column(
+                // 도감 입구 — 아이콘만. 옆의 토큰 카드와 높이를 맞춰 두면
+                // 글자 없이도 "누르는 것"으로 읽힌다. 몇 개 모았는지는
+                // 아래 보관함 머리글이 이미 말하고 있다.
+                Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
+                        .size(42.dp)
+                        .clip(RoundedCornerShape(15.dp))
                         .background(CarbonHigh)
-                        .border(1.dp, Volt.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
-                        .quietClickable(onOpenDex)
-                        .padding(horizontal = 12.dp, vertical = 9.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(3.dp),
+                        .border(1.dp, Volt.copy(alpha = 0.35f), RoundedCornerShape(15.dp))
+                        .quietClickable(onOpenDex),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.MenuBook,
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.dex_title),
                         tint = Volt,
-                        modifier = Modifier.size(19.dp),
-                    )
-                    Text(
-                        text = stringResource(R.string.dex_title),
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Silver,
-                    )
-                    Text(
-                        text = "${progress.first} / ${progress.second}",
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Black,
-                        color = Volt,
+                        modifier = Modifier.size(21.dp),
                     )
                 }
+                TokenCard(balance = balance)
             }
         }
 

@@ -65,9 +65,38 @@ interface WalkSessionDao {
     @Query("SELECT COUNT(*) FROM walk_sessions WHERE uploadState IN ('PENDING', 'FAILED') AND track != ''")
     fun observePendingUploadCount(): Flow<Int>
 
+    /**
+     * 크루 러닝으로 달린 거리를, 크루별로 묶어서.
+     *
+     * 크루 순위의 재료다. 크루 이름이 붙지 않은 세션(혼자·번개러닝)은
+     * 빠진다 — 크루원이 혼자 달린 거리까지 세면 사람 많은 크루가 자동으로
+     * 1등이 된다.
+     *
+     * @param fromMillis 이 시각 이후에 시작한 러닝만. 전체기간이면 0.
+     */
+    @Query(
+        """
+        SELECT crewId AS crewId,
+               COALESCE(SUM(distanceMeters), 0) AS meters,
+               COUNT(*) AS runs
+          FROM walk_sessions
+         WHERE crewId != ''
+           AND startedAt >= :fromMillis
+         GROUP BY crewId
+        """,
+    )
+    suspend fun crewDistances(fromMillis: Long): List<CrewDistance>
+
     @Update
     suspend fun update(session: WalkSessionEntity)
 }
+
+/** [WalkSessionDao.crewDistances] 의 한 줄 — 크루 하나의 누적 거리(m)와 횟수 */
+data class CrewDistance(
+    val crewId: String,
+    val meters: Double,
+    val runs: Int,
+)
 
 @Dao
 interface RewardDao {

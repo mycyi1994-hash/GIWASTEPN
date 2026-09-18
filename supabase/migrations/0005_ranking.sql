@@ -147,7 +147,10 @@ as $$
   order by r.rnk
 $$;
 
-comment on function public.leaderboard is
+-- 인자 목록을 적어 둔다. 뒤에 나오는 0006 이 인자를 하나 더한 같은 이름의
+-- 함수를 만들기 때문에, 이 파일을 다시 돌릴 때 이름만으로는 어느 쪽인지
+-- 가릴 수 없다.
+comment on function public.leaderboard(text, int) is
   '상위 p_limit 명과 내 줄. 300등이어도 자기 자리가 보여야 순위표가 내 이야기가 된다.';
 
 -- ════════════════════════════════════════════════════════════════════
@@ -183,7 +186,7 @@ as $$
   order by 2 desc, 1
 $$;
 
-comment on function public.faction_leaderboard is
+comment on function public.faction_leaderboard() is
   '종족별 누적 거리와 그중 내 몫. 신발을 고르는 일이 소속을 정하는 일이 된다.';
 
 grant execute on function public.leaderboard(text, int) to authenticated;

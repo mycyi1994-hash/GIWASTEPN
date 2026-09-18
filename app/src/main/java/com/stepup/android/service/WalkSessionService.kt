@@ -313,6 +313,14 @@ class WalkSessionService : Service() {
             } else {
                 session.partySize
             }
+            // 크루 러닝이었다면 어느 크루였는지. 크루 순위가 세는 것이 이 값이다.
+            // 파티 상태는 아래 finishParty() 에서 결과 화면으로 넘어가므로
+            // 지금 읽어 둔다.
+            val partyCrewId = if (session.partySize > 1) {
+                ServiceLocator.crewRepository.currentPartyCrewId()
+            } else {
+                ""
+            }
             // 러닝으로 볼 수 없는 세션은 여기서 걸러진다 — 걸음 0으로 정산해
             // 적립도, 에너지 소모도, 코스 완주도 일어나지 않게 한다.
             val verdict = RunIntegrity.verdict(
@@ -360,6 +368,7 @@ class WalkSessionService : Service() {
                     boostBps = boostBps,
                     partySize = settleSize,
                     faction = equippedFaction?.id.orEmpty(),
+                    crewId = partyCrewId,
                 )
             )
             if (verdict.isRewardable) {

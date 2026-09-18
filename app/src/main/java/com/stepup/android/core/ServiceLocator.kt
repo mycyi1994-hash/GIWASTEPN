@@ -118,6 +118,7 @@ object ServiceLocator {
         crewRepository = CrewRepository(
             crewDao = database.crewDao(),
             crewInfoDao = database.crewInfoDao(),
+            walkSessionDao = database.walkSessionDao(),
             rewardRepository = rewardRepository,
             appContext = app,
         )

@@ -112,6 +112,45 @@ enum class RankBoard {
     TOTAL_SUP,
 }
 
+/**
+ * 순위를 매길 기간.
+ *
+ * 전체기간만 있으면 순위표는 일찍 시작한 사람의 명단이 된다. 어제 가입한
+ * 사람이 아무리 달려도 3년 치 누적을 따라잡을 수 없고, 따라잡을 수 없는
+ * 순위표는 두 번 보지 않는다. 오늘·이번 주·이번 달은 누구에게나 0부터다.
+ */
+enum class RankPeriod {
+    /** 최근 24시간 */
+    DAY,
+
+    /** 최근 7일 */
+    WEEK,
+
+    /** 최근 30일 */
+    MONTH,
+
+    /** 처음부터 지금까지 */
+    ALL;
+
+    /**
+     * 이 기간이 시작되는 시각(epoch ms). 전체기간은 0 — 시간의 시작이다.
+     *
+     * "이번 주"를 월요일 0시로 끊지 않고 최근 7일로 잡았다. 월요일 0시로
+     * 끊으면 일요일 밤에 올린 기록이 몇 시간 만에 사라지고, 사용자는
+     * 기록이 지워졌다고 생각한다.
+     */
+    fun sinceMillis(now: Long = System.currentTimeMillis()): Long = when (this) {
+        DAY -> now - DAY_MS
+        WEEK -> now - 7 * DAY_MS
+        MONTH -> now - 30 * DAY_MS
+        ALL -> 0L
+    }
+
+    private companion object {
+        const val DAY_MS = 24L * 60 * 60 * 1000
+    }
+}
+
 data class RankEntry(
     val rank: Int,
     val name: String,
@@ -146,3 +185,29 @@ data class FactionRank(
     val myShare: Float
         get() = if (km > 0.0) (myKm / km).coerceIn(0.0, 1.0).toFloat() else 0f
 }
+
+// ─────────────────────────────────────────────────────────────
+// 크루 랭킹
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * 크루 순위 한 줄.
+ *
+ * 개인 순위가 "나 vs 남"이고 종족 순위가 "우리 편 vs 저쪽"이라면, 이건
+ * "우리 모임 vs 저 모임"이다. 세는 것은 **크루 러닝으로 달린 거리**뿐이다 —
+ * 크루원이 혼자 달린 거리까지 얹으면 사람 많은 크루가 자동으로 1등이 되고,
+ * 그러면 크루 러닝을 여는 이유가 사라진다.
+ *
+ * @param km 크루 러닝으로 달린 거리의 합
+ * @param runs 그 거리를 만든 크루 러닝 횟수
+ * @param joined 내가 가입한 크루인지
+ */
+data class CrewRank(
+    val rank: Int,
+    val crewId: String,
+    val name: String,
+    val monogram: String,
+    val km: Double,
+    val runs: Int,
+    val joined: Boolean,
+)

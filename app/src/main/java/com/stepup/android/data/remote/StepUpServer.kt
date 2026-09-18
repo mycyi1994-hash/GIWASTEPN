@@ -136,11 +136,17 @@ class StepUpServer(
      * 자기 자리를 영영 모르고, 그러면 순위표는 남의 이야기가 된다.
      *
      * @param board TOP_SPEED · LONGEST_TIME · TOTAL_SUP
+     * @param period DAY · WEEK · MONTH · ALL. 그 기간 안의 기록만 센다.
      */
-    suspend fun leaderboard(board: String, limit: Int = 20): ServerResult<List<LeaderboardRow>> {
+    suspend fun leaderboard(
+        board: String,
+        limit: Int = 20,
+        period: String = "ALL",
+    ): ServerResult<List<LeaderboardRow>> {
         val body = jsonBody {
             put("p_board", board)
             put("p_limit", limit)
+            put("p_period", period)
         }
         return authed { token ->
             http.post("$restUrl/rpc/leaderboard", body, headers(token))
@@ -148,10 +154,12 @@ class StepUpServer(
     }
 
     /** 종족 순위. 아무도 안 뛴 종족도 0으로 온다. */
-    suspend fun factionLeaderboard(): ServerResult<List<FactionRankRow>> =
-        authed { token ->
-            http.post("$restUrl/rpc/faction_leaderboard", "{}", headers(token))
+    suspend fun factionLeaderboard(period: String = "ALL"): ServerResult<List<FactionRankRow>> {
+        val body = jsonBody { put("p_period", period) }
+        return authed { token ->
+            http.post("$restUrl/rpc/faction_leaderboard", body, headers(token))
         }.map { text -> json.decodeFromString<List<FactionRankRow>>(text) }
+    }
 
     /** 지금 잔고. 서버 원장의 합이다. */
     suspend fun balance(): ServerResult<Double> =

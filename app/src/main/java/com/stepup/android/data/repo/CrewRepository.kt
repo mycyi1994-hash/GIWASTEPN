@@ -7,6 +7,8 @@ import com.stepup.android.data.local.CrewEntity
 import com.stepup.android.data.local.CrewInfoDao
 import com.stepup.android.data.local.CrewMembershipEntity
 import com.stepup.android.data.local.NotificationType
+import com.stepup.android.data.local.WalkSessionDao
+import com.stepup.android.domain.CrewRank
 import kotlin.random.Random
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +16,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -104,6 +107,7 @@ data class PartyState(
 class CrewRepository(
     private val crewDao: CrewDao,
     private val crewInfoDao: CrewInfoDao,
+    private val walkSessionDao: WalkSessionDao,
     private val rewardRepository: RewardRepository,
     private val appContext: Context,
 ) {
@@ -485,6 +489,49 @@ class CrewRepository(
     /** 현재 파티 인원 (파티런이 아니면 1) */
     fun currentPartySize(): Int =
         if (_party.value.isActive) _party.value.partySize.coerceAtLeast(1) else 1
+
+    /**
+     * 지금 달리고 있는 크루 러닝의 크루 id. 크루 러닝이 아니면 빈 문자열이다.
+     *
+     * 번개러닝 로비도 파티지만 크루가 없다(crewId 가 null 이다). 그 거리를
+     * 아무 크루에나 얹을 수는 없으므로 여기서도 빈 문자열이 나간다.
+     */
+    fun currentPartyCrewId(): String =
+        if (_party.value.isActive) _party.value.crewId.orEmpty() else ""
+
+    /**
+     * 크루 순위 — 크루 러닝으로 많이 달린 순.
+     *
+     * 아직 한 번도 같이 달리지 않은 크루는 0 km 로 명단에 남는다. 목록에서
+     * 빼 버리면 "우리 크루가 순위에 없다"가 되고, 사용자는 기능이 고장 난
+     * 줄 안다. 0 km 는 고장이 아니라 아직 안 달렸다는 뜻이다.
+     *
+     * @param since 이 시각 이후에 시작한 러닝만 센다. 전체기간이면 0.
+     */
+    suspend fun ranking(since: Long): List<CrewRank> {
+        val totals = walkSessionDao.crewDistances(since).associateBy { it.crewId }
+        val joined = joinedCrewIds.first()
+        // crews 대신 표를 직접 읽는다. 화면이 열리자마자 순위를 물으면
+        // StateFlow 가 아직 첫 값을 못 받아 빈 목록일 수 있다.
+        return crewInfoDao.observeAll().first()
+            .map { it.toDomain() }
+            .map { crew ->
+                val total = totals[crew.id]
+                CrewRank(
+                    // 번호는 정렬한 뒤에 붙인다
+                    rank = 0,
+                    crewId = crew.id,
+                    name = crew.name,
+                    monogram = crew.monogram,
+                    km = (total?.meters ?: 0.0) / 1000.0,
+                    runs = total?.runs ?: 0,
+                    joined = crew.id in joined,
+                )
+            }
+            // 같은 거리면 이름순. 순서가 매번 흔들리면 순위표를 믿지 않게 된다.
+            .sortedWith(compareByDescending<CrewRank> { it.km }.thenBy { it.name })
+            .mapIndexed { index, row -> row.copy(rank = index + 1) }
+    }
 
     companion object {
         /** 파티장에게서 이만큼 떨어지면 자동으로 파티에서 빠진다 */

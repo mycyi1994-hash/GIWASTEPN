@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,11 +44,14 @@ import com.stepup.android.R
 import com.stepup.android.data.repo.FactionRankingState
 import com.stepup.android.data.repo.RankingProblem
 import com.stepup.android.data.repo.RankingState
+import com.stepup.android.domain.CrewRank
 import com.stepup.android.domain.FactionRank
 import com.stepup.android.domain.RankBoard
 import com.stepup.android.domain.RankEntry
+import com.stepup.android.domain.RankPeriod
 import com.stepup.android.ui.components.DarkIconButton
 import com.stepup.android.ui.components.GlowCard
+import com.stepup.android.ui.components.PillChip
 import com.stepup.android.ui.components.quietClickable
 import com.stepup.android.ui.theme.CarbonHigh
 import com.stepup.android.ui.theme.Night
@@ -59,7 +63,12 @@ import com.stepup.android.ui.theme.Volt
 /**
  * 랭킹.
  *
- * 줄 세우는 축은 넷이다 — 쾌속·지구력·적립, 그리고 종족.
+ * 줄 세우는 축은 다섯이다 — 쾌속·지구력·적립, 크루, 그리고 종족. 그리고
+ * 어느 축이든 기간을 고를 수 있다: 오늘·이번 주·이번 달·전체기간.
+ *
+ * 기간이 있어야 하는 이유는 전체기간만 있으면 순위표가 일찍 시작한 사람의
+ * 명단이 되기 때문이다. 어제 가입한 사람은 3년 치 누적을 따라잡을 수 없고,
+ * 따라잡을 수 없는 순위표는 두 번 보지 않는다.
  *
  * **여기 보이는 사람은 전부 실제 사용자다.** 예전에는 상대 15명이 코드에
  * 박혀 있었다. 그러면 "당신은 3등입니다"는 거짓말이 된다. 지금은 서버가
@@ -73,17 +82,25 @@ fun RankingScreen(
     var boardIndex by rememberSaveable { mutableIntStateOf(0) }
 
     val personalBoards = RankBoard.entries
-    val isFactionTab = boardIndex >= personalBoards.size
+    // 순서: 쾌속 · 지구력 · 적립 · 크루 · 종족. 개인 셋이 먼저이고 그 뒤가 단체다.
+    val crewIndex = personalBoards.size
+    val factionIndex = personalBoards.size + 1
     val board = personalBoards[boardIndex.coerceIn(0, personalBoards.lastIndex)]
     val meLabel = stringResource(R.string.rank_me)
 
     val ranking by viewModel.ranking.collectAsStateWithLifecycle()
     val factionRanking by viewModel.factionRanking.collectAsStateWithLifecycle()
+    val crewRanking by viewModel.crewRanking.collectAsStateWithLifecycle()
+    val period by viewModel.period.collectAsStateWithLifecycle()
 
-    // 탭을 옮길 때마다 그 부문을 받아 온다. 이미 받아 둔 부문은 다시 묻지
+    // 탭을 옮길 때마다 그 부문을 받아 온다. 이미 받아 둔 것은 다시 묻지
     // 않는다 — 같은 답을 받으려고 네트워크를 쓸 이유가 없다.
-    LaunchedEffect(boardIndex) {
-        if (isFactionTab) viewModel.loadFactionRanking() else viewModel.loadRanking(board, meLabel)
+    LaunchedEffect(boardIndex, period) {
+        when (boardIndex) {
+            crewIndex -> viewModel.loadCrewRanking()
+            factionIndex -> viewModel.loadFactionRanking()
+            else -> viewModel.loadRanking(board, meLabel)
+        }
     }
 
     LazyColumn(
@@ -115,20 +132,68 @@ fun RankingScreen(
             }
         }
 
+        // 부문은 다섯이라 한 줄에 균등 분할로는 글자가 뭉개진다 — 옆으로
+        // 밀어서 고른다. 기간은 넷이고 이름이 짧아 한 줄에 들어간다.
+        item {
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                val labels = listOf(
+                    R.string.rank_board_speed,
+                    R.string.rank_board_time,
+                    R.string.rank_board_sup,
+                    R.string.rank_board_crew,
+                    R.string.rank_board_faction,
+                )
+                items(labels.size) { index ->
+                    PillChip(
+                        text = stringResource(labels[index]),
+                        selected = boardIndex == index,
+                        onClick = { boardIndex = index },
+                    )
+                }
+            }
+        }
+
         item {
             SegmentedTabs(
                 labels = listOf(
-                    stringResource(R.string.rank_board_speed),
-                    stringResource(R.string.rank_board_time),
-                    stringResource(R.string.rank_board_sup),
-                    stringResource(R.string.rank_board_faction),
+                    stringResource(R.string.rank_period_day),
+                    stringResource(R.string.rank_period_week),
+                    stringResource(R.string.rank_period_month),
+                    stringResource(R.string.rank_period_all),
                 ),
-                selected = boardIndex,
-                onSelect = { boardIndex = it },
+                selected = RankPeriod.entries.indexOf(period),
+                onSelect = { viewModel.selectPeriod(RankPeriod.entries[it]) },
             )
         }
 
-        if (isFactionTab) {
+        if (boardIndex == crewIndex) {
+            item {
+                GlowCard(contentPadding = PaddingValues(16.dp), spacing = 6.dp) {
+                    Text(
+                        text = stringResource(R.string.rank_crew_title),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = Snow,
+                    )
+                    Text(
+                        text = stringResource(R.string.rank_crew_body),
+                        fontSize = 11.sp,
+                        color = Silver,
+                        lineHeight = 17.sp,
+                    )
+                }
+            }
+            val crews = crewRanking
+            when {
+                crews == null -> item { RankingNotice(R.string.rank_loading) }
+                // 명단은 있는데 아무도 같이 달리지 않았다. 0 km 만 늘어놓는
+                // 것보다 왜 비었는지 말하는 편이 낫다.
+                crews.none { it.runs > 0 } -> item { RankingNotice(R.string.rank_crew_empty) }
+                else -> items(crews, key = { it.crewId }) { row -> CrewRow(row) }
+            }
+            return@LazyColumn
+        }
+
+        if (boardIndex == factionIndex) {
             item {
                 GlowCard(contentPadding = PaddingValues(16.dp), spacing = 6.dp) {
                     Text(
@@ -178,8 +243,8 @@ fun RankingScreen(
         if (entries.size >= 3) item { Podium(entries.take(3), board) }
 
         if (me == null) {
-            // 순위에 오르려면 한 번은 뛰어야 한다. 0으로 채운 줄을 만들어
-            // "전체 1명 중 1등"이라고 하는 것보다 이렇게 말하는 편이 낫다.
+            // 순위에 오르려면 이 기간에 한 번은 뛰어야 한다. 0으로 채운 줄을
+            // 만들어 "전체 1명 중 1등"이라고 하는 것보다 이렇게 말하는 편이 낫다.
             item { RankingNotice(R.string.rank_no_record) }
         } else item {
             GlowCard(accent = true, contentPadding = PaddingValues(16.dp), spacing = 4.dp) {
@@ -406,6 +471,67 @@ private fun durationLabel(seconds: Long): String {
     val hours = seconds / 3600
     val minutes = (seconds % 3600) / 60
     return if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
+}
+
+/**
+ * 크루 한 줄 — 순위 · 이름 · 크루 러닝 누적 거리.
+ *
+ * 아직 같이 달리지 않은 크루도 0 km 로 남는다. 목록에서 빼 버리면
+ * "우리 크루가 순위에 없다"가 되고, 사용자는 기능이 고장 난 줄 안다.
+ */
+@Composable
+private fun CrewRow(row: CrewRank) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(if (row.joined) Volt.copy(alpha = 0.11f) else Color.Transparent)
+            .padding(horizontal = 12.dp, vertical = 11.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(11.dp),
+    ) {
+        Box(Modifier.width(28.dp), contentAlignment = Alignment.CenterStart) {
+            Text(
+                text = "${row.rank}",
+                color = if (row.rank <= 3) medalColor(row.rank) else Slate,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Black,
+            )
+        }
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .background(if (row.joined) Volt else CarbonHigh, CircleShape),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = row.monogram,
+                color = if (row.joined) Night else Silver,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Black,
+            )
+        }
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(
+                text = row.name,
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (row.joined) Snow else Silver,
+                fontWeight = if (row.joined) FontWeight.Bold else FontWeight.Normal,
+                maxLines = 1,
+            )
+            Text(
+                text = stringResource(R.string.rank_crew_runs, row.runs),
+                fontSize = 10.sp,
+                color = Slate,
+            )
+        }
+        Text(
+            text = "%,.1f km".format(row.km),
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold,
+            color = if (row.joined) Volt else Snow,
+        )
+    }
 }
 
 /** 종족 한 줄 — 순위 · 이름 · 누적 거리 · 내 기여 비중 막대 */

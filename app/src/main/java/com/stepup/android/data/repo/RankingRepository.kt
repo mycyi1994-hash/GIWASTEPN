@@ -8,6 +8,7 @@ import com.stepup.android.domain.Faction
 import com.stepup.android.domain.FactionRank
 import com.stepup.android.domain.RankBoard
 import com.stepup.android.domain.RankEntry
+import com.stepup.android.domain.RankPeriod
 
 /** 순위를 못 가져온 이유. 화면이 어떤 말을 할지 정하는 데 쓴다. */
 enum class RankingProblem {
@@ -57,11 +58,18 @@ sealed interface FactionRankingState {
 class RankingRepository(private val server: StepUpServer) {
 
     /**
+     * @param period 셀 기간. 전체기간만 있으면 순위표는 일찍 시작한 사람의
+     *   명단이 되고, 어제 가입한 사람은 두 번 보지 않는다.
      * @param meLabel 내 줄에 쓸 이름. 순위표에서 "나"를 찾는 데 1초도 쓰지
      *   않게 하려는 것이다 — 자기 이름을 목록에서 찾는 것은 생각보다 느리다.
      */
-    suspend fun personal(board: RankBoard, meLabel: String, limit: Int = 20): RankingState =
-        when (val result = server.leaderboard(board.name, limit)) {
+    suspend fun personal(
+        board: RankBoard,
+        period: RankPeriod,
+        meLabel: String,
+        limit: Int = 20,
+    ): RankingState =
+        when (val result = server.leaderboard(board.name, limit, period.name)) {
             is ServerResult.Ok -> RankingState.Ready(
                 entries = result.value.map { it.toEntry(meLabel) },
                 totalRunners = result.value.firstOrNull()?.total ?: 0,
@@ -72,8 +80,8 @@ class RankingRepository(private val server: StepUpServer) {
         }
 
     /** @param myFaction 지금 신고 있는 신발의 종족. "우리 편"을 표시하는 데 쓴다. */
-    suspend fun factions(myFaction: Faction?): FactionRankingState =
-        when (val result = server.factionLeaderboard()) {
+    suspend fun factions(myFaction: Faction?, period: RankPeriod): FactionRankingState =
+        when (val result = server.factionLeaderboard(period.name)) {
             is ServerResult.Ok -> FactionRankingState.Ready(
                 result.value.toRanks(myFaction),
             )

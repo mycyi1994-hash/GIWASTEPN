@@ -20,7 +20,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         CourseEntity::class,
         NotificationEntity::class,
     ],
-    version = 9,
+    version = 10,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -102,6 +102,20 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-        val MIGRATIONS = arrayOf(MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9)
+        /**
+         * 세션에 크루 러닝의 크루 id 를 더한다.
+         *
+         * 기존 행은 빈 값으로 남는다. 파티런이었는지는 partySize 로 알 수 있지만
+         * **어느 크루였는지**는 남아 있지 않다. 모르는 것을 아무 크루에나 얹으면
+         * 크루 순위가 지어낸 숫자가 되므로, 크루 순위는 이 열이 생긴 뒤의
+         * 러닝부터 센다.
+         */
+        val MIGRATION_9_10 = object : Migration(9, 10) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE walk_sessions ADD COLUMN crewId TEXT NOT NULL DEFAULT ''")
+            }
+        }
+
+        val MIGRATIONS = arrayOf(MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)
     }
 }

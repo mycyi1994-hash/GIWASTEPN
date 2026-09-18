@@ -479,8 +479,13 @@
     <string name="rank_board_time">継続時間</string>
     <string name="rank_board_faction">種族</string>
     <string name="rank_board_sup">SUP 残高</string>
+    <string name="rank_board_crew">クルー</string>
+    <string name="rank_period_day">日間</string>
+    <string name="rank_period_week">週間</string>
+    <string name="rank_period_month">月間</string>
+    <string name="rank_period_all">全期間</string>
     <string name="rank_my_position">自分の順位</string>
-    <string name="rank_total_runners">今週のランナー %1$d 人中</string>
+    <string name="rank_total_runners">ランナー %1$d 人中</string>
     <string name="ranking_teaser">%1$d 位 · %2$s SUP</string>
     <string name="ranking_teaser_unknown">自分の順位を見る · %1$s SUP</string>
     <string name="rank_loading">ランキングを読み込み中…</string>
@@ -494,6 +499,10 @@
     <string name="rank_faction_km">累計 %1$s km</string>
     <string name="rank_faction_my_km">あなたの貢献 · %1$s km</string>
     <string name="rank_faction_mine">自分の種族</string>
+    <string name="rank_crew_title">クルー順位</string>
+    <string name="rank_crew_body">クルーランで走った距離だけを数えます。メンバーが一人で走った分は入りません — そうしないと人数の多いクルーが何もせずに1位になります。</string>
+    <string name="rank_crew_runs">クルーラン %1$d 回</string>
+    <string name="rank_crew_empty">この期間のクルーランはまだありません。一度一緒に走れば順位が始まります。</string>
     <string name="run_flagged_title">速度チェック</string>
     <string name="run_flagged_body">%1$d 区間を除外しました — 人が走れる速度を超えています。</string>
     <string name="run_void_title">セッション無効</string>
