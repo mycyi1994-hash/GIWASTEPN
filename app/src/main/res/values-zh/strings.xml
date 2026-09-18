@@ -105,6 +105,11 @@
     <string name="crew_ready_count">%1$d / %2$d 人已准备</string>
     <string name="crew_waiting">正在等队友…</string>
     <string name="crew_all_ready">全员准备完毕！</string>
+    <string name="crew_can_start">可以出发了</string>
+    <string name="party_start_ready">与已准备的 %1$d 人开始</string>
+    <string name="party_start_leaves_behind">尚未准备的 %1$d 人本次不参加。</string>
+    <string name="flash_lobby_cta">准备开跑</string>
+    <string name="flash_lobby_hint">集合后以组队形式一起跑 · 收益 +%1$d%%</string>
     <string name="crew_you">我</string>
     <string name="crew_state_ready">已准备</string>
     <string name="crew_state_waiting">等待中</string>

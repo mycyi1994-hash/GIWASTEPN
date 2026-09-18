@@ -107,6 +107,11 @@
     <string name="crew_ready_count">%1$d / %2$d ready</string>
     <string name="crew_waiting">Waiting for the crew…</string>
     <string name="crew_all_ready">Everyone\'s ready!</string>
+    <string name="crew_can_start">Ready to go</string>
+    <string name="party_start_ready">Start with %1$d ready</string>
+    <string name="party_start_leaves_behind">%1$d who are not ready sit this one out.</string>
+    <string name="flash_lobby_cta">Get ready to run</string>
+    <string name="flash_lobby_hint">Run it together as a party · +%1$d%% earnings</string>
     <string name="crew_you">You</string>
     <string name="crew_state_ready">Ready</string>
     <string name="crew_state_waiting">Waiting</string>

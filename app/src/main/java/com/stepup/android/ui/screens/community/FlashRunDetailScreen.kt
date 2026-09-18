@@ -53,6 +53,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.stepup.android.R
 import com.stepup.android.core.ExternalIntents
 import com.stepup.android.domain.Post
+import com.stepup.android.domain.RewardEconomy
 import com.stepup.android.ui.components.AvatarStack
 import com.stepup.android.ui.components.DarkIconButton
 import com.stepup.android.ui.components.GhostButton
@@ -91,6 +92,7 @@ private val demoRunners = listOf(
 fun FlashRunDetailScreen(
     postId: Long,
     onBack: () -> Unit = {},
+    onOpenLobby: () -> Unit = {},
     viewModel: CommunityViewModel = viewModel(factory = CommunityViewModel.Factory),
 ) {
     val posts by viewModel.allPosts.collectAsStateWithLifecycle()
@@ -165,6 +167,7 @@ fun FlashRunDetailScreen(
 
         item {
             FlashCtaRow(
+                onOpenLobby = onOpenLobby,
                 post = post,
                 onLike = { viewModel.toggleLike(post.id) },
                 onToggleJoin = { viewModel.toggleJoinFlash(post.id) },
@@ -663,7 +666,9 @@ private fun FlashCtaRow(
     post: Post,
     onLike: () -> Unit,
     onToggleJoin: () -> Unit,
+    onOpenLobby: () -> Unit,
 ) {
+    Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -698,5 +703,24 @@ private fun FlashCtaRow(
                 modifier = Modifier.weight(1f),
             )
         }
+    }
+
+    // 참가만 눌러 놓고 끝나면 이 글은 게시판 글일 뿐이다. 실제로 같이
+    // 뛰려면 크루 파티런과 같은 자리 — 준비하고, 모이면 출발하는 — 가 있어야 한다.
+    if (post.joined && !post.isClosed) {
+        VoltButton(
+            text = stringResource(R.string.flash_lobby_cta),
+            onClick = onOpenLobby,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Text(
+            text = stringResource(
+                R.string.flash_lobby_hint,
+                RewardEconomy.partyBonusPercent(post.joinedCount.coerceAtLeast(1)),
+            ),
+            style = MaterialTheme.typography.bodySmall,
+            color = Slate,
+        )
+    }
     }
 }

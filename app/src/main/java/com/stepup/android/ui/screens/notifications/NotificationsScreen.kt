@@ -22,16 +22,18 @@ import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.GroupAdd
-import androidx.compose.material.icons.filled.PersonOff
-import androidx.compose.material.icons.filled.Redeem
-import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.MilitaryTech
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.PersonOff
+import androidx.compose.material.icons.filled.Redeem
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.filled.Whatshot
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,25 +49,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.stepup.android.R
-import com.stepup.android.domain.parseSlotKey
-import com.stepup.android.ui.components.label
-import com.stepup.android.ui.components.variantLabel
 import com.stepup.android.core.ServiceLocator
 import com.stepup.android.data.local.NotificationEntity
 import com.stepup.android.data.local.NotificationType
+import com.stepup.android.data.repo.CommentTarget
 import com.stepup.android.data.repo.CrewRepository
 import com.stepup.android.data.repo.NotificationRepository
+import com.stepup.android.domain.parseSlotKey
 import com.stepup.android.ui.components.DarkIconButton
 import com.stepup.android.ui.components.GhostButton
 import com.stepup.android.ui.components.GlowCard
 import com.stepup.android.ui.components.IconSquare
 import com.stepup.android.ui.components.VoltButton
+import com.stepup.android.ui.components.label
+import com.stepup.android.ui.components.quietClickable
+import com.stepup.android.ui.components.variantLabel
 import com.stepup.android.ui.theme.Silver
 import com.stepup.android.ui.theme.Slate
 import com.stepup.android.ui.theme.Snow
@@ -128,6 +132,10 @@ class NotificationsViewModel(
 fun NotificationsScreen(
     onBack: () -> Unit = {},
     onOpenLobby: (String) -> Unit = {},
+    /** 알림이 가리키는 댓글로 이동 */
+    onOpenComment: (CommentTarget) -> Unit = {},
+    /** 알림이 가리키는 크루 게시판으로 이동 */
+    onOpenCrew: (String) -> Unit = {},
     viewModel: NotificationsViewModel = viewModel(factory = NotificationsViewModel.Factory),
 ) {
     val notifications by viewModel.items.collectAsStateWithLifecycle()
@@ -205,6 +213,15 @@ fun NotificationsScreen(
                     onDecline = { viewModel.decline(entity) },
                     onAcceptParty = { viewModel.acceptPartyInvite(entity, onOpenLobby) },
                     onClaim = { viewModel.claimEventReward(entity) },
+                    onOpen = destinationOf(entity)?.let { destination ->
+                        {
+                            when (destination) {
+                                is NotifDestination.CommentThread -> onOpenComment(destination.target)
+                                is NotifDestination.CrewBoard -> onOpenCrew(destination.crewId)
+                                is NotifDestination.Lobby -> onOpenLobby(destination.crewId)
+                            }
+                        }
+                    },
                 )
             }
         }
@@ -219,6 +236,8 @@ private fun NotificationRow(
     onDecline: () -> Unit,
     onAcceptParty: () -> Unit,
     onClaim: () -> Unit,
+    /** 갈 곳이 있는 알림이면 그 곳으로. 없으면 null — 눌러도 아무 일 없다. */
+    onOpen: (() -> Unit)? = null,
 ) {
     val actionable = entity.type in listOf(
         NotificationType.CREW_INVITE,
@@ -226,6 +245,9 @@ private fun NotificationRow(
         NotificationType.EVENT_REWARD,
     )
     GlowCard(
+        // 알림을 누르면 그 알림이 생긴 자리로 간다. 읽고 나서 직접 찾아
+        // 들어가야 한다면, 알림은 "무슨 일이 있었다"까지만 알려 주고 끝난다.
+        modifier = if (onOpen != null) Modifier.quietClickable(onOpen) else Modifier,
         contentPadding = PaddingValues(horizontal = 15.dp, vertical = 13.dp),
         shape = RoundedCornerShape(18.dp),
         accent = actionable && !entity.actioned,
@@ -256,6 +278,15 @@ private fun NotificationRow(
                     modifier = Modifier
                         .size(4.dp)
                         .background(Volt, CircleShape),
+                )
+            }
+            // 누를 수 있는 알림임을 표시한다.
+            if (onOpen != null) {
+                Icon(
+                    imageVector = Icons.Filled.ChevronRight,
+                    contentDescription = null,
+                    tint = Slate,
+                    modifier = Modifier.size(16.dp),
                 )
             }
         }
@@ -405,4 +436,37 @@ private fun relativeTime(timestamp: Long, now: Long): String {
         days < 1L -> stringResource(R.string.time_hours_ago, hours.toInt())
         else -> stringResource(R.string.time_days_ago, days.toInt())
     }
+}
+
+
+/** 알림을 누르면 갈 곳 */
+private sealed interface NotifDestination {
+    data class CommentThread(val target: CommentTarget) : NotifDestination
+    data class CrewBoard(val crewId: String) : NotifDestination
+    data class Lobby(val crewId: String) : NotifDestination
+}
+
+/**
+ * 이 알림이 가리키는 곳.
+ *
+ * 갈 곳이 분명한 알림만 누를 수 있게 한다. "SUP 적립됨"처럼 볼 자리가 따로
+ * 없는 알림까지 누르게 해 두면, 눌렀는데 아무 일도 안 일어나는 경험이 섞인다.
+ */
+private fun destinationOf(entity: NotificationEntity): NotifDestination? = when (entity.type) {
+    NotificationType.COMMENT_REPLY ->
+        CommentTarget.decode(entity.argExtra)?.let { NotifDestination.CommentThread(it) }
+
+    NotificationType.CREW_JOINED ->
+        entity.argExtra.takeIf { it.isNotBlank() }?.let { NotifDestination.CrewBoard(it) }
+
+    // 초대는 수락 버튼이 따로 있다. 카드를 누르면 어떤 크루인지 먼저 본다.
+    NotificationType.CREW_INVITE ->
+        entity.argExtra.takeIf { it.isNotBlank() }?.let { NotifDestination.CrewBoard(it) }
+
+    // 파티런 알림 중 로비 주소를 담고 있는 것은 초대뿐이다. 나머지
+    // (누가 빠졌다·정산 끝)는 argExtra 에 사람 이름이 들어 있어서 갈 곳이 없다.
+    NotificationType.PARTY_INVITE ->
+        entity.argExtra.takeIf { it.isNotBlank() }?.let { NotifDestination.Lobby(it) }
+
+    else -> null
 }

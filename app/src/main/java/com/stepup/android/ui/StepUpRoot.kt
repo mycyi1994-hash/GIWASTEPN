@@ -126,6 +126,7 @@ object Routes {
     const val CREW_BOARD = "crew/board/{crewId}"
     const val POST_COMPOSE = "post/compose/{crewId}"
     const val FLASH_DETAIL = "flash/{postId}"
+    const val FLASH_LOBBY = "flash/lobby/{postId}"
     const val COURSES = "courses"
 
     fun sneaker(id: Long) = "sneaker/$id"
@@ -136,6 +137,8 @@ object Routes {
     fun postCompose(crewId: String) = "post/compose/${crewId.ifBlank { NO_CREW }}"
 
     fun flashDetail(postId: Long) = "flash/$postId"
+
+    fun flashLobby(postId: Long) = "flash/lobby/$postId"
 
     const val NO_CREW = "_"
 }
@@ -283,6 +286,13 @@ private fun MainScaffold(startTour: Boolean = false) {
                 NotificationsScreen(
                     onBack = { navController.popBackStack() },
                     onOpenLobby = { crewId -> navController.navigate(Routes.lobby(crewId)) },
+                    onOpenCrew = { crewId -> navController.navigate(Routes.crewBoard(crewId)) },
+                    // 댓글은 게시판 위에 창으로 뜬다. 어느 댓글인지는 저장소에
+                    // 남겨 두고 커뮤니티 탭으로 보내면, 게시판이 그 창을 연다.
+                    onOpenComment = { target ->
+                        ServiceLocator.communityRepository.focusComment(target)
+                        navController.switchTab(Screen.Community)
+                    },
                 )
             }
             composable(Routes.ACHIEVEMENTS) {
@@ -353,9 +363,21 @@ private fun MainScaffold(startTour: Boolean = false) {
                 route = Routes.FLASH_DETAIL,
                 arguments = listOf(navArgument("postId") { type = NavType.LongType }),
             ) { entry ->
+                val postId = entry.arguments?.getLong("postId") ?: 0L
                 FlashRunDetailScreen(
-                    postId = entry.arguments?.getLong("postId") ?: 0L,
+                    postId = postId,
                     onBack = { navController.popBackStack() },
+                    onOpenLobby = { navController.navigate(Routes.flashLobby(postId)) },
+                )
+            }
+            composable(
+                route = Routes.FLASH_LOBBY,
+                arguments = listOf(navArgument("postId") { type = NavType.LongType }),
+            ) { entry ->
+                PartyLobbyScreen(
+                    flashPostId = entry.arguments?.getLong("postId") ?: 0L,
+                    onBack = { navController.popBackStack() },
+                    onRunStarted = { navController.navigate(Routes.RUN) },
                 )
             }
             composable(

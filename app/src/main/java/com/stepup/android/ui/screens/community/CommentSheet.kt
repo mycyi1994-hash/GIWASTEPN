@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -30,6 +31,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,6 +71,7 @@ import com.stepup.android.ui.theme.Volt
 fun CommentSheetHost(viewModel: CommunityViewModel) {
     val openId by viewModel.openCommentsFor.collectAsStateWithLifecycle()
     val posts by viewModel.allPosts.collectAsStateWithLifecycle()
+    val focusId by viewModel.focusCommentId.collectAsStateWithLifecycle()
     val id = openId ?: return
     val post = posts.firstOrNull { it.id == id } ?: return
     val stream = remember(id) { viewModel.commentThreads(id) }
@@ -78,6 +81,7 @@ fun CommentSheetHost(viewModel: CommunityViewModel) {
     CommentSheet(
         post = post,
         threads = threads,
+        focusCommentId = focusId,
         onSend = { body, parentId -> viewModel.sendComment(id, body, parentId, author) },
         onDeleteComment = viewModel::deleteComment,
         onDismiss = viewModel::closeComments,
@@ -97,10 +101,25 @@ fun CommentSheet(
     onSend: (body: String, parentId: Long) -> Unit,
     onDeleteComment: (Long) -> Unit,
     onDismiss: () -> Unit,
+    /** 알림에서 들어왔다면 그 댓글. 0이면 없음. */
+    focusCommentId: Long = 0L,
 ) {
     var input by remember { mutableStateOf("") }
     var replyTo by remember { mutableStateOf<Comment?>(null) }
     val total = threads.sumOf { it.size }
+    val listState = rememberLazyListState()
+
+    // 알림을 눌러 들어왔으면 그 댓글이 보이는 자리까지 내려간다.
+    //
+    // 댓글이 200개인 글에서 맨 위만 보여주면, 사용자는 알림이 가리킨 댓글을
+    // 직접 찾아야 한다. 그러면 알림을 누른 의미가 없다.
+    LaunchedEffect(focusCommentId, threads.size) {
+        if (focusCommentId == 0L || threads.isEmpty()) return@LaunchedEffect
+        val index = threads.indexOfFirst { thread ->
+            thread.comment.id == focusCommentId || thread.replies.any { it.id == focusCommentId }
+        }
+        if (index >= 0) listState.animateScrollToItem(index)
+    }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -192,6 +211,7 @@ fun CommentSheet(
                     }
                 } else {
                     LazyColumn(
+                        state = listState,
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f),
@@ -204,6 +224,7 @@ fun CommentSheet(
                                     comment = thread.comment,
                                     onReply = { replyTo = thread.comment },
                                     onDelete = { onDeleteComment(thread.comment.id) },
+                                    highlighted = thread.comment.id == focusCommentId,
                                 )
                                 thread.replies.forEach { reply ->
                                     CommentRow(
@@ -211,6 +232,7 @@ fun CommentSheet(
                                         onReply = { replyTo = thread.comment },
                                         onDelete = { onDeleteComment(reply.id) },
                                         modifier = Modifier.padding(start = 30.dp),
+                                        highlighted = reply.id == focusCommentId,
                                     )
                                 }
                             }
@@ -325,9 +347,23 @@ private fun CommentRow(
     onReply: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
+    /** 알림이 가리킨 댓글 — 스크롤해 놓고 표시까지 해야 눈에 들어온다 */
+    highlighted: Boolean = false,
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .then(
+                if (highlighted) {
+                    Modifier
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(Volt.copy(alpha = 0.10f))
+                        .border(1.dp, Volt.copy(alpha = 0.55f), RoundedCornerShape(14.dp))
+                        .padding(9.dp)
+                } else {
+                    Modifier
+                },
+            ),
         horizontalArrangement = Arrangement.spacedBy(9.dp),
     ) {
         Box(

@@ -67,6 +67,8 @@ enum class PartyPhase {
 data class PartyState(
     val phase: PartyPhase = PartyPhase.IDLE,
     val crewId: String? = null,
+    /** 번개러닝에서 연 로비면 그 글의 id. 크루 로비면 null. */
+    val flashPostId: Long? = null,
     val crewName: String = "",
     val members: List<PartyMember> = emptyList(),
     val countdown: Int = 0,
@@ -77,6 +79,15 @@ data class PartyState(
     val partySize: Int get() = members.size
     val allReady: Boolean get() = members.isNotEmpty() && members.all { it.ready }
     val myReady: Boolean get() = members.firstOrNull { it.isMe }?.ready == true
+
+    /**
+     * 파티장이 지금 출발할 수 있는가.
+     *
+     * 전원이 준비하기를 기다리지 않는다. 한 사람이 신발 끈을 못 찾으면
+     * 나머지 넷이 길에 서 있게 되고, 그 다섯 명은 다음부터 파티런을 안 쓴다.
+     * 파티장 본인만 준비돼 있으면 출발할 수 있고, 준비를 마친 사람들끼리 뛴다.
+     */
+    val canStart: Boolean get() = myReady && readyCount >= 1
     val isActive: Boolean get() = phase == PartyPhase.RUNNING
 }
 
@@ -169,7 +180,10 @@ class CrewRepository(
 
     suspend fun join(crewId: String) {
         crewDao.insert(CrewMembershipEntity(crewId, System.currentTimeMillis()))
-        crewOf(crewId)?.let { rewardRepository.notify(NotificationType.CREW_JOINED, it.name) }
+        crewOf(crewId)?.let {
+            // 크루 id 를 함께 담는다. 알림을 눌렀을 때 그 크루로 갈 수 있어야 한다.
+            rewardRepository.notify(NotificationType.CREW_JOINED, it.name, argExtra = it.id)
+        }
     }
 
     suspend fun leave(crewId: String) {
@@ -270,6 +284,42 @@ class CrewRepository(
         )
     }
 
+    /**
+     * 번개러닝 로비.
+     *
+     * 크루 로비와 같은 판을 쓴다 — 준비를 누르고, 파티장이 시작하고, 인원수만큼
+     * 적립 부스트가 붙는다. 번개러닝만 이 흐름이 없으면 "모집은 되는데 같이
+     * 뛸 수는 없는 글"이 되고, 그건 게시판이지 러닝 기능이 아니다.
+     *
+     * 크루 로비와 마찬가지로 **로비를 연 사람이 파티장**이다. 주최자만 시작할
+     * 수 있게 하면, 주최자가 늦는 날 모인 사람들이 아무것도 못 한다.
+     *
+     * @param others 나를 뺀 참가자 수. 글의 참가 인원에서 온다.
+     */
+    fun openFlashLobby(postId: Long, title: String, others: Int) {
+        if (_party.value.flashPostId == postId &&
+            _party.value.phase !in listOf(PartyPhase.IDLE, PartyPhase.FINISHED)
+        ) {
+            return // 이미 이 번개 로비에 있음
+        }
+        simulationJob?.cancel()
+        driftJob?.cancel()
+        val random = Random(System.nanoTime())
+        val squad = EXTRA_RUNNERS.shuffled(random).take(others.coerceIn(0, 9))
+        val members = buildList {
+            add(PartyMember("me", "", "", 0, ready = false, isMe = true, distanceM = 0))
+            squad.forEachIndexed { index, name ->
+                add(member(index, name, random, ready = index == 0 && random.nextBoolean()))
+            }
+        }
+        _party.value = PartyState(
+            phase = PartyPhase.LOBBY,
+            flashPostId = postId,
+            crewName = title,
+            members = members,
+        )
+    }
+
     fun leaveLobby() {
         simulationJob?.cancel()
         driftJob?.cancel()
@@ -279,9 +329,10 @@ class CrewRepository(
     /** 파티에 없는 크루원 — 초대 후보 */
     fun inviteCandidates(): List<String> {
         val state = _party.value
-        val crew = state.crewId?.let { crewOf(it) } ?: return emptyList()
         val inParty = state.members.map { it.name }.toSet()
-        return (crew.roster + EXTRA_RUNNERS).distinct().filterNot { it in inParty }
+        // 번개러닝 로비에는 크루 명단이 없다. 그때는 일반 러너 중에서 부른다.
+        val roster = state.crewId?.let { crewOf(it) }?.roster.orEmpty()
+        return (roster + EXTRA_RUNNERS).distinct().filterNot { it in inParty }
     }
 
     /** 파티장 권한 — 크루원 초대. 초대된 크루원은 잠시 후 준비를 누른다. */
@@ -344,10 +395,28 @@ class CrewRepository(
         }
     }
 
-    /** 파티장 권한 — 전원 준비 후 시작. 카운트다운을 거쳐 동시 측정에 들어간다. */
+    /**
+     * 파티장 권한 — 준비된 사람들끼리 시작. 카운트다운을 거쳐 동시 측정에 들어간다.
+     *
+     * 아직 준비하지 않은 사람은 여기서 파티에서 빠진다. 데리고 들어가면
+     * 적립 부스트(인원수 배율)에는 들어가면서 실제로는 안 뛰는 사람이 생긴다 —
+     * 같이 뛴 사람들 몫을 안 뛴 사람이 나눠 갖는 셈이다.
+     */
     fun startParty() {
         val state = _party.value
-        if (state.phase != PartyPhase.LOBBY || !state.allReady) return
+        if (state.phase != PartyPhase.LOBBY || !state.canStart) return
+
+        val ready = state.members.filter { it.ready }
+        val leftBehind = state.members.filterNot { it.ready }
+        if (ready.size != state.members.size) {
+            _party.value = state.copy(members = ready)
+            // 두고 간 사람에게는 알림을 남긴다. 로비에 있다가 조용히
+            // 사라지면 본인은 앱이 고장 난 줄 안다.
+            leftBehind.forEach {
+                rewardRepository.notify(NotificationType.PARTY_MEMBER_LEFT, it.name)
+            }
+        }
+
         simulationJob?.cancel()
         simulationJob = scope.launch {
             for (n in 3 downTo 1) {

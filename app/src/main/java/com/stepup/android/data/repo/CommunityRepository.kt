@@ -17,8 +17,29 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+
+/**
+ * 알림이 가리키는 댓글 한 개.
+ *
+ * 알림에는 문자열 한 칸(argExtra)만 있어서 "글 번호:댓글 번호"로 눌러 담는다.
+ * 댓글 번호가 없던 시절의 알림(글 번호만 있는 것)도 그대로 읽힌다 — 이미
+ * 알림함에 쌓여 있는 것들을 깨뜨리지 않기 위해서다.
+ */
+data class CommentTarget(val postId: Long, val commentId: Long) {
+    fun encode(): String = "$postId:$commentId"
+
+    companion object {
+        fun decode(raw: String): CommentTarget? {
+            val parts = raw.split(":")
+            val post = parts.getOrNull(0)?.toLongOrNull() ?: return null
+            return CommentTarget(post, parts.getOrNull(1)?.toLongOrNull() ?: 0L)
+        }
+    }
+}
 
 /**
  * 커뮤니티 게시판.
@@ -36,6 +57,24 @@ class CommunityRepository(
 
     /** 데모용 답글을 잠시 뒤에 붙이는 용도 — 화면이 사라져도 살아 있어야 한다 */
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    /**
+     * 알림에서 눌러 들어온 댓글.
+     *
+     * 화면(뷰모델)마다 인스턴스가 달라서 알림함에서 게시판으로 값을 건네줄 방법이
+     * 없다. 저장소는 앱에 하나뿐이므로 여기에 둔다. 게시판이 이 값을 보고
+     * 댓글 창을 열어 그 댓글까지 스크롤한 뒤 비운다.
+     */
+    private val _commentFocus = MutableStateFlow<CommentTarget?>(null)
+    val commentFocus: StateFlow<CommentTarget?> = _commentFocus
+
+    fun focusComment(target: CommentTarget) {
+        _commentFocus.value = target
+    }
+
+    fun clearCommentFocus() {
+        _commentFocus.value = null
+    }
 
     val posts: Flow<List<Post>> = postDao.observeAll().map { list -> list.map { it.toDomain() } }
 
@@ -222,10 +261,12 @@ class CommunityRepository(
                 )
             )
             syncCount(postId)
+            // 글 번호만 담으면 댓글이 200개인 글에서 "어디에 달렸는지"를
+            // 사용자가 직접 찾아야 한다. 댓글 번호까지 같이 담는다.
             rewardRepository.notify(
                 type = NotificationType.COMMENT_REPLY,
                 argText = responder,
-                argExtra = postId.toString(),
+                argExtra = CommentTarget(postId, target.id).encode(),
             )
         }
     }

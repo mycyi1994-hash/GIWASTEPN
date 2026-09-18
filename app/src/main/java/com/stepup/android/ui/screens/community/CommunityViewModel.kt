@@ -6,6 +6,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.stepup.android.data.repo.SneakerRepository
 import com.stepup.android.core.ServiceLocator
+import com.stepup.android.data.repo.CommentTarget
 import com.stepup.android.data.repo.CommunityRepository
 import com.stepup.android.data.repo.Crew
 import com.stepup.android.data.repo.CrewRepository
@@ -111,12 +112,30 @@ class CommunityViewModel(
     /** 댓글 창을 열어 둔 글의 id. null이면 닫혀 있다 */
     val openCommentsFor = MutableStateFlow<Long?>(null)
 
+    /**
+     * 알림에서 눌러 들어온 댓글. 댓글 창이 이 댓글까지 스크롤하고 표시해 준다.
+     * 0이면 특정 댓글을 가리키지 않는다.
+     */
+    val focusCommentId = MutableStateFlow(0L)
+
+    /** 알림함이 남긴 "이 댓글로" 신호 */
+    val commentFocus: StateFlow<CommentTarget?> = communityRepository.commentFocus
+
     fun openComments(postId: Long) {
+        focusCommentId.value = 0L
         openCommentsFor.value = postId
+    }
+
+    /** 알림에서 들어온 경로 — 글의 댓글 창을 열고 그 댓글을 가리킨다 */
+    fun openCommentsFocused(target: CommentTarget) {
+        openCommentsFor.value = target.postId
+        focusCommentId.value = target.commentId
+        communityRepository.clearCommentFocus()
     }
 
     fun closeComments() {
         openCommentsFor.value = null
+        focusCommentId.value = 0L
     }
 
     fun commentThreads(postId: Long): Flow<List<CommentThread>> =

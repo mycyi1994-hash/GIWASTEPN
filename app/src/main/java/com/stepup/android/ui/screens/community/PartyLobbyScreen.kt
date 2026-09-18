@@ -79,20 +79,33 @@ import com.stepup.android.ui.theme.Volt
 /**
  * 파티런 로비 — 로비를 연 사람이 파티장이다.
  *
- * 파티장은 크루원을 초대·강퇴할 수 있고, 전원이 준비를 마치면
- * "시작"을 눌러 카운트다운 후 다 같이 측정에 들어간다.
- * 러닝 중 파티장에게서 일정 거리 이상 떨어진 크루원은 자동으로 빠진다.
+ * 크루 로비와 번개러닝 로비가 같은 화면을 쓴다. 준비 → 시작 → 같이 측정까지
+ * 흐름이 똑같고, 다른 것은 누가 모였는가뿐이다.
+ *
+ * 파티장은 사람을 초대·강퇴할 수 있고, **준비를 마친 사람들끼리** 시작한다.
+ * 전원을 기다리지 않는다 — 한 사람 때문에 나머지가 길에 서 있게 되면,
+ * 그 사람들은 다음부터 파티런을 안 쓴다.
+ * 러닝 중 파티장에게서 일정 거리 이상 떨어진 사람은 자동으로 빠진다.
+ *
+ * @param crewId 크루 로비면 크루 id, 번개러닝 로비면 빈 문자열
+ * @param flashPostId 번개러닝 로비면 그 글의 id
  */
 @Composable
 fun PartyLobbyScreen(
-    crewId: String,
+    crewId: String = "",
+    flashPostId: Long? = null,
     onBack: () -> Unit,
     onRunStarted: () -> Unit,
     viewModel: PartyLobbyViewModel = viewModel(factory = PartyLobbyViewModel.Factory),
+    community: CommunityViewModel = viewModel(factory = CommunityViewModel.Factory),
 ) {
     val context = LocalContext.current
     val party by viewModel.party.collectAsStateWithLifecycle()
     var showInvite by rememberSaveable { mutableStateOf(false) }
+
+    // 번개러닝이면 글에서 제목과 참가 인원을 가져온다.
+    val posts by community.allPosts.collectAsStateWithLifecycle()
+    val flashPost = flashPostId?.let { id -> posts.firstOrNull { it.id == id } }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -102,7 +115,18 @@ fun PartyLobbyScreen(
         }
     }
 
-    LaunchedEffect(crewId) { viewModel.openLobby(crewId) }
+    LaunchedEffect(crewId, flashPost?.id) {
+        val post = flashPost
+        when {
+            post != null -> viewModel.openFlashLobby(
+                postId = post.id,
+                title = post.title,
+                // 나를 뺀 참가자. 글에서 내가 참가를 눌렀으면 한 명은 나다.
+                others = (post.joinedCount - if (post.joined) 1 else 0).coerceAtLeast(0),
+            )
+            crewId.isNotEmpty() -> viewModel.openLobby(crewId)
+        }
+    }
 
     // 전원 준비 → 카운트다운이 끝나면 실제 세션을 시작한다.
     LaunchedEffect(party.phase) {
@@ -161,20 +185,22 @@ fun PartyLobbyScreen(
 
             // 준비 현황
             item {
-                GlowCard(accent = party.allReady, contentPadding = PaddingValues(18.dp), spacing = 13.dp) {
+                GlowCard(accent = party.canStart, contentPadding = PaddingValues(18.dp), spacing = 13.dp) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = if (party.allReady) {
-                                stringResource(R.string.crew_all_ready)
-                            } else {
-                                stringResource(R.string.crew_waiting)
+                            text = when {
+                                party.allReady -> stringResource(R.string.crew_all_ready)
+                                // 파티장이 준비를 마치면 더는 "기다리는 중"이
+                                // 아니다. 출발 여부는 이제 본인이 정한다.
+                                party.canStart -> stringResource(R.string.crew_can_start)
+                                else -> stringResource(R.string.crew_waiting)
                             },
                             style = MaterialTheme.typography.titleMedium,
-                            color = if (party.allReady) Volt else Snow,
+                            color = if (party.canStart) Volt else Snow,
                         )
                         Text(
                             text = stringResource(
@@ -184,7 +210,7 @@ fun PartyLobbyScreen(
                             ),
                             style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.Bold,
-                            color = if (party.allReady) Volt else Silver,
+                            color = if (party.canStart) Volt else Silver,
                         )
                     }
                     BarMeter(
@@ -316,12 +342,30 @@ fun PartyLobbyScreen(
                     }
                     else -> {
                         Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
-                            if (party.allReady) {
+                            // 전원을 기다리지 않는다. 파티장이 준비했으면
+                            // 준비된 사람들끼리 출발할 수 있다.
+                            if (party.canStart) {
                                 VoltButton(
-                                    text = stringResource(R.string.party_start),
+                                    text = if (party.allReady) {
+                                        stringResource(R.string.party_start)
+                                    } else {
+                                        // 몇 명과 출발하는지 버튼에 적는다.
+                                        // 누르고 나서야 두 명인 걸 알면 늦다.
+                                        stringResource(R.string.party_start_ready, party.readyCount)
+                                    },
                                     onClick = { viewModel.startParty() },
                                     modifier = Modifier.fillMaxWidth(),
                                 )
+                                if (!party.allReady) {
+                                    Text(
+                                        text = stringResource(
+                                            R.string.party_start_leaves_behind,
+                                            party.partySize - party.readyCount,
+                                        ),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Slate,
+                                    )
+                                }
                             }
                             if (party.myReady) {
                                 GhostButton(

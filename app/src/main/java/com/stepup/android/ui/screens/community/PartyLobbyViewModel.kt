@@ -14,6 +14,10 @@ class PartyLobbyViewModel(private val crewRepository: CrewRepository) : ViewMode
 
     fun openLobby(crewId: String) = crewRepository.openLobby(crewId)
 
+    /** 번개러닝 로비. 크루 로비와 같은 판을 쓴다. */
+    fun openFlashLobby(postId: Long, title: String, others: Int) =
+        crewRepository.openFlashLobby(postId, title, others)
+
     fun setReady(ready: Boolean) = crewRepository.setMyReady(ready)
 
     fun leaveLobby() = crewRepository.leaveLobby()

@@ -105,6 +105,11 @@
     <string name="crew_ready_count">%1$d / %2$d명 준비</string>
     <string name="crew_waiting">크루원을 기다리는 중…</string>
     <string name="crew_all_ready">전원 준비 완료!</string>
+    <string name="crew_can_start">출발할 수 있어요</string>
+    <string name="party_start_ready">준비된 %1$d명과 시작</string>
+    <string name="party_start_leaves_behind">아직 준비 안 된 %1$d명은 이번 러닝에서 빠져요.</string>
+    <string name="flash_lobby_cta">러닝 준비하기</string>
+    <string name="flash_lobby_hint">모이면 파티런으로 같이 달려요 · 적립 +%1$d%%</string>
     <string name="crew_you">나</string>
     <string name="crew_state_ready">준비됨</string>
     <string name="crew_state_waiting">대기 중</string>
