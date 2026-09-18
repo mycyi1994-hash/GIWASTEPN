@@ -2,8 +2,10 @@ package com.stepup.android.ui.screens.profile
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,6 +32,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,6 +64,7 @@ import com.stepup.android.ui.components.HairlineDivider
 import com.stepup.android.ui.components.IconSquare
 import com.stepup.android.ui.components.SectionHeader
 import com.stepup.android.ui.components.StatCell
+import com.stepup.android.ui.components.quietClickable
 import com.stepup.android.ui.theme.Night
 import com.stepup.android.ui.theme.Silver
 import com.stepup.android.ui.theme.Slate
@@ -159,7 +166,13 @@ fun AnalyticsScreen(
     }
 }
 
-/** 지난 7일 큰 바 차트 — 볼트 바 + 점선 목표선 + 요일 이니셜 */
+/**
+ * 지난 7일 큰 바 차트 — 볼트 바 + 점선 목표선 + 요일 이니셜.
+ *
+ * 막대를 누르면 그날의 기록이 작은 창으로 뜬다. 막대 높이만으로는 "수요일이
+ * 목요일보다 조금 높다"까지만 읽히고, 정작 궁금한 "그래서 몇 보 걸었나"는
+ * 알 수 없다. 누르는 동작 하나로 그 답을 준다.
+ */
 @Composable
 private fun WeekChartCard(week: List<DailyStepsEntity>, goal: Int) {
     val today = LocalDate.now().toEpochDay()
@@ -167,6 +180,9 @@ private fun WeekChartCard(week: List<DailyStepsEntity>, goal: Int) {
     val byDay = week.associateBy { it.epochDay }
     val weekSteps = days.sumOf { (byDay[it]?.steps ?: 0).toLong() }
     val maxValue = maxOf(week.maxOfOrNull { it.steps } ?: 0, goal, 1)
+
+    // 고른 날. 화면을 나갔다 와도 유지된다.
+    var selectedDay by rememberSaveable { mutableStateOf<Long?>(null) }
 
     GlowCard(accent = true, contentPadding = PaddingValues(18.dp), spacing = 12.dp) {
         Row(
@@ -184,34 +200,68 @@ private fun WeekChartCard(week: List<DailyStepsEntity>, goal: Int) {
                     color = Snow,
                 )
             }
-            Text(
-                text = stringResource(R.string.home_daily_goal, "%,d".format(goal)),
-                fontSize = 10.sp,
-                color = Slate,
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(2.dp),
                 modifier = Modifier.padding(bottom = 6.dp),
-            )
+            ) {
+                Text(
+                    text = stringResource(R.string.home_daily_goal, "%,d".format(goal)),
+                    fontSize = 10.sp,
+                    color = Slate,
+                )
+                // 누를 수 있다는 것을 모르면 없는 기능이나 같다.
+                Text(
+                    text = stringResource(R.string.analytics_tap_hint),
+                    fontSize = 9.sp,
+                    color = Volt.copy(alpha = 0.75f),
+                )
+            }
         }
 
-        Box(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(150.dp),
         ) {
+            val chartWidth = maxWidth
+            val gap = 8.dp
+            val slot = (chartWidth - gap * (days.size - 1)) / days.size
+
             Row(
                 modifier = Modifier.matchParentSize(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(gap),
                 verticalAlignment = Alignment.Bottom,
             ) {
                 days.forEach { day ->
                     val steps = byDay[day]?.steps ?: 0
                     val fraction = (steps.toFloat() / maxValue).coerceIn(0.04f, 1f)
+                    val selected = day == selectedDay
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .fillMaxHeight(fraction)
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(if (day == today) Volt else Volt.copy(alpha = 0.30f)),
-                    )
+                            // 막대만 누르면 손가락보다 얇아 자꾸 빗나간다.
+                            // 칸 전체(빈 위쪽 포함)를 누를 수 있게 한다.
+                            .fillMaxHeight()
+                            .quietClickable {
+                                selectedDay = if (selected) null else day
+                            },
+                        contentAlignment = Alignment.BottomCenter,
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(fraction)
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(
+                                    when {
+                                        selected -> Volt
+                                        day == today -> Volt.copy(alpha = 0.75f)
+                                        else -> Volt.copy(alpha = 0.30f)
+                                    },
+                                ),
+                        )
+                    }
                 }
             }
             Canvas(Modifier.matchParentSize()) {
@@ -224,6 +274,30 @@ private fun WeekChartCard(week: List<DailyStepsEntity>, goal: Int) {
                     pathEffect = PathEffect.dashPathEffect(floatArrayOf(12f, 10f), 0f),
                 )
             }
+
+            // 고른 막대 위에 뜨는 작은 창.
+            //
+            // 카드 아래에 붙이지 않고 차트 안에 띄우는 이유는, 창이 생길 때마다
+            // 카드가 늘어나면 아래 내용이 밀려 내려가 눈이 따라가야 하기 때문이다.
+            // 막대 쪽으로 붙여 두면 어느 날 것인지도 따로 읽을 필요가 없다.
+            selectedDay?.let { day ->
+                val index = days.indexOf(day)
+                if (index >= 0) {
+                    val panelWidth = 132.dp
+                    val center = slot * index + slot / 2 + gap * index
+                    val x = (center - panelWidth / 2)
+                        .coerceIn(0.dp, (chartWidth - panelWidth).coerceAtLeast(0.dp))
+                    DayCallout(
+                        day = day,
+                        steps = byDay[day]?.steps ?: 0,
+                        goal = goal,
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .offset(x = x)
+                            .width(panelWidth),
+                    )
+                }
+            }
         }
 
         Row(
@@ -234,7 +308,7 @@ private fun WeekChartCard(week: List<DailyStepsEntity>, goal: Int) {
                 val label = LocalDate.ofEpochDay(day).dayOfWeek
                     .getDisplayName(TextStyle.NARROW, Locale.getDefault())
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                    if (day == today) {
+                    if (day == today || day == selectedDay) {
                         Box(
                             modifier = Modifier
                                 .size(17.dp)
@@ -381,3 +455,69 @@ private fun SessionRow(session: WalkSessionEntity) {
         )
     }
 }
+
+/**
+ * 막대 하나를 눌렀을 때 뜨는 작은 창.
+ *
+ * 걸음 수만 있으면 "5,200보"가 어느 정도인지 감이 안 온다. 거리와 칼로리를
+ * 같이 보여주면 같은 숫자가 몸으로 읽힌다 — 그래서 셋을 함께 둔다.
+ */
+@Composable
+private fun DayCallout(
+    day: Long,
+    steps: Int,
+    goal: Int,
+    modifier: Modifier = Modifier,
+) {
+    val date = LocalDate.ofEpochDay(day)
+    val km = RewardEconomy.distanceMeters(steps) / 1000.0
+    val kcal = RewardEconomy.calories(steps)
+    val rate = if (goal > 0) (steps * 100 / goal).coerceAtMost(999) else 0
+
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(13.dp))
+            .background(Night.copy(alpha = 0.95f))
+            .border(1.dp, Volt.copy(alpha = 0.5f), RoundedCornerShape(13.dp))
+            .padding(horizontal = 11.dp, vertical = 9.dp),
+        verticalArrangement = Arrangement.spacedBy(5.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = date.format(calloutDateFormatter),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                color = Snow,
+            )
+            Text(
+                text = "$rate%",
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                // 목표를 넘긴 날은 색으로 먼저 보인다.
+                color = if (steps >= goal) Volt else Slate,
+            )
+        }
+
+        CalloutRow(stringResource(R.string.stat_steps), "%,d".format(steps))
+        CalloutRow(stringResource(R.string.stat_distance), "%.2f km".format(km))
+        CalloutRow(stringResource(R.string.stat_calories), "%,.0f kcal".format(kcal))
+    }
+}
+
+@Composable
+private fun CalloutRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(text = label, fontSize = 10.sp, color = Slate)
+        Text(text = value, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Snow)
+    }
+}
+
+private val calloutDateFormatter: DateTimeFormatter =
+    DateTimeFormatter.ofPattern("M.d (E)", Locale.getDefault())

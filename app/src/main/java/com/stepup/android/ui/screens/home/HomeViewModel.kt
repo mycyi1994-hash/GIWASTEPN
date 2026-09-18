@@ -42,6 +42,8 @@ class HomeViewModel(
         val equipped: Sneaker? = null,
         val avatarId: Int = 0,
         val avatarRev: Int = 0,
+        /** 프로필에서 정한 닉네임. 비어 있으면 화면이 기본 호칭을 쓴다. */
+        val nickname: String = "",
     ) {
         val energyPercent: Int
             get() = if (maxEnergy > 0) ((energy / maxEnergy) * 100).toInt().coerceIn(0, 100) else 0
@@ -52,6 +54,12 @@ class HomeViewModel(
         val runner: RunnerProgress get() = RunnerLevels.ofSteps(lifetimeSteps)
         val level: Int get() = runner.level
     }
+
+    private data class Identity(
+        val avatarId: Int,
+        val avatarRev: Int,
+        val nickname: String,
+    )
 
     private data class Wallet(
         val balance: Double,
@@ -77,8 +85,10 @@ class HomeViewModel(
         ) { balance, streak, level, lifetime -> Wallet(balance, streak, level, lifetime) },
         stepRepository.observeWeek(),
         sneakerRepository.equipped,
-        combine(prefs.avatarId, prefs.avatarRev) { id, rev -> id to rev },
-    ) { (steps, goal, energy), wallet, week, equipped, (avatarId, avatarRev) ->
+        combine(prefs.avatarId, prefs.avatarRev, prefs.nickname) { id, rev, nick ->
+            Identity(id, rev, nick)
+        },
+    ) { (steps, goal, energy), wallet, week, equipped, identity ->
         UiState(
             todaySteps = steps,
             goal = goal,
@@ -91,8 +101,9 @@ class HomeViewModel(
             week = week,
             sensorAvailable = stepRepository.stepSensorAvailable,
             equipped = equipped,
-            avatarId = avatarId,
-            avatarRev = avatarRev,
+            avatarId = identity.avatarId,
+            avatarRev = identity.avatarRev,
+            nickname = identity.nickname,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState())
 

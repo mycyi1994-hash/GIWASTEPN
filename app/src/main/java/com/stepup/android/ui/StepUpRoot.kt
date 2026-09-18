@@ -229,6 +229,7 @@ private fun MainScaffold(startTour: Boolean = false) {
                     onStartRun = { navController.navigate(Routes.RUN) },
                     onOpenWallet = { navController.navigate(Routes.WALLET) },
                     onOpenNotifications = { navController.navigate(Routes.NOTIFICATIONS) },
+                    onOpenLanguage = { navController.navigate(Routes.SETTINGS_LANGUAGE) },
                     onOpenProfile = { navController.navigate(Routes.ANALYTICS) },
                     onOpenItems = { navController.switchTab(Screen.Items) },
                 )

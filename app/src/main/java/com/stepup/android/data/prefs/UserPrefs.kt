@@ -36,6 +36,7 @@ class UserPrefs(private val context: Context) {
         val BASELINE_DAY = longPreferencesKey("baseline_day")
         val BASELINE_STEPS = longPreferencesKey("baseline_steps")
         val RUNNER_UID = stringPreferencesKey("runner_uid")
+        val NICKNAME = stringPreferencesKey("nickname")
         val AVATAR_ID = intPreferencesKey("avatar_id")
         val AVATAR_REV = intPreferencesKey("avatar_rev")
         val LOGIN_METHOD = stringPreferencesKey("login_method")
@@ -57,11 +58,25 @@ class UserPrefs(private val context: Context) {
     /** 러너 고유 ID — "SU-XXXXXX". 발급 전이면 빈 문자열. */
     val runnerUid: Flow<String> = context.dataStore.data.map { it[Keys.RUNNER_UID] ?: "" }
 
+    /**
+     * 사용자가 정한 닉네임. 정하지 않았으면 빈 문자열이고, 화면은 기본 호칭을 쓴다.
+     *
+     * 빈 문자열을 "러너"로 채워 두지 않는 이유는, 그러면 "아직 안 정했다"와
+     * "러너라고 정했다"를 구별할 수 없기 때문이다.
+     */
+    val nickname: Flow<String> = context.dataStore.data.map { it[Keys.NICKNAME] ?: "" }
+
     /** 선택한 아바타 인덱스 (기본 0, [AVATAR_CUSTOM]이면 갤러리 사진) */
     val avatarId: Flow<Int> = context.dataStore.data.map { it[Keys.AVATAR_ID] ?: 0 }
 
     /** 갤러리 사진이 바뀔 때마다 올라가는 리비전 — UI가 파일을 다시 읽는 신호 */
     val avatarRev: Flow<Int> = context.dataStore.data.map { it[Keys.AVATAR_REV] ?: 0 }
+
+    /** 앞뒤 공백을 떼고 [NICKNAME_MAX] 자로 자른다. 빈 값이면 기본 호칭으로 돌아간다. */
+    suspend fun setNickname(name: String) {
+        val cleaned = name.trim().take(NICKNAME_MAX)
+        context.dataStore.edit { it[Keys.NICKNAME] = cleaned }
+    }
 
     suspend fun setAvatarId(id: Int) {
         context.dataStore.edit { it[Keys.AVATAR_ID] = id }
@@ -340,6 +355,9 @@ class UserPrefs(private val context: Context) {
         const val DEFAULT_GOAL = 8000
         const val MIN_GOAL = 3000
         const val MAX_GOAL = 20000
+
+        /** 닉네임 최대 길이. 순위표 한 줄에 들어가야 해서 짧게 잡는다. */
+        const val NICKNAME_MAX = 16
 
         /** avatarId가 이 값이면 갤러리에서 고른 사진을 쓴다 */
         const val AVATAR_CUSTOM = -2

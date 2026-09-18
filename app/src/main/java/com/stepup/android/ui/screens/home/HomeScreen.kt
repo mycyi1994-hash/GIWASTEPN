@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -91,6 +92,7 @@ fun HomeScreen(
     onStartRun: () -> Unit = {},
     onOpenWallet: () -> Unit = {},
     onOpenNotifications: () -> Unit = {},
+    onOpenLanguage: () -> Unit = {},
     onOpenProfile: () -> Unit = {},
     onOpenItems: () -> Unit = {},
     viewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory),
@@ -125,10 +127,11 @@ fun HomeScreen(
             .padding(top = 8.dp, bottom = 10.dp),
         verticalArrangement = Arrangement.spacedBy(9.dp),
     ) {
-        TopBar(unread, onOpenNotifications, onOpenWallet)
+        TopBar(unread, onOpenLanguage, onOpenNotifications, onOpenWallet)
 
         GreetingRow(
             level = state.level,
+            nickname = state.nickname,
             avatarId = state.avatarId,
             avatarRev = state.avatarRev,
             balance = state.balance,
@@ -193,7 +196,12 @@ fun HomeScreen(
 }
 
 @Composable
-private fun TopBar(unread: Int, onOpenNotifications: () -> Unit, onOpenWallet: () -> Unit) {
+private fun TopBar(
+    unread: Int,
+    onOpenLanguage: () -> Unit,
+    onOpenNotifications: () -> Unit,
+    onOpenWallet: () -> Unit,
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -201,6 +209,11 @@ private fun TopBar(unread: Int, onOpenNotifications: () -> Unit, onOpenWallet: (
     ) {
         Wordmark(fontSize = 20.sp)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            DarkIconButton(
+                icon = Icons.Filled.Language,
+                contentDescription = stringResource(R.string.cd_language),
+                onClick = onOpenLanguage,
+            )
             DarkIconButton(
                 icon = Icons.Filled.Notifications,
                 contentDescription = stringResource(R.string.cd_notifications),
@@ -219,6 +232,7 @@ private fun TopBar(unread: Int, onOpenNotifications: () -> Unit, onOpenWallet: (
 @Composable
 private fun GreetingRow(
     level: Int,
+    nickname: String,
     avatarId: Int,
     avatarRev: Int,
     balance: Double,
@@ -251,7 +265,13 @@ private fun GreetingRow(
                 color = Silver,
             )
             Text(
-                text = stringResource(R.string.greeting_runner),
+                // 닉네임을 정했으면 그 이름으로 부른다. 방금 이름을 정하고
+                // 홈으로 왔는데 여전히 "러너님"이면 설정이 안 먹은 줄 안다.
+                text = if (nickname.isBlank()) {
+                    stringResource(R.string.greeting_runner)
+                } else {
+                    stringResource(R.string.greeting_named, nickname)
+                },
                 fontSize = 19.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = (-0.4).sp,
@@ -636,18 +656,25 @@ private fun SneakerStrip(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(50))
-                            .background(CarbonHigh)
-                            .padding(horizontal = 7.dp, vertical = 2.dp),
-                    ) {
-                        Text(
-                            text = stringResource(R.string.level_chip, state.level),
-                            color = Volt,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
+                    // 신발 칸에는 **신발의** 레벨을 쓴다.
+                    //
+                    // 여기에 러너 레벨(state.level)이 들어가 있었다. 강화로
+                    // Lv.8 이 된 신발을 신고도 홈에서는 Lv.1 로 보였고,
+                    // 그러면 강화에 쓴 SUP 가 어디로 갔는지 알 수 없다.
+                    if (sneaker != null) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(50))
+                                .background(CarbonHigh)
+                                .padding(horizontal = 7.dp, vertical = 2.dp),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.level_chip, sneaker.level),
+                                color = Volt,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
                     }
                     Text(
                         text = "+%.1f%%".format(sneaker?.boostPercent ?: 0.0),

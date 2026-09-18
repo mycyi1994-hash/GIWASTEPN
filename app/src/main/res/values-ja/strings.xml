@@ -22,6 +22,10 @@
     <string name="common_yes">はい</string>
     <string name="common_no">いいえ</string>
     <string name="common_none">まだありません</string>
+    <string name="analytics_tap_hint">バーを押すとその日の記録</string>
+    <string name="profile_set_nickname">ニックネーム変更</string>
+    <string name="profile_nickname_hint">呼び名を決めてください</string>
+    <string name="profile_nickname_note">空にすると既定の呼び名</string>
 
     <!-- Splash -->
     <string name="splash_tagline">Every Step. Every Stride. Every Day.</string>
@@ -35,6 +39,7 @@
     <string name="greeting_afternoon">こんにちは、</string>
     <string name="greeting_evening">こんばんは、</string>
     <string name="greeting_runner">ランナーさん！ 👋</string>
+    <string name="greeting_named">%1$sさん！ 👋</string>
     <string name="level_chip">Lv. %1$d</string>
 
     <!-- Permission / sensor -->
@@ -355,6 +360,7 @@
     <string name="cd_resume">再開</string>
     <string name="cd_stop">停止</string>
     <string name="cd_profile">プロフィール</string>
+    <string name="cd_language">言語</string>
     <string name="cd_notifications">通知</string>
     <string name="cd_wallet">ウォレット</string>
     <string name="cd_back">戻る</string>

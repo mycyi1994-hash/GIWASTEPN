@@ -37,6 +37,8 @@ class ProfileViewModel(
         val monthSteps: Long = 0,
         val ownedSneakers: Int = 0,
         val runnerUid: String = "",
+        /** 사용자가 정한 닉네임. 비어 있으면 화면이 기본 호칭을 쓴다. */
+        val nickname: String = "",
         val avatarId: Int = 0,
         val avatarRev: Int = 0,
         val equipped: Sneaker? = null,
@@ -76,10 +78,11 @@ class ProfileViewModel(
         ) { totalSec, sessions -> totalSec to sessions },
         combine(
             prefs.runnerUid,
+            prefs.nickname,
             prefs.avatarId,
             prefs.avatarRev,
             sneakerRepository.equipped,
-        ) { uid, avatar, rev, equipped -> Ident(uid, avatar, rev, equipped) },
+        ) { uid, nick, avatar, rev, equipped -> Ident(uid, nick, avatar, rev, equipped) },
     ) { (goal, level, balance), (streak, lifetime, month), (owned, week), (totalSec, sessions), ident ->
         // 최근 세션 기반 요약 — 세션 기록이 없으면 0으로 두고 화면에서 "—" 처리
         val sessionSec = sessions.sumOf { it.durationSec }
@@ -93,6 +96,7 @@ class ProfileViewModel(
             monthSteps = month,
             ownedSneakers = owned,
             runnerUid = ident.uid,
+            nickname = ident.nickname,
             avatarId = ident.avatarId,
             avatarRev = ident.avatarRev,
             equipped = ident.equipped,
@@ -105,6 +109,10 @@ class ProfileViewModel(
 
     fun setGoal(goal: Int) {
         viewModelScope.launch { stepRepository.setDailyGoal(goal) }
+    }
+
+    fun setNickname(name: String) {
+        viewModelScope.launch { prefs.setNickname(name) }
     }
 
     fun setAvatar(id: Int) {
@@ -150,6 +158,7 @@ class ProfileViewModel(
     /** combine 5개 값 묶음 */
     private data class Ident(
         val uid: String,
+        val nickname: String,
         val avatarId: Int,
         val avatarRev: Int,
         val equipped: com.stepup.android.domain.Sneaker?,

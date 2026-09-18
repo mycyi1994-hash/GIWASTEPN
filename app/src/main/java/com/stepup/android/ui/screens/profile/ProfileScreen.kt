@@ -25,11 +25,13 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsRun
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Edit
@@ -55,8 +57,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,9 +69,11 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -128,6 +132,7 @@ fun ProfileScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var showAvatarPicker by rememberSaveable { mutableStateOf(false) }
     var showGoalDialog by rememberSaveable { mutableStateOf(false) }
+    var showNicknameDialog by rememberSaveable { mutableStateOf(false) }
 
     // 갤러리 사진 선택 — 시스템 포토 피커 (권한 불필요)
     val photoPicker = rememberLauncherForActivityResult(
@@ -155,6 +160,17 @@ fun ProfileScreen(
         )
     }
 
+    if (showNicknameDialog) {
+        NicknameDialog(
+            current = state.nickname,
+            onConfirm = {
+                viewModel.setNickname(it)
+                showNicknameDialog = false
+            },
+            onDismiss = { showNicknameDialog = false },
+        )
+    }
+
     if (showGoalDialog) {
         GoalDialog(
             goal = state.goal,
@@ -165,6 +181,7 @@ fun ProfileScreen(
 
     val pills = listOf(
         SettingsPill(Icons.Filled.Edit, R.string.profile_edit_profile) { showAvatarPicker = true },
+        SettingsPill(Icons.Filled.Badge, R.string.profile_set_nickname) { showNicknameDialog = true },
         SettingsPill(Icons.Filled.Flag, R.string.profile_set_goal) { showGoalDialog = true },
         SettingsPill(Icons.Filled.Notifications, R.string.settings_notifications, onOpenNotificationSettings),
         SettingsPill(Icons.Filled.Link, R.string.settings_connected, onOpenConnected),
@@ -323,7 +340,7 @@ private fun ProfileHeader(
                 )
                 // 좁은 화면에서도 한 줄로 읽히게 — 줄바꿈을 막고 넘치면 줄임표
                 Text(
-                    text = stringResource(R.string.greeting_runner),
+                    text = state.nickname.ifBlank { stringResource(R.string.greeting_runner) },
                     style = MaterialTheme.typography.headlineSmall,
                     color = Snow,
                     maxLines = 1,
@@ -1009,6 +1026,97 @@ private fun GoalDialog(
                     style = MaterialTheme.typography.bodySmall,
                     color = Slate,
                 )
+            }
+        },
+    )
+}
+
+/**
+ * 닉네임 변경 다이얼로그.
+ *
+ * 비워서 저장하면 기본 호칭으로 돌아간다. "지우기" 버튼을 따로 두지 않는
+ * 이유는, 이름을 지우는 것과 기본값으로 되돌리는 것이 같은 일이기 때문이다.
+ */
+@Composable
+private fun NicknameDialog(
+    current: String,
+    onConfirm: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var text by rememberSaveable(current) { mutableStateOf(current) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Carbon,
+        titleContentColor = Snow,
+        textContentColor = Silver,
+        confirmButton = {
+            TextButton(onClick = { onConfirm(text) }) {
+                Text(
+                    text = stringResource(R.string.common_confirm),
+                    color = Volt,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(R.string.common_cancel), color = Slate)
+            }
+        },
+        title = {
+            Text(
+                text = stringResource(R.string.profile_set_nickname),
+                fontWeight = FontWeight.Black,
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                // 앱의 다른 입력칸과 같은 모양으로 둔다. 여기만 머티리얼
+                // 기본 입력칸을 쓰면 이 창만 다른 앱에서 떼어 온 것처럼 보인다.
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(CarbonHigh)
+                        .border(1.dp, Edge, RoundedCornerShape(14.dp))
+                        .padding(horizontal = 13.dp, vertical = 12.dp),
+                ) {
+                    if (text.isEmpty()) {
+                        Text(
+                            text = stringResource(R.string.profile_nickname_hint),
+                            fontSize = 13.sp,
+                            color = Slate,
+                        )
+                    }
+                    BasicTextField(
+                        // 길이 제한은 저장할 때가 아니라 입력할 때 건다. 17자를
+                        // 쳐 놓고 저장 뒤에 잘려 있으면 고장으로 읽힌다.
+                        value = text,
+                        onValueChange = { if (it.length <= UserPrefs.NICKNAME_MAX) text = it },
+                        singleLine = true,
+                        textStyle = TextStyle(color = Snow, fontSize = 14.sp),
+                        cursorBrush = SolidColor(Volt),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(
+                        text = stringResource(R.string.profile_nickname_note),
+                        style = MaterialTheme.typography.bodySmall,
+                        fontSize = 11.sp,
+                        color = Slate,
+                    )
+                    Text(
+                        text = "${text.length} / ${UserPrefs.NICKNAME_MAX}",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontSize = 11.sp,
+                        color = Slate,
+                    )
+                }
             }
         },
     )
