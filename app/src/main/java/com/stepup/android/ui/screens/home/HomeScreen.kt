@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -501,17 +503,28 @@ private fun EnergyCard(
         ) {
             // 링 안에는 퍼센트 하나만 둔다. 두 줄을 넣으면 작은 링 안에서
             // 글자끼리 겹쳐 둘 다 못 읽게 된다 — 숫자는 링 밖으로 뺐다.
+            //
+            // aspectRatio 로 정사각형을 못 박는 것이 핵심이다. 높이만 채우게
+            // 두면 폭은 글씨를 감싸는 만큼(≈40dp)이 되고, NeonRing 은 가로·세로
+            // 중 **작은 쪽**으로 원을 그리므로 원이 글씨보다 작아진다. 그러면
+            // "100%"가 테두리를 넘어 링 위에 겹쳐 찍힌다.
             NeonRing(
                 progress = percent / 100f,
-                modifier = Modifier.fillMaxHeight(),
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .aspectRatio(1f),
                 ringWidth = 7.dp,
             ) {
                 Text(
+                    // 링 안쪽 지름보다 확실히 좁게. 세 자리(100%)가 들어가는
+                    // 것이 기준이다 — 9%는 남지만 100%가 넘치면 안 된다.
                     text = "$percent%",
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.ExtraBold,
                     letterSpacing = (-0.5).sp,
                     color = Snow,
+                    maxLines = 1,
+                    softWrap = false,
                 )
             }
         }
@@ -594,7 +607,7 @@ private fun DistanceCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            horizontalArrangement = Arrangement.spacedBy(5.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.Bottom,
         ) {
             days.forEach { day ->
@@ -609,19 +622,36 @@ private fun DistanceCard(
                         .weight(1f)
                         .fillMaxHeight(),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Bottom,
                 ) {
+                    // 막대가 설 자리는 남은 높이를 통째로 갖고, 막대는 그 안에서
+                    // 비율만큼만 채운다.
+                    //
+                    // 예전에는 막대 자체에 weight(비율)를 줬는데, 한 칸에 무게를
+                    // 가진 자식이 하나뿐이면 무게 값과 상관없이 남은 공간을 전부
+                    // 가져간다 — 7일이 전부 꽉 찬 막대로 나왔다.
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(fraction)
-                            .clip(RoundedCornerShape(3.dp))
-                            .background(if (isToday) Volt else Volt.copy(alpha = 0.30f)),
-                    )
+                            .weight(1f),
+                        contentAlignment = Alignment.BottomCenter,
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(fraction)
+                                .clip(RoundedCornerShape(3.dp))
+                                .background(if (isToday) Volt else Volt.copy(alpha = 0.30f)),
+                        )
+                    }
                     Spacer(Modifier.height(5.dp))
+                    // 동그라미는 칸 너비를 따라간다. 16dp 로 못 박아 두면
+                    // 좁은 화면에서 칸(≈15dp)보다 넓어져 옆 칸을 밀어내고,
+                    // 그렇게 밀린 만큼 요일이 막대와 어긋나 보인다.
                     Box(
                         modifier = Modifier
-                            .size(16.dp)
+                            .widthIn(max = 18.dp)
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
                             .then(
                                 if (isToday) Modifier.background(Volt, CircleShape) else Modifier,
                             ),
@@ -632,6 +662,7 @@ private fun DistanceCard(
                             color = if (isToday) Night else Slate,
                             fontSize = 8.sp,
                             fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
+                            maxLines = 1,
                         )
                     }
                 }

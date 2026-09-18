@@ -144,10 +144,17 @@ fun LiveRouteMap(
                     } else {
                         Modifier.pointerInput(Unit) {
                             detectTransformGestures { _, pan, gestureZoom, _ ->
+                                // 지도가 손가락을 따라간다 — 종이 지도를 손으로
+                                // 밀듯이. 손가락을 오른쪽으로 끌면 지도도 오른쪽으로
+                                // 따라오고, 그만큼 시야는 왼쪽 땅으로 옮겨 간다.
+                                //
+                                // 반대로 두면(끄는 방향과 지도가 반대로 움직이면)
+                                // 한 번에 원하는 쪽으로 못 가고 매번 두 번씩 끌게 된다.
+                                //
                                 // 끈 거리는 화면 픽셀이다. 타일 좌표계로 옮겨야
-                                // 줌이 바뀌어도 손가락과 지도가 같이 움직인다.
-                                panX -= pan.x / scale
-                                panY -= pan.y / scale
+                                // 줌이 바뀌어도 손가락과 지도가 같은 만큼 움직인다.
+                                panX += pan.x / scale
+                                panY += pan.y / scale
 
                                 pinch *= gestureZoom
                                 // 타일은 정수 줌만 있다. 2배쯤 벌리면 한 단계 올린다.

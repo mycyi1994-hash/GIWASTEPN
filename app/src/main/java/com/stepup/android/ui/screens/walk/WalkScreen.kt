@@ -83,6 +83,7 @@ import com.stepup.android.service.WalkSessionService
 import com.stepup.android.ui.StepPermissions
 import com.stepup.android.ui.components.BarMeter
 import com.stepup.android.ui.components.LiveRouteMap
+import com.stepup.android.ui.components.rememberCurrentLocation
 import com.stepup.android.ui.components.DarkIconButton
 import com.stepup.android.ui.components.EnergyMeter
 import com.stepup.android.ui.components.GhostButton
@@ -1157,9 +1158,20 @@ private fun CourseChallengeCard(
         ) {
             // 지도에 그릴 좌표 — 달리는 중이면 내 실시간 경로가 우선이다.
             // 코스를 골랐어도 "내가 지금 어디를 뛰고 있는지"가 더 급한 정보다.
-            val mapPoints = when {
+            val routePoints = when {
                 liveTrack.size >= 2 -> liveTrack
                 course != null && course.hasTrack -> course.points
+                else -> emptyList()
+            }
+
+            // 보여 줄 경로가 없으면 **내가 선 자리**를 보여 준다. 예전에는
+            // 지어낸 아트 지도가 나왔는데, 저 지그재그는 어디에도 없는 길이라
+            // 사용자는 GPS 가 엉뚱한 곳을 잡은 줄 안다. 아직 코스를 안 골랐다는
+            // 사실은 아래 "선택한 코스가 없어요"가 이미 말하고 있다.
+            val here = rememberCurrentLocation(enabled = routePoints.isEmpty())
+            val mapPoints = when {
+                routePoints.isNotEmpty() -> routePoints
+                here != null -> listOf(here)
                 else -> emptyList()
             }
             when {
@@ -1171,8 +1183,16 @@ private fun CourseChallengeCard(
                     }
                     // 시드는 세션 내내 고정이어야 한다. 좌표 수로 만들면 8점마다
                     // 폴백 도로망이 다시 추첨돼 배경이 눈앞에서 뒤바뀐다.
-                    val fallbackSeed = remember(course?.id, mapPoints.firstOrNull()) {
-                        course?.id?.toInt() ?: mapPoints.firstOrNull()?.let {
+                    //
+                    // 내 자리를 보여 주는 동안에는 좌표가 몇 초마다 갱신되므로
+                    // 도 단위로 뭉뚱그린 값에 묶는다. 한 도시 안에서는 같은 키다.
+                    val first = mapPoints.firstOrNull()
+                    val fallbackSeed = remember(
+                        course?.id,
+                        first?.lat?.toInt(),
+                        first?.lng?.toInt(),
+                    ) {
+                        course?.id?.toInt() ?: first?.let {
                             (it.lat * 1e4).toInt() xor (it.lng * 1e4).toInt()
                         } ?: 0
                     }
@@ -1185,6 +1205,7 @@ private fun CourseChallengeCard(
                     )
                 }
 
+                // 권한이 없거나 위치가 꺼져 있어 내 자리조차 모를 때만 아트 지도로 남는다
                 else -> RouteMap(Modifier.fillMaxSize())
             }
 
