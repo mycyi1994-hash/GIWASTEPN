@@ -408,17 +408,19 @@ class CrewRepository(
 
         val ready = state.members.filter { it.ready }
         val leftBehind = state.members.filterNot { it.ready }
-        if (ready.size != state.members.size) {
-            _party.value = state.copy(members = ready)
-            // 두고 간 사람에게는 알림을 남긴다. 로비에 있다가 조용히
-            // 사라지면 본인은 앱이 고장 난 줄 안다.
-            leftBehind.forEach {
-                rewardRepository.notify(NotificationType.PARTY_MEMBER_LEFT, it.name)
-            }
-        }
+        if (leftBehind.isNotEmpty()) _party.value = state.copy(members = ready)
 
         simulationJob?.cancel()
         simulationJob = scope.launch {
+            // 두고 간 사람은 알림으로 남긴다. 로비에 있다가 조용히 사라지면
+            // 본인은 앱이 고장 난 줄 안다.
+            //
+            // 알림 쓰기는 suspend 라 여기 코루틴 안에서 한다. 화면이 보는
+            // 파티 상태는 위에서 이미 바꿔 뒀으므로, 카운트다운은 알림을
+            // 기다리지 않고 바로 시작한다.
+            leftBehind.forEach {
+                rewardRepository.notify(NotificationType.PARTY_MEMBER_LEFT, it.name)
+            }
             for (n in 3 downTo 1) {
                 val snapshot = _party.value
                 if (snapshot.phase !in listOf(PartyPhase.LOBBY, PartyPhase.COUNTDOWN)) return@launch
