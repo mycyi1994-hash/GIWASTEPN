@@ -23,9 +23,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsRun
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
@@ -89,6 +91,7 @@ import com.stepup.android.domain.runnerTitle
 import com.stepup.android.ui.components.AvatarEmojis
 import com.stepup.android.ui.components.BarMeter
 import com.stepup.android.ui.components.GlowCard
+import com.stepup.android.ui.components.HairlineDivider
 import com.stepup.android.ui.components.HexEmblem
 import com.stepup.android.ui.components.LevelAvatar
 import com.stepup.android.ui.components.NeonRing
@@ -129,44 +132,35 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    var showAvatarPicker by rememberSaveable { mutableStateOf(false) }
+    // 사진과 이름을 한 창에서 고친다. 나눠 두면 "프로필 편집"을 눌렀는데
+    // 이름은 못 바꾸는, 이름이 기능과 어긋나는 상태가 된다.
+    var showProfileEdit by rememberSaveable { mutableStateOf(false) }
     var showGoalDialog by rememberSaveable { mutableStateOf(false) }
-    var showNicknameDialog by rememberSaveable { mutableStateOf(false) }
 
     // 갤러리 사진 선택 — 시스템 포토 피커 (권한 불필요)
     val photoPicker = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia()
     ) { uri ->
-        if (uri != null) {
-            viewModel.setCustomAvatar(uri)
-            showAvatarPicker = false
-        }
+        // 사진을 고르면 창은 열어 둔다 — 이름도 여기서 마저 고칠 수 있어야 한다.
+        if (uri != null) viewModel.setCustomAvatar(uri)
     }
 
-    if (showAvatarPicker) {
-        AvatarPickerDialog(
-            selected = state.avatarId,
-            onPick = { id ->
-                viewModel.setAvatar(id)
-                showAvatarPicker = false
-            },
+    if (showProfileEdit) {
+        ProfileEditDialog(
+            nickname = state.nickname,
+            selectedAvatar = state.avatarId,
+            avatarRev = state.avatarRev,
+            onPickAvatar = viewModel::setAvatar,
             onPickGallery = {
                 photoPicker.launch(
                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                 )
             },
-            onDismiss = { showAvatarPicker = false },
-        )
-    }
-
-    if (showNicknameDialog) {
-        NicknameDialog(
-            current = state.nickname,
-            onConfirm = {
-                viewModel.setNickname(it)
-                showNicknameDialog = false
+            onSave = { name ->
+                viewModel.setNickname(name)
+                showProfileEdit = false
             },
-            onDismiss = { showNicknameDialog = false },
+            onDismiss = { showProfileEdit = false },
         )
     }
 
@@ -179,8 +173,7 @@ fun ProfileScreen(
     }
 
     val pills = listOf(
-        SettingsPill(Icons.Filled.Edit, R.string.profile_edit_profile) { showAvatarPicker = true },
-        SettingsPill(Icons.Filled.Badge, R.string.profile_set_nickname) { showNicknameDialog = true },
+        SettingsPill(Icons.Filled.Edit, R.string.profile_edit_profile) { showProfileEdit = true },
         SettingsPill(Icons.Filled.Flag, R.string.profile_set_goal) { showGoalDialog = true },
         SettingsPill(Icons.Filled.Notifications, R.string.settings_notifications, onOpenNotificationSettings),
         SettingsPill(Icons.Filled.Link, R.string.settings_connected, onOpenConnected),
@@ -201,7 +194,7 @@ fun ProfileScreen(
             Box(Modifier.guideTarget(GuideTour.Targets.PROFILE_AVATAR)) {
                 ProfileHeader(
                     state = state,
-                    onEditAvatar = { showAvatarPicker = true },
+                    onEditAvatar = { showProfileEdit = true },
                     onOpenWallet = onOpenWallet,
                 )
             }
@@ -877,74 +870,6 @@ private fun RowScope.BadgeCell(
     }
 }
 
-/** 아바타 선택 — 이모지 4×4 그리드 */
-@Composable
-private fun AvatarPickerDialog(
-    selected: Int,
-    onPick: (Int) -> Unit,
-    onPickGallery: () -> Unit,
-    onDismiss: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = Carbon,
-        titleContentColor = Snow,
-        textContentColor = Silver,
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(
-                    text = stringResource(R.string.common_close),
-                    color = Volt,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
-        },
-        title = {
-            Text(
-                text = stringResource(R.string.profile_edit_avatar),
-                fontWeight = FontWeight.Black,
-            )
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                VoltButton(
-                    text = stringResource(R.string.profile_avatar_gallery),
-                    onClick = onPickGallery,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                Text(
-                    text = stringResource(R.string.profile_avatar_or_emoji),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Slate,
-                )
-                AvatarEmojis.chunked(4).forEachIndexed { rowIndex, row ->
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        row.forEachIndexed { colIndex, emoji ->
-                            val id = rowIndex * 4 + colIndex
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .aspectRatio(1f)
-                                    .clip(CircleShape)
-                                    .background(CarbonHigh)
-                                    .border(
-                                        width = if (selected == id) 2.dp else 1.dp,
-                                        color = if (selected == id) Volt else Edge,
-                                        shape = CircleShape,
-                                    )
-                                    .quietClickable { onPick(id) },
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Text(text = emoji, fontSize = 24.sp)
-                            }
-                        }
-                    }
-                }
-            }
-        },
-    )
-}
-
 /** 목표 설정 다이얼로그 — 기존 목표 카드의 슬라이더 UI를 그대로 품는다 */
 @Composable
 private fun GoalDialog(
@@ -1031,18 +956,25 @@ private fun GoalDialog(
 }
 
 /**
- * 닉네임 변경 다이얼로그.
+ * 프로필 편집 — 사진과 이름을 한 창에서.
  *
- * 비워서 저장하면 기본 호칭으로 돌아간다. "지우기" 버튼을 따로 두지 않는
- * 이유는, 이름을 지우는 것과 기본값으로 되돌리는 것이 같은 일이기 때문이다.
+ * 예전에는 "프로필 편집"이 사진만 바꾸고 이름은 옆 칩에 따로 있었다.
+ * 이름을 바꾸러 프로필 편집을 누른 사람은 거기서 멈춘다.
+ *
+ * 사진은 고르는 즉시 저장한다(되돌릴 것이 없다). 이름은 저장을 눌러야
+ * 반영한다 — 글자를 지우는 중간 상태가 그대로 저장되면 곤란하다.
  */
 @Composable
-private fun NicknameDialog(
-    current: String,
-    onConfirm: (String) -> Unit,
+private fun ProfileEditDialog(
+    nickname: String,
+    selectedAvatar: Int,
+    avatarRev: Int,
+    onPickAvatar: (Int) -> Unit,
+    onPickGallery: () -> Unit,
+    onSave: (String) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    var text by rememberSaveable(current) { mutableStateOf(current) }
+    var text by rememberSaveable(nickname) { mutableStateOf(nickname) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -1050,7 +982,7 @@ private fun NicknameDialog(
         titleContentColor = Snow,
         textContentColor = Silver,
         confirmButton = {
-            TextButton(onClick = { onConfirm(text) }) {
+            TextButton(onClick = { onSave(text) }) {
                 Text(
                     text = stringResource(R.string.common_confirm),
                     color = Volt,
@@ -1065,56 +997,130 @@ private fun NicknameDialog(
         },
         title = {
             Text(
-                text = stringResource(R.string.profile_set_nickname),
+                text = stringResource(R.string.profile_edit_profile),
                 fontWeight = FontWeight.Black,
             )
         },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                // 앱의 다른 입력칸과 같은 모양으로 둔다. 여기만 머티리얼
-                // 기본 입력칸을 쓰면 이 창만 다른 앱에서 떼어 온 것처럼 보인다.
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(CarbonHigh)
-                        .border(1.dp, Edge, RoundedCornerShape(14.dp))
-                        .padding(horizontal = 13.dp, vertical = 12.dp),
-                ) {
-                    if (text.isEmpty()) {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
+                // ── 이름 ──
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(
+                        text = stringResource(R.string.profile_set_nickname),
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp,
+                        color = Slate,
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(CarbonHigh)
+                            .border(1.dp, Edge, RoundedCornerShape(14.dp))
+                            .padding(horizontal = 13.dp, vertical = 12.dp),
+                    ) {
+                        if (text.isEmpty()) {
+                            Text(
+                                text = stringResource(R.string.profile_nickname_hint),
+                                fontSize = 13.sp,
+                                color = Slate,
+                            )
+                        }
+                        BasicTextField(
+                            // 길이 제한은 저장할 때가 아니라 입력할 때 건다. 17자를
+                            // 쳐 놓고 저장 뒤에 잘려 있으면 고장으로 읽힌다.
+                            value = text,
+                            onValueChange = { if (it.length <= UserPrefs.NICKNAME_MAX) text = it },
+                            singleLine = true,
+                            textStyle = androidx.compose.ui.text.TextStyle(color = Snow, fontSize = 14.sp),
+                            cursorBrush = SolidColor(Volt),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
                         Text(
-                            text = stringResource(R.string.profile_nickname_hint),
-                            fontSize = 13.sp,
+                            text = stringResource(R.string.profile_nickname_note),
+                            fontSize = 11.sp,
+                            color = Slate,
+                        )
+                        Text(
+                            text = "${text.length} / ${UserPrefs.NICKNAME_MAX}",
+                            fontSize = 11.sp,
                             color = Slate,
                         )
                     }
-                    BasicTextField(
-                        // 길이 제한은 저장할 때가 아니라 입력할 때 건다. 17자를
-                        // 쳐 놓고 저장 뒤에 잘려 있으면 고장으로 읽힌다.
-                        value = text,
-                        onValueChange = { if (it.length <= UserPrefs.NICKNAME_MAX) text = it },
-                        singleLine = true,
-                        textStyle = androidx.compose.ui.text.TextStyle(color = Snow, fontSize = 14.sp),
-                        cursorBrush = SolidColor(Volt),
+                }
+
+                HairlineDivider()
+
+                // ── 사진 ──
+                Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
+                    Text(
+                        text = stringResource(R.string.profile_edit_avatar),
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp,
+                        color = Slate,
+                    )
+                    VoltButton(
+                        text = stringResource(R.string.profile_avatar_gallery),
+                        onClick = onPickGallery,
                         modifier = Modifier.fillMaxWidth(),
                     )
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
+                    // 갤러리 사진을 쓰고 있으면 지금 무엇이 걸려 있는지 보여준다.
+                    if (selectedAvatar == UserPrefs.AVATAR_CUSTOM) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(9.dp),
+                        ) {
+                            LevelAvatar(
+                                level = 1,
+                                size = 42.dp,
+                                avatarId = selectedAvatar,
+                                customBitmap = rememberCustomAvatar(avatarRev),
+                            )
+                            Text(
+                                text = stringResource(R.string.profile_avatar_current),
+                                fontSize = 11.sp,
+                                color = Silver,
+                            )
+                        }
+                    }
                     Text(
-                        text = stringResource(R.string.profile_nickname_note),
+                        text = stringResource(R.string.profile_avatar_or_emoji),
                         style = MaterialTheme.typography.bodySmall,
-                        fontSize = 11.sp,
                         color = Slate,
                     )
-                    Text(
-                        text = "${text.length} / ${UserPrefs.NICKNAME_MAX}",
-                        style = MaterialTheme.typography.bodySmall,
-                        fontSize = 11.sp,
-                        color = Slate,
-                    )
+                    AvatarEmojis.chunked(4).forEachIndexed { rowIndex, row ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            row.forEachIndexed { colIndex, emoji ->
+                                val id = rowIndex * 4 + colIndex
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .aspectRatio(1f)
+                                        .clip(CircleShape)
+                                        .background(CarbonHigh)
+                                        .border(
+                                            width = if (selectedAvatar == id) 2.dp else 1.dp,
+                                            color = if (selectedAvatar == id) Volt else Edge,
+                                            shape = CircleShape,
+                                        )
+                                        .quietClickable { onPickAvatar(id) },
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Text(text = emoji, fontSize = 24.sp)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         },

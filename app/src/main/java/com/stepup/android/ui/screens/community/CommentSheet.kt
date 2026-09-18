@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.stepup.android.R
 import com.stepup.android.domain.Comment
 import com.stepup.android.domain.CommentThread
@@ -62,6 +63,26 @@ import com.stepup.android.ui.theme.Silver
 import com.stepup.android.ui.theme.Slate
 import com.stepup.android.ui.theme.Snow
 import com.stepup.android.ui.theme.Volt
+
+/**
+ * 알림에서 눌러 들어온 댓글 창.
+ *
+ * 앱 껍데기(MainScaffold)에 붙인다. 게시판 화면 안에 두면 그 화면이 화면에
+ * 올라와 있을 때만 열리는데, 알림함은 게시판이 아니라 그 위에 뜬 다른
+ * 화면이다. 탭이 바뀌고 게시판이 다시 그려지기까지의 순서에 기대는 대신,
+ * 어느 화면에 있든 열리게 한다 — 댓글 창은 어차피 화면 위에 뜨는 창이다.
+ */
+@Composable
+fun FocusedCommentSheetHost() {
+    val viewModel: CommunityViewModel = viewModel(factory = CommunityViewModel.Factory)
+    val pending by viewModel.commentFocus.collectAsStateWithLifecycle()
+
+    LaunchedEffect(pending) {
+        pending?.let { viewModel.openCommentsFocused(it) }
+    }
+
+    CommentSheetHost(viewModel)
+}
 
 /**
  * 열려 있는 댓글 창을 화면에 붙여 주는 호스트.

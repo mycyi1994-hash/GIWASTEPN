@@ -95,12 +95,6 @@ fun CommunityScreen(
         stringResource(R.string.community_seg_crew),
     )
 
-    // 알림함에서 댓글 알림을 누르고 들어온 경우 — 그 글의 댓글 창을 연다.
-    val pendingFocus by viewModel.commentFocus.collectAsStateWithLifecycle()
-    LaunchedEffect(pendingFocus) {
-        pendingFocus?.let { viewModel.openCommentsFocused(it) }
-    }
-
     // 댓글 창은 어느 세그먼트에 있든 같은 뷰모델이 열고 닫는다
     CommentSheetHost(viewModel)
 

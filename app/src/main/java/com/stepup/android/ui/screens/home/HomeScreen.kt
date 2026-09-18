@@ -164,6 +164,8 @@ fun HomeScreen(
                 energy = state.energy,
                 maxEnergy = state.maxEnergy,
                 percent = state.energyPercent,
+                earnableSteps = state.earnableSteps,
+                earnableSup = state.earnableSup,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
@@ -448,6 +450,10 @@ private fun EnergyCard(
     energy: Double,
     maxEnergy: Double,
     percent: Int,
+    /** 남은 에너지로 아직 적립할 수 있는 걸음 */
+    earnableSteps: Int,
+    /** 그 걸음을 다 걸었을 때 받는 SUP */
+    earnableSup: Double,
     modifier: Modifier = Modifier,
 ) {
     var secondsLeft by remember { mutableIntStateOf(86_400 - LocalTime.now().toSecondOfDay()) }
@@ -495,14 +501,23 @@ private fun EnergyCard(
                         letterSpacing = (-0.5).sp,
                         color = Snow,
                     )
+                    // "7 / 10" 은 7 이 무엇인지 말해 주지 않는다. 에너지 한 칸이
+                    // 곧 600보이므로, 남은 칸수 대신 남은 걸음으로 적는다.
                     Text(
-                        text = "%.0f / %.0f".format(energy, maxEnergy),
+                        text = stringResource(R.string.home_energy_steps_left, "%,d".format(earnableSteps)),
                         fontSize = 8.sp,
                         color = Slate,
                     )
                 }
             }
         }
+        // %가 무엇의 %인지 — 오늘 남은 적립 여력이다.
+        Text(
+            text = stringResource(R.string.home_energy_sup_left, "%,.0f".format(earnableSup)),
+            fontSize = 10.sp,
+            color = Snow,
+            fontWeight = FontWeight.Bold,
+        )
         Text(
             text = stringResource(R.string.home_recharge_in, countdown),
             fontSize = 10.sp,

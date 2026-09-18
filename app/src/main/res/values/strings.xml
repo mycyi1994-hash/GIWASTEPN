@@ -56,6 +56,8 @@
     <string name="home_daily_goal">Daily Goal %1$s</string>
     <string name="home_view_analytics">View Analytics</string>
     <string name="home_energy">Energy</string>
+    <string name="home_energy_steps_left">%1$s steps left</string>
+    <string name="home_energy_sup_left">%1$s SUP still earnable today</string>
     <string name="home_recharge_in">Recharge in %1$s</string>
     <string name="home_distance">Distance</string>
     <string name="home_this_week">This Week</string>
@@ -201,6 +203,8 @@
     <string name="toast_not_finished">Not finished yet — keep going!</string>
     <string name="invite_subject">Join me on StepUp</string>
     <string name="invite_text">I\'m earning SUP just by walking on StepUp. Come run with me!</string>
+    <string name="invite_send">Send</string>
+    <string name="invite_edit_hint">Edit the message before you send it. You pick the app next.</string>
 
     <!-- Notifications -->
     <string name="notif_title">Notifications</string>
@@ -270,6 +274,26 @@
 
     <!-- Analytics -->
     <string name="analytics_title">Analytics</string>
+    <string name="analytics_tab_week">Week</string>
+    <string name="analytics_tab_quarter">3 months</string>
+    <string name="analytics_goal_days">Goal met</string>
+    <string name="analytics_days_of">%1$d / %2$d days</string>
+    <string name="analytics_days_count">%1$d days</string>
+    <string name="analytics_active_days">Days walked</string>
+    <string name="analytics_tap_hint_week">Tap a bar for that week</string>
+    <string name="analytics_this_week">This week</string>
+    <string name="analytics_months">By month</string>
+    <string name="analytics_run_stats">Run stats</string>
+    <string name="analytics_run_count">Runs</string>
+    <string name="analytics_times">%1$d</string>
+    <string name="analytics_total_time">Total time</string>
+    <string name="analytics_avg_pace">Avg pace</string>
+    <string name="analytics_top_speed">Top speed</string>
+    <string name="analytics_avg_speed">Avg speed</string>
+    <string name="analytics_longest_run">Longest run</string>
+    <string name="analytics_no_data">No records yet</string>
+    <string name="analytics_hours_minutes">%1$dh %2$dm</string>
+    <string name="analytics_minutes">%1$dm</string>
     <string name="analytics_week">Week</string>
     <string name="analytics_month">Month</string>
     <string name="analytics_all">All time</string>
@@ -735,6 +759,7 @@ Start running with StepUp.</string>
     <string name="community_board_section">Board</string>
     <string name="profile_avatar_gallery">Choose from gallery</string>
     <string name="profile_avatar_or_emoji">…or pick an emoji</string>
+    <string name="profile_avatar_current">Current photo</string>
 
     <!-- Spotlight tour -->
     <string name="tour1_title">Today\'s steps</string>

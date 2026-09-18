@@ -54,6 +54,8 @@
     <string name="home_daily_goal">일일 목표 %1$s</string>
     <string name="home_view_analytics">통계 보기</string>
     <string name="home_energy">에너지</string>
+    <string name="home_energy_steps_left">%1$s보 더</string>
+    <string name="home_energy_sup_left">오늘 %1$s SUP 더 받을 수 있어요</string>
     <string name="home_recharge_in">%1$s 후 충전</string>
     <string name="home_distance">거리</string>
     <string name="home_this_week">이번 주</string>
@@ -199,6 +201,8 @@
     <string name="toast_not_finished">아직 달성 전이에요 — 조금만 더!</string>
     <string name="invite_subject">StepUp에서 같이 달려요</string>
     <string name="invite_text">걷기만 해도 SUP가 쌓이는 StepUp, 같이 해요!</string>
+    <string name="invite_send">보내기</string>
+    <string name="invite_edit_hint">보낼 문구를 고칠 수 있어요. 보내기를 누르면 앱을 고릅니다.</string>
 
     <!-- Notifications -->
     <string name="notif_title">알림</string>
@@ -268,6 +272,26 @@
 
     <!-- Analytics -->
     <string name="analytics_title">통계</string>
+    <string name="analytics_tab_week">주간</string>
+    <string name="analytics_tab_quarter">3개월</string>
+    <string name="analytics_goal_days">목표 달성</string>
+    <string name="analytics_days_of">%1$d / %2$d일</string>
+    <string name="analytics_days_count">%1$d일</string>
+    <string name="analytics_active_days">걸은 날</string>
+    <string name="analytics_tap_hint_week">막대를 누르면 그 주 기록</string>
+    <string name="analytics_this_week">이번 주</string>
+    <string name="analytics_months">달별</string>
+    <string name="analytics_run_stats">러닝 통계</string>
+    <string name="analytics_run_count">러닝 횟수</string>
+    <string name="analytics_times">%1$d회</string>
+    <string name="analytics_total_time">총 시간</string>
+    <string name="analytics_avg_pace">평균 페이스</string>
+    <string name="analytics_top_speed">최고 속도</string>
+    <string name="analytics_avg_speed">평균 속도</string>
+    <string name="analytics_longest_run">최장 러닝</string>
+    <string name="analytics_no_data">아직 기록이 없어요</string>
+    <string name="analytics_hours_minutes">%1$d시간 %2$d분</string>
+    <string name="analytics_minutes">%1$d분</string>
     <string name="analytics_week">주간</string>
     <string name="analytics_month">월간</string>
     <string name="analytics_all">전체</string>
@@ -733,6 +757,7 @@ StepUp과 함께 달려보세요.</string>
     <string name="community_board_section">게시판</string>
     <string name="profile_avatar_gallery">갤러리에서 사진 선택</string>
     <string name="profile_avatar_or_emoji">…또는 이모지 고르기</string>
+    <string name="profile_avatar_current">지금 쓰는 사진</string>
 
     <!-- Spotlight tour -->
     <string name="tour1_title">오늘 걸음</string>

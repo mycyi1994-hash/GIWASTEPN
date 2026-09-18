@@ -4,6 +4,7 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -19,17 +21,21 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -41,9 +47,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,11 +67,13 @@ import com.stepup.android.ui.components.GlowCard
 import com.stepup.android.ui.components.HexEmblem
 import com.stepup.android.ui.components.PillChip
 import com.stepup.android.ui.components.SectionHeader
-import com.stepup.android.ui.guide.GuideTour
-import com.stepup.android.ui.guide.guideTarget
 import com.stepup.android.ui.components.VoltButton
 import com.stepup.android.ui.components.Wordmark
+import com.stepup.android.ui.guide.GuideTour
+import com.stepup.android.ui.guide.guideTarget
+import com.stepup.android.ui.theme.Carbon
 import com.stepup.android.ui.theme.CarbonHigh
+import com.stepup.android.ui.theme.Edge
 import com.stepup.android.ui.theme.Night
 import com.stepup.android.ui.theme.Silver
 import com.stepup.android.ui.theme.Slate
@@ -98,15 +108,31 @@ fun EventsScreen(
         if (claimResult != null) viewModel.consumeClaimResult()
     }
 
+    // 초대는 두 걸음이다 — 무슨 말을 보낼지 먼저 정하고, 그다음에 어디로 보낼지 고른다.
+    //
+    // 예전에는 누르자마자 공유 시트가 떴다. 보낼 문구를 그때는 볼 수 없어서,
+    // 앱이 대신 써 준 한 줄이 그대로 상대에게 갔다. 친구에게 보내는 말은
+    // 보내는 사람이 정하는 것이 맞다.
     val inviteSubject = stringResource(R.string.invite_subject)
     val inviteText = stringResource(R.string.invite_text)
-    val shareInvite = {
-        val send = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_SUBJECT, inviteSubject)
-            putExtra(Intent.EXTRA_TEXT, inviteText)
-        }
-        context.startActivity(Intent.createChooser(send, inviteSubject))
+    var showInvite by rememberSaveable { mutableStateOf(false) }
+    val shareInvite = { showInvite = true }
+
+    if (showInvite) {
+        InviteDialog(
+            subject = inviteSubject,
+            initialText = inviteText,
+            onSend = { text ->
+                showInvite = false
+                val send = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_SUBJECT, inviteSubject)
+                    putExtra(Intent.EXTRA_TEXT, text)
+                }
+                context.startActivity(Intent.createChooser(send, inviteSubject))
+            },
+            onDismiss = { showInvite = false },
+        )
     }
 
     var selectedChip by rememberSaveable { mutableIntStateOf(0) }
@@ -603,3 +629,85 @@ private fun EventCard(
         }
     }
 }
+
+
+/**
+ * 친구 초대 — 보낼 문구를 먼저 보여 준다.
+ *
+ * 기본 문구를 넣어 두되 고칠 수 있게 한다. 빈 칸으로 시작하면 대부분 아무
+ * 말도 못 쓰고 닫고, 고칠 수 없으면 앱이 쓴 말이 내 이름으로 나간다.
+ *
+ * "보내기"를 누르면 그때 공유 시트가 뜬다 — 어디로 보낼지(메시지·카톡·메일)는
+ * 안드로이드가 고르게 두는 편이 낫다. 우리가 목록을 만들면 그 사람이 쓰는
+ * 앱이 빠져 있을 수 있다.
+ */
+@Composable
+private fun InviteDialog(
+    subject: String,
+    initialText: String,
+    onSend: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var text by rememberSaveable(initialText) { mutableStateOf(initialText) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Carbon,
+        titleContentColor = Snow,
+        textContentColor = Silver,
+        confirmButton = {
+            TextButton(
+                onClick = { onSend(text.trim()) },
+                enabled = text.isNotBlank(),
+            ) {
+                Text(
+                    text = stringResource(R.string.invite_send),
+                    color = if (text.isNotBlank()) Volt else Slate,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(R.string.common_cancel), color = Slate)
+            }
+        },
+        title = { Text(text = subject, fontWeight = FontWeight.Black) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = stringResource(R.string.invite_edit_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Slate,
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(CarbonHigh)
+                        .border(1.dp, Edge, RoundedCornerShape(14.dp))
+                        .padding(horizontal = 13.dp, vertical = 12.dp),
+                ) {
+                    BasicTextField(
+                        value = text,
+                        onValueChange = { if (it.length <= INVITE_MAX) text = it },
+                        textStyle = TextStyle(color = Snow, fontSize = 14.sp, lineHeight = 20.sp),
+                        cursorBrush = SolidColor(Volt),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 76.dp),
+                    )
+                }
+                Text(
+                    text = "${text.length} / $INVITE_MAX",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Slate,
+                    modifier = Modifier.align(Alignment.End),
+                )
+            }
+        },
+    )
+}
+
+/** 초대 문구 길이 상한. 문자 메시지 한 통에 들어가는 정도. */
+private const val INVITE_MAX = 300

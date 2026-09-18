@@ -62,6 +62,15 @@ class StepRepository(
         return stepDao.observeSince(from)
     }
 
+    /**
+     * 지난 [days]일(오늘 포함) 기록.
+     *
+     * 기록이 없는 날은 행 자체가 없다 — 화면이 날짜를 만들어 채운다. 걷지 않은
+     * 날까지 0으로 저장해 두면 앱을 안 쓴 날과 0보 걸은 날이 구별되지 않는다.
+     */
+    fun observeDays(days: Int): Flow<List<DailyStepsEntity>> =
+        stepDao.observeSince(LocalDate.now().toEpochDay() - (days - 1).coerceAtLeast(0))
+
     /** 앱 설치 후 누적 걸음 수 */
     fun observeLifetimeSteps(): Flow<Long> = stepDao.observeTotalSteps()
 

@@ -70,6 +70,7 @@ import com.stepup.android.ui.guide.guideTarget
 import com.stepup.android.ui.screens.community.CommunityScreen
 import com.stepup.android.ui.screens.community.CrewBoardScreen
 import com.stepup.android.ui.screens.community.FlashRunDetailScreen
+import com.stepup.android.ui.screens.community.FocusedCommentSheetHost
 import com.stepup.android.ui.screens.community.CrewCreateScreen
 import com.stepup.android.ui.screens.community.PartyLobbyScreen
 import com.stepup.android.ui.screens.community.PostComposeScreen
@@ -394,6 +395,9 @@ private fun MainScaffold(startTour: Boolean = false) {
             }
         }
     }
+
+    // 알림에서 눌러 들어온 댓글 창. 어느 탭에 있든 여기서 연다.
+    FocusedCommentSheetHost()
 
     // 스포트라이트 가이드 오버레이 — 하단 바까지 덮는다
     if (GuideTour.active) {

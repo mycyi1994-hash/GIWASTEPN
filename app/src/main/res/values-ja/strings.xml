@@ -55,6 +55,8 @@
     <string name="home_daily_goal">1日の目標 %1$s</string>
     <string name="home_view_analytics">統計を見る</string>
     <string name="home_energy">エナジー</string>
+    <string name="home_energy_steps_left">あと %1$s 歩</string>
+    <string name="home_energy_sup_left">今日はあと %1$s SUP 獲得できます</string>
     <string name="home_recharge_in">%1$s後に回復</string>
     <string name="home_distance">距離</string>
     <string name="home_this_week">今週</string>
@@ -200,6 +202,8 @@
     <string name="toast_not_finished">まだ達成していません — あともう少し！</string>
     <string name="invite_subject">StepUpで一緒に走ろう</string>
     <string name="invite_text">StepUpなら歩くだけでSUPが貯まるよ。一緒に走ろう！</string>
+    <string name="invite_send">送信</string>
+    <string name="invite_edit_hint">送る文面を編集できます。送信を押すとアプリを選びます。</string>
 
     <!-- Notifications -->
     <string name="notif_title">通知</string>
@@ -269,6 +273,26 @@
 
     <!-- Analytics -->
     <string name="analytics_title">統計</string>
+    <string name="analytics_tab_week">週間</string>
+    <string name="analytics_tab_quarter">3か月</string>
+    <string name="analytics_goal_days">目標達成</string>
+    <string name="analytics_days_of">%1$d / %2$d 日</string>
+    <string name="analytics_days_count">%1$d 日</string>
+    <string name="analytics_active_days">歩いた日</string>
+    <string name="analytics_tap_hint_week">バーを押すとその週の記録</string>
+    <string name="analytics_this_week">今週</string>
+    <string name="analytics_months">月別</string>
+    <string name="analytics_run_stats">ラン統計</string>
+    <string name="analytics_run_count">ラン回数</string>
+    <string name="analytics_times">%1$d 回</string>
+    <string name="analytics_total_time">合計時間</string>
+    <string name="analytics_avg_pace">平均ペース</string>
+    <string name="analytics_top_speed">最高速度</string>
+    <string name="analytics_avg_speed">平均速度</string>
+    <string name="analytics_longest_run">最長ラン</string>
+    <string name="analytics_no_data">まだ記録がありません</string>
+    <string name="analytics_hours_minutes">%1$d時間 %2$d分</string>
+    <string name="analytics_minutes">%1$d分</string>
     <string name="analytics_week">週</string>
     <string name="analytics_month">月</string>
     <string name="analytics_all">全期間</string>
@@ -734,6 +758,7 @@ StepUp と走り出そう。</string>
     <string name="community_board_section">掲示板</string>
     <string name="profile_avatar_gallery">ギャラリーから選ぶ</string>
     <string name="profile_avatar_or_emoji">…または絵文字を選ぶ</string>
+    <string name="profile_avatar_current">今の写真</string>
 
     <!-- Spotlight tour -->
     <string name="tour1_title">今日の歩数</string>

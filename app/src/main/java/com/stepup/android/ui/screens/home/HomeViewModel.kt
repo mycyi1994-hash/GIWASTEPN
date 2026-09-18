@@ -47,6 +47,19 @@ class HomeViewModel(
     ) {
         val energyPercent: Int
             get() = if (maxEnergy > 0) ((energy / maxEnergy) * 100).toInt().coerceIn(0, 100) else 0
+
+        /**
+         * 남은 에너지로 아직 적립할 수 있는 걸음.
+         *
+         * 에너지 %는 결국 이 숫자의 다른 표현이다. 에너지 한 칸이 600보이고,
+         * 신발의 에너지 절감이 붙으면 같은 칸으로 더 걸을 수 있다.
+         */
+        val earnableSteps: Int
+            get() = RewardEconomy.earnableSteps(energy, equipped?.energyEfficiency ?: 1.0)
+
+        /** 그 걸음을 다 걸었을 때 받는 SUP — 신발 부스트와 종족 배율 포함 전 기본값 */
+        val earnableSup: Double
+            get() = earnableSteps * RewardEconomy.POINTS_PER_STEP
         val goalPercent: Int
             get() = if (goal > 0) (todaySteps * 100 / goal) else 0
 
