@@ -1,6 +1,7 @@
 package com.stepup.android
 
 import com.stepup.android.data.local.UploadState
+import com.stepup.android.data.local.CrewDistance
 import com.stepup.android.data.local.WalkSessionDao
 import com.stepup.android.data.local.WalkSessionEntity
 import com.stepup.android.data.remote.ServerResult
@@ -55,6 +56,14 @@ class ClaimUploadTest {
         override fun observeSessionCount(): Flow<Int> = flowOf(rows.size)
         override fun observeDurationSince(fromMillis: Long): Flow<Long> = flowOf(0L)
         override fun observePendingUploadCount(): Flow<Int> = flowOf(pendingCount())
+
+        override suspend fun crewDistances(fromMillis: Long): List<CrewDistance> =
+            rows.values
+                .filter { it.crewId.isNotEmpty() && it.startedAt >= fromMillis }
+                .groupBy { it.crewId }
+                .map { (crewId, runs) ->
+                    CrewDistance(crewId, runs.sumOf { it.distanceMeters }, runs.size)
+                }
 
         private fun pendingCount() = rows.values.count {
             it.uploadState in setOf(UploadState.PENDING.name, UploadState.FAILED.name) && it.track.isNotEmpty()
