@@ -127,6 +127,12 @@
 
     <!-- Items -->
     <string name="items_sub">装備を整えて、もっと稼ごう</string>
+    <string name="dex_title">NFT 図鑑</string>
+    <string name="dex_progress">収集状況</string>
+    <string name="dex_filter_all">すべて</string>
+    <string name="dex_filter_owned">所持</string>
+    <string name="dex_filter_missing">未所持</string>
+    <string name="dex_empty">条件に合う靴がありません</string>
     <string name="items_my_gear">マイギア</string>
     <string name="items_next_level">次のレベルまで</string>
     <string name="items_upgrade_cost">強化 · %1$s SUP</string>
@@ -266,6 +272,7 @@
     <string name="goal_title">1日の目標</string>
     <string name="goal_steps_suffix">歩</string>
     <string name="goal_about_km">約 %1$s km</string>
+    <string name="goal_bonus_preview">達成で +%1$s SUP</string>
     <string name="goal_hint">目標を達成するとボーナスSUP！ 連続で達成するほど大きくなります。</string>
     <string name="about_version">バージョン</string>
     <string name="about_network">ネットワーク</string>

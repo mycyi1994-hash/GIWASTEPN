@@ -126,6 +126,12 @@
 
     <!-- Items -->
     <string name="items_sub">装备到位，赚得更多</string>
+    <string name="dex_title">NFT 图鉴</string>
+    <string name="dex_progress">收集进度</string>
+    <string name="dex_filter_all">全部</string>
+    <string name="dex_filter_owned">已拥有</string>
+    <string name="dex_filter_missing">未拥有</string>
+    <string name="dex_empty">没有符合条件的鞋子</string>
     <string name="items_my_gear">我的装备</string>
     <string name="items_next_level">距离下一级</string>
     <string name="items_upgrade_cost">升级 · %1$s SUP</string>
@@ -265,6 +271,7 @@
     <string name="goal_title">每日目标</string>
     <string name="goal_steps_suffix">步</string>
     <string name="goal_about_km">≈ %1$s km</string>
+    <string name="goal_bonus_preview">达成可得 +%1$s SUP</string>
     <string name="goal_hint">达成目标就有每日 SUP 奖励 —— 连续打卡奖励更大。</string>
     <string name="about_version">版本</string>
     <string name="about_network">网络</string>

@@ -80,6 +80,7 @@ import com.stepup.android.ui.screens.home.HomeScreen
 import com.stepup.android.ui.screens.login.LoginScreen
 import com.stepup.android.ui.screens.items.ItemsScreen
 import com.stepup.android.ui.screens.items.SneakerDetailScreen
+import com.stepup.android.ui.screens.items.SneakerDexScreen
 import com.stepup.android.ui.screens.notifications.NotificationsScreen
 import com.stepup.android.ui.screens.profile.AchievementsScreen
 import com.stepup.android.ui.screens.profile.AnalyticsScreen
@@ -129,6 +130,7 @@ object Routes {
     const val FLASH_DETAIL = "flash/{postId}"
     const val FLASH_LOBBY = "flash/lobby/{postId}"
     const val COURSES = "courses"
+    const val SNEAKER_DEX = "sneaker/dex"
 
     fun sneaker(id: Long) = "sneaker/$id"
     fun lobby(crewId: String) = "lobby/$crewId"
@@ -250,7 +252,10 @@ private fun MainScaffold(startTour: Boolean = false) {
                 )
             }
             composable(Screen.Items.route) {
-                ItemsScreen(onOpenSneaker = { id -> navController.navigate(Routes.sneaker(id)) })
+                ItemsScreen(
+                    onOpenSneaker = { id -> navController.navigate(Routes.sneaker(id)) },
+                    onOpenDex = { navController.navigate(Routes.SNEAKER_DEX) },
+                )
             }
             composable(Screen.Events.route) {
                 EventsScreen(onOpenNotifications = { navController.navigate(Routes.NOTIFICATIONS) })
@@ -334,6 +339,12 @@ private fun MainScaffold(startTour: Boolean = false) {
                     crewId = entry.arguments?.getString("crewId").orEmpty(),
                     onBack = { navController.popBackStack() },
                     onRunStarted = { navController.navigate(Routes.RUN) },
+                )
+            }
+            composable(Routes.SNEAKER_DEX) {
+                SneakerDexScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenSneaker = { id -> navController.navigate(Routes.sneaker(id)) },
                 )
             }
             composable(Routes.RANKING) {

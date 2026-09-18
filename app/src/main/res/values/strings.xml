@@ -128,6 +128,12 @@
 
     <!-- Items -->
     <string name="items_sub">Gear up, earn more</string>
+    <string name="dex_title">NFT Dex</string>
+    <string name="dex_progress">Collected</string>
+    <string name="dex_filter_all">All</string>
+    <string name="dex_filter_owned">Owned</string>
+    <string name="dex_filter_missing">Missing</string>
+    <string name="dex_empty">No sneakers match this filter</string>
     <string name="items_my_gear">My Gear</string>
     <string name="items_next_level">To next level</string>
     <string name="items_upgrade_cost">Upgrade · %1$s SUP</string>
@@ -267,6 +273,7 @@
     <string name="goal_title">Daily Goal</string>
     <string name="goal_steps_suffix">steps</string>
     <string name="goal_about_km">≈ %1$s km</string>
+    <string name="goal_bonus_preview">+%1$s SUP when you hit it</string>
     <string name="goal_hint">Hit your goal for daily bonus SUP — streaks make it bigger.</string>
     <string name="about_version">Version</string>
     <string name="about_network">Network</string>

@@ -1,8 +1,8 @@
 package com.stepup.android.ui.screens.items
 
 import android.widget.Toast
-import androidx.compose.foundation.border
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,19 +15,20 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Air
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.LocalFireDepartment
-import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -70,10 +71,10 @@ import com.stepup.android.ui.components.RarityChip
 import com.stepup.android.ui.components.SectionHeader
 import com.stepup.android.ui.components.SneakerCollectionCard
 import com.stepup.android.ui.components.SneakerFrame
-import com.stepup.android.ui.components.fullLabel
 import com.stepup.android.ui.components.TokenCard
 import com.stepup.android.ui.components.VoltButton
 import com.stepup.android.ui.components.Wordmark
+import com.stepup.android.ui.components.fullLabel
 import com.stepup.android.ui.components.label
 import com.stepup.android.ui.components.quietClickable
 import com.stepup.android.ui.components.tint
@@ -89,6 +90,7 @@ import com.stepup.android.ui.theme.Volt
 @Composable
 fun ItemsScreen(
     onOpenSneaker: (Long) -> Unit = {},
+    onOpenDex: () -> Unit = {},
     viewModel: ItemsViewModel = viewModel(factory = ItemsViewModel.Factory),
 ) {
     val context = LocalContext.current
@@ -145,19 +147,59 @@ fun ItemsScreen(
         }
 
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(
-                    text = stringResource(R.string.tab_items),
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Black,
-                    letterSpacing = (-1).sp,
-                    color = Snow,
-                )
-                Text(
-                    text = stringResource(R.string.items_sub),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Silver,
-                )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    Text(
+                        text = stringResource(R.string.tab_items),
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = (-1).sp,
+                        color = Snow,
+                    )
+                    Text(
+                        text = stringResource(R.string.items_sub),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Silver,
+                    )
+                }
+                // 도감 입구. 제목과 같은 줄, 토큰 카드 바로 아래에 둔다.
+                // 보관함(가진 것)과 도감(전부)은 다른 질문에 답하므로 입구도 나눈다.
+                Column(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(CarbonHigh)
+                        .border(1.dp, Volt.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
+                        .quietClickable(onOpenDex)
+                        .padding(horizontal = 12.dp, vertical = 9.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(3.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.MenuBook,
+                        contentDescription = null,
+                        tint = Volt,
+                        modifier = Modifier.size(19.dp),
+                    )
+                    Text(
+                        text = stringResource(R.string.dex_title),
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Silver,
+                    )
+                    Text(
+                        text = "${progress.first} / ${progress.second}",
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Black,
+                        color = Volt,
+                    )
+                }
             }
         }
 

@@ -924,12 +924,27 @@ private fun GoalDialog(
                             modifier = Modifier.padding(bottom = 5.dp),
                         )
                     }
-                    Text(
-                        text = stringResource(R.string.goal_about_km, "%.1f".format(distanceKm)),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Slate,
+                    Column(
+                        horizontalAlignment = Alignment.End,
                         modifier = Modifier.padding(bottom = 5.dp),
-                    )
+                    ) {
+                        Text(
+                            text = stringResource(R.string.goal_about_km, "%.1f".format(distanceKm)),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Slate,
+                        )
+                        // 목표를 올리면 보너스도 오른다는 것을 여기서 보여준다.
+                        // 규칙만 바꾸고 알리지 않으면 아무도 목표를 올리지 않는다.
+                        Text(
+                            text = stringResource(
+                                R.string.goal_bonus_preview,
+                                "%,.1f".format(RewardEconomy.goalBaseBonus(steps)),
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.Bold,
+                            color = Volt,
+                        )
+                    }
                 }
                 Slider(
                     value = sliderValue,

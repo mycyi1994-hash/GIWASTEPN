@@ -1177,6 +1177,7 @@ private fun CourseChallengeCard(
                         } ?: 0
                     }
                     LiveRouteMap(
+                        interactive = true,
                         points = mapPoints,
                         seed = fallbackSeed,
                         progress = progress.takeIf { course != null && sessionKm > 0.005 },

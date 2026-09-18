@@ -87,9 +87,14 @@ class RewardRepository(
 
     // ── 일일 목표 ────────────────────────────────────────────
 
-    /** 일일 목표 달성 보너스 적립 (streak = 오늘까지의 연속 달성 일수, 1 이상) */
-    suspend fun creditGoalBonus(streak: Int) {
-        val amount = RewardEconomy.goalBonus(streak)
+    /**
+     * 일일 목표 달성 보너스 적립.
+     *
+     * @param streak 오늘까지의 연속 달성 일수 (1 이상)
+     * @param dailyGoal 그 사람이 정한 목표 — 높게 잡을수록 보너스가 크다
+     */
+    suspend fun creditGoalBonus(streak: Int, dailyGoal: Int) {
+        val amount = RewardEconomy.goalBonus(streak, dailyGoal)
         credit(RewardType.BONUS_GOAL, amount, "일일 목표 달성 보너스 (연속 ${streak}일)")
         notify(NotificationType.GOAL_REACHED, argText = streak.toString(), argAmount = amount)
     }

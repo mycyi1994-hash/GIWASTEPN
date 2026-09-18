@@ -96,7 +96,7 @@ class StepRepository(
             val metYesterday = prefs.lastGoalMetDay() == today - 1
             val newStreak = if (metYesterday) prefs.streakValue() + 1 else 1
             prefs.setGoalMet(today, newStreak)
-            rewardRepository.creditGoalBonus(newStreak)
+            rewardRepository.creditGoalBonus(newStreak, goal)
         }
 
         accrueBackground(today, steps)

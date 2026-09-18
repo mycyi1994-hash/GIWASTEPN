@@ -126,6 +126,12 @@
 
     <!-- Items -->
     <string name="items_sub">장비를 갖추면 더 쌓여요</string>
+    <string name="dex_title">NFT 도감</string>
+    <string name="dex_progress">수집 현황</string>
+    <string name="dex_filter_all">전체</string>
+    <string name="dex_filter_owned">보유</string>
+    <string name="dex_filter_missing">미보유</string>
+    <string name="dex_empty">조건에 맞는 신발이 없어요</string>
     <string name="items_my_gear">내 장비</string>
     <string name="items_next_level">다음 레벨까지</string>
     <string name="items_upgrade_cost">강화 · %1$s SUP</string>
@@ -265,6 +271,7 @@
     <string name="goal_title">일일 목표</string>
     <string name="goal_steps_suffix">걸음</string>
     <string name="goal_about_km">약 %1$s km</string>
+    <string name="goal_bonus_preview">달성 시 +%1$s SUP</string>
     <string name="goal_hint">목표를 달성하면 보너스 SUP! 연속 달성하면 보너스가 커져요.</string>
     <string name="about_version">버전</string>
     <string name="about_network">네트워크</string>

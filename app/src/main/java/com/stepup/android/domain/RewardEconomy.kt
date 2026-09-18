@@ -21,8 +21,21 @@ object RewardEconomy {
     /** 기본 최대 에너지 */
     const val BASE_MAX_ENERGY = 10.0
 
-    /** 일일 목표 달성 기본 보너스(SUP) */
+    /** 일일 목표 달성 기본 보너스(SUP) — 기본 목표(8,000보) 기준 */
     const val DAILY_GOAL_BONUS = 20.0
+
+    /**
+     * 일일 목표 1,000보당 달성 보너스(SUP).
+     *
+     * 목표를 높게 잡은 사람이 더 받는다. 8,000보 × 2.5 = 20 SUP 라서 기본
+     * 목표에서는 예전과 같은 금액이 나온다 — 규칙을 바꾸면서 이미 쓰던
+     * 사람의 보상이 줄어들면 그건 개선이 아니다.
+     *
+     * 목표에 비례해 곧게 올린다. 곱절로 걷는 일은 곱절로 힘들기 때문이다.
+     * 높게 잡기만 하고 안 걸으면 한 푼도 못 받으므로, 무작정 올리는 것을
+     * 막는 장치는 규칙 안에 이미 있다.
+     */
+    const val GOAL_BONUS_PER_1K = 2.5
 
     /** 연속 달성(스트릭) 1일당 추가 보너스 비율 */
     const val STREAK_BONUS_RATE = 0.1
@@ -111,8 +124,18 @@ object RewardEconomy {
             energyEfficiency.coerceIn(0.5, 1.0)).toInt()
 
     /** streak일 연속 달성 시 일일 목표 보너스 (7일 초과분은 가산하지 않음) */
-    fun goalBonus(streak: Int): Double =
-        DAILY_GOAL_BONUS * (1.0 + STREAK_BONUS_RATE * (streak - 1).coerceIn(0, 7))
+    /**
+     * 목표 달성 보너스.
+     *
+     * @param streak 오늘까지의 연속 달성 일수 (1 이상)
+     * @param dailyGoal 그 사람이 정한 목표 걸음
+     */
+    fun goalBonus(streak: Int, dailyGoal: Int): Double =
+        goalBaseBonus(dailyGoal) * (1.0 + STREAK_BONUS_RATE * (streak - 1).coerceIn(0, 7))
+
+    /** 연속 달성을 빼고, 목표만으로 정해지는 몫 */
+    fun goalBaseBonus(dailyGoal: Int): Double =
+        ((dailyGoal / 1000.0) * GOAL_BONUS_PER_1K * 100).roundToInt() / 100.0
 
     fun distanceMeters(steps: Int): Double = steps * STRIDE_METERS
 
