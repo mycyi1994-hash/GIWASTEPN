@@ -488,35 +488,34 @@ private fun EnergyCard(
                 .weight(1f),
             contentAlignment = Alignment.Center,
         ) {
+            // 링 안에는 퍼센트 하나만 둔다. 두 줄을 넣으면 작은 링 안에서
+            // 글자끼리 겹쳐 둘 다 못 읽게 된다 — 숫자는 링 밖으로 뺐다.
             NeonRing(
                 progress = percent / 100f,
                 modifier = Modifier.fillMaxHeight(),
                 ringWidth = 7.dp,
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "$percent%",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        letterSpacing = (-0.5).sp,
-                        color = Snow,
-                    )
-                    // "7 / 10" 은 7 이 무엇인지 말해 주지 않는다. 에너지 한 칸이
-                    // 곧 600보이므로, 남은 칸수 대신 남은 걸음으로 적는다.
-                    Text(
-                        text = stringResource(R.string.home_energy_steps_left, "%,d".format(earnableSteps)),
-                        fontSize = 8.sp,
-                        color = Slate,
-                    )
-                }
+                Text(
+                    text = "$percent%",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    letterSpacing = (-0.5).sp,
+                    color = Snow,
+                )
             }
         }
         // %가 무엇의 %인지 — 오늘 남은 적립 여력이다.
+        // "N 보"와 "N SUP"를 한 줄에 붙여 카드 높이를 늘리지 않는다.
         Text(
-            text = stringResource(R.string.home_energy_sup_left, "%,.0f".format(earnableSup)),
+            text = stringResource(
+                R.string.home_energy_left,
+                "%,d".format(earnableSteps),
+                "%,.0f".format(earnableSup),
+            ),
             fontSize = 10.sp,
             color = Snow,
             fontWeight = FontWeight.Bold,
+            maxLines = 1,
         )
         Text(
             text = stringResource(R.string.home_recharge_in, countdown),
@@ -574,6 +573,12 @@ private fun DistanceCard(
                 modifier = Modifier.padding(bottom = 3.dp),
             )
         }
+        // 막대와 요일을 **한 칸 안에 같이** 둔다.
+        //
+        // 예전에는 막대 줄과 요일 줄이 따로 있었다. 둘 다 7등분이라 맞아떨어질
+        // 것 같지만, 요일 동그라미는 16dp 고정이라 칸 너비와 어긋나 조금씩
+        // 밀렸다 — 화면에서는 동그라미와 요일이 안 맞는 것으로 보인다.
+        // 한 칸(Column)에 막대와 요일을 세로로 쌓으면 어긋날 자리가 없다.
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -584,37 +589,39 @@ private fun DistanceCard(
             days.forEach { day ->
                 val steps = byDay[day]?.steps ?: 0
                 val fraction = (steps.toFloat() / maxSteps).coerceIn(0.08f, 1f)
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(fraction)
-                        .clip(RoundedCornerShape(3.dp))
-                        .background(if (day == today) Volt else Volt.copy(alpha = 0.30f)),
-                )
-            }
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(18.dp),
-            horizontalArrangement = Arrangement.spacedBy(5.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            days.forEach { day ->
+                val isToday = day == today
                 val label = LocalDate.ofEpochDay(day).dayOfWeek
                     .getDisplayName(TextStyle.NARROW, Locale.getDefault())
-                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                    if (day == today) {
-                        Box(
-                            modifier = Modifier
-                                .size(16.dp)
-                                .background(Volt, CircleShape),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Text(label, color = Night, fontSize = 8.sp, fontWeight = FontWeight.Bold)
-                        }
-                    } else {
-                        Text(label, color = Slate, fontSize = 8.sp)
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Bottom,
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(fraction)
+                            .clip(RoundedCornerShape(3.dp))
+                            .background(if (isToday) Volt else Volt.copy(alpha = 0.30f)),
+                    )
+                    Spacer(Modifier.height(5.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(16.dp)
+                            .then(
+                                if (isToday) Modifier.background(Volt, CircleShape) else Modifier,
+                            ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = label,
+                            color = if (isToday) Night else Slate,
+                            fontSize = 8.sp,
+                            fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
+                        )
                     }
                 }
             }

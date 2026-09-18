@@ -58,6 +58,7 @@
     <string name="home_energy">Energy</string>
     <string name="home_energy_steps_left">%1$s steps left</string>
     <string name="home_energy_sup_left">%1$s SUP still earnable today</string>
+    <string name="home_energy_left">%1$s steps · %2$s SUP left</string>
     <string name="home_recharge_in">Recharge in %1$s</string>
     <string name="home_distance">Distance</string>
     <string name="home_this_week">This Week</string>
@@ -420,6 +421,9 @@
 
     <!-- Post categories -->
     <string name="post_cat_all">All</string>
+    <string name="post_cat_hot">Hot</string>
+    <string name="board_hot_title">Hot this week</string>
+    <string name="board_hot_rule">Top %3$d by score: %1$d per like, %2$d per comment. Picked fresh every Monday at 9am KST — a post is only ever featured once.</string>
     <string name="post_cat_flash">Flash run</string>
     <string name="post_cat_free">Open board</string>
     <string name="post_cat_tip">Tips</string>

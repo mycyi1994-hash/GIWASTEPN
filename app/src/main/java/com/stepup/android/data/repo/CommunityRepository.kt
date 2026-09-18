@@ -7,6 +7,7 @@ import com.stepup.android.data.local.CommentEntity
 import com.stepup.android.data.local.NotificationType
 import com.stepup.android.data.local.PostDao
 import com.stepup.android.data.local.PostEntity
+import com.stepup.android.data.prefs.UserPrefs
 import com.stepup.android.domain.Comment
 import com.stepup.android.domain.CommentThread
 import com.stepup.android.domain.Post
@@ -16,7 +17,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import java.time.DayOfWeek
+import java.time.Instant
+import java.time.ZoneId
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -52,6 +58,7 @@ class CommunityRepository(
     private val postDao: PostDao,
     private val commentDao: CommentDao,
     private val rewardRepository: RewardRepository,
+    private val prefs: UserPrefs,
     private val appContext: Context,
 ) {
 
@@ -196,6 +203,49 @@ class CommunityRepository(
         postDao.delete(id)
     }
 
+    // ── 핫글 ─────────────────────────────────────────────────
+    //
+    // 매주 한 번, 그 주에 가장 많이 읽히고 이야기된 글 30개를 골라 둔다.
+    //
+    // 한 번 오른 글은 다시 오르지 않는다. 안 그러면 인기 글 몇 개가 자리를
+    // 차지하고 앉아, 이번 주에 잘 쓴 글이 영영 못 올라온다. 핫글은 명예의
+    // 전당이 아니라 "이번 주에 볼 만한 것"이어야 한다.
+
+    /** 이번 주 핫글. 뽑힌 순서(점수 높은 순) 그대로 나온다. */
+    val hotPosts: Flow<List<Post>> =
+        combine(posts, prefs.hotPostIds) { all, ids ->
+            val byId = all.associateBy { it.id }
+            // 지워진 글은 조용히 빠진다. 목록에 남아 있어도 보여 줄 것이 없다.
+            ids.mapNotNull { byId[it] }
+        }
+
+    /**
+     * 갱신할 때가 됐으면 이번 주 핫글을 다시 뽑는다.
+     *
+     * 화면을 열 때마다 불러도 된다 — 갱신 시각이 지나지 않았으면 아무 일도
+     * 하지 않는다.
+     */
+    suspend fun refreshHotIfDue(now: Long = System.currentTimeMillis()) {
+        val due = lastHotRotation(now)
+        if (prefs.hotRotatedAt() >= due) return
+
+        val featured = prefs.hotFeaturedIds.first()
+        val picked = postDao.allOnce()
+            .map { it.toDomain() }
+            .filter { it.id !in featured && hotScore(it) > 0 }
+            // 점수가 같으면 최근 글을 앞에 둔다. 오래된 글이 계속 앞자리를
+            // 차지하면 새 글은 같은 점수로는 절대 못 올라온다.
+            .sortedWith(compareByDescending<Post> { hotScore(it) }.thenByDescending { it.createdAt })
+            .take(HOT_LIMIT)
+            .map { it.id }
+
+        prefs.setHotPosts(picked, due)
+    }
+
+    /** 좋아요 5점, 댓글 10점. 댓글이 더 무거운 것은 쓰는 데 더 드는 값이기 때문이다. */
+    fun hotScore(post: Post): Int =
+        post.likes * HOT_LIKE_POINTS + post.commentCount * HOT_COMMENT_POINTS
+
     // ── 댓글 ─────────────────────────────────────────────────
 
     /** 한 글의 댓글을 부모–답글 묶음으로 */
@@ -274,6 +324,37 @@ class CommunityRepository(
     // ── 데모 시드 ────────────────────────────────────────────
 
     private fun s(resId: Int): String = appContext.getString(resId)
+
+    companion object HotRules {
+        /** 핫글에 올릴 글 수 */
+        const val HOT_LIMIT = 30
+
+        const val HOT_LIKE_POINTS = 5
+        const val HOT_COMMENT_POINTS = 10
+
+        /** 갱신 시각 — 한국 시간 월요일 09:00 */
+        private val ROTATION_ZONE: ZoneId = ZoneId.of("Asia/Seoul")
+        private val ROTATION_DAY: DayOfWeek = DayOfWeek.MONDAY
+        private const val ROTATION_HOUR = 9
+
+        /**
+         * [now] 기준으로 가장 최근에 지나온 갱신 시각.
+         *
+         * 이 값이 곧 "이번 주 핫글"의 이름표다. 저장된 값이 이것보다 오래됐으면
+         * 새로 뽑을 때가 된 것이다. 앱이 그 시각에 꺼져 있었어도, 다음에 켤 때
+         * 같은 값이 나오므로 한 주를 통째로 건너뛰지 않는다.
+         */
+        fun lastHotRotation(now: Long): Long {
+            val zoned = Instant.ofEpochMilli(now).atZone(ROTATION_ZONE)
+            var boundary = zoned.with(ROTATION_DAY)
+                .withHour(ROTATION_HOUR)
+                .withMinute(0)
+                .withSecond(0)
+                .withNano(0)
+            if (boundary.isAfter(zoned)) boundary = boundary.minusWeeks(1)
+            return boundary.toInstant().toEpochMilli()
+        }
+    }
 
     private fun seed(): List<PostEntity> {
         val now = System.currentTimeMillis()

@@ -57,6 +57,7 @@
     <string name="home_energy">エナジー</string>
     <string name="home_energy_steps_left">あと %1$s 歩</string>
     <string name="home_energy_sup_left">今日はあと %1$s SUP 獲得できます</string>
+    <string name="home_energy_left">%1$s 歩 · %2$s SUP</string>
     <string name="home_recharge_in">%1$s後に回復</string>
     <string name="home_distance">距離</string>
     <string name="home_this_week">今週</string>
@@ -419,6 +420,9 @@
 
     <!-- Post categories -->
     <string name="post_cat_all">すべて</string>
+    <string name="post_cat_hot">人気</string>
+    <string name="board_hot_title">今週の人気投稿</string>
+    <string name="board_hot_rule">いいね %1$d点 + コメント %2$d点で上位 %3$d件。毎週月曜 午前9時(KST)に選び直し、一度載った投稿は再び載りません。</string>
     <string name="post_cat_flash">フラッシュラン</string>
     <string name="post_cat_free">自由</string>
     <string name="post_cat_tip">お役立ち</string>

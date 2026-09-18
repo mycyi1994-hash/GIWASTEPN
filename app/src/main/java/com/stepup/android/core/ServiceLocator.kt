@@ -125,6 +125,7 @@ object ServiceLocator {
             postDao = database.postDao(),
             commentDao = database.commentDao(),
             rewardRepository = rewardRepository,
+            prefs = userPrefs,
             appContext = app,
         )
         courseRepository = CourseRepository(

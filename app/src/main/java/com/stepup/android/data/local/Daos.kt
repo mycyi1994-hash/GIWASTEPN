@@ -223,6 +223,10 @@ interface PostDao {
     @Query("SELECT * FROM posts ORDER BY createdAt DESC")
     fun observeAll(): Flow<List<PostEntity>>
 
+    /** 핫글을 뽑을 때처럼 한 번만 훑으면 되는 경우 */
+    @Query("SELECT * FROM posts ORDER BY createdAt DESC")
+    suspend fun allOnce(): List<PostEntity>
+
     @Query("SELECT * FROM posts WHERE id = :id")
     suspend fun byId(id: Long): PostEntity?
 

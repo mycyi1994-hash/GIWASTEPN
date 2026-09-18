@@ -31,6 +31,21 @@ import kotlinx.coroutines.launch
 /** 커뮤니티 최상단 세그먼트 */
 enum class CommunityTab { BOARD, CREW }
 
+/**
+ * 게시판 필터.
+ *
+ * 카테고리(번개·자유·꿀팁)와 핫글을 한 줄에 같이 둔다. 핫글은 카테고리가
+ * 아니라 **뽑힌 목록**이라 PostCategory 에 넣을 수 없다 — 글은 자유이면서
+ * 동시에 핫글일 수 있다.
+ */
+enum class BoardFilter(val category: PostCategory?) {
+    ALL(null),
+    FLASH(PostCategory.FLASH),
+    HOT(null),
+    FREE(PostCategory.FREE),
+    TIP(PostCategory.TIP),
+}
+
 class CommunityViewModel(
     private val crewRepository: CrewRepository,
     private val communityRepository: CommunityRepository,
@@ -38,6 +53,12 @@ class CommunityViewModel(
     rewardRepository: RewardRepository,
     private val sneakerRepository: SneakerRepository,
 ) : ViewModel() {
+
+    init {
+        // 갱신할 때가 지났으면 이번 주 핫글을 다시 뽑는다. 때가 아니면
+        // 아무 일도 하지 않으므로 화면이 열릴 때마다 불러도 된다.
+        viewModelScope.launch { communityRepository.refreshHotIfDue() }
+    }
 
     val crews: StateFlow<List<Crew>> = crewRepository.crews
 
@@ -106,8 +127,12 @@ class CommunityViewModel(
     /** 선택된 세그먼트 — 탭을 오갔다 와도 유지된다 */
     val tab = MutableStateFlow(CommunityTab.BOARD)
 
-    /** 게시판 카테고리 필터. null이면 전체 */
-    val categoryFilter = MutableStateFlow<PostCategory?>(null)
+    /** 게시판 필터 */
+    val boardFilter = MutableStateFlow(BoardFilter.ALL)
+
+    /** 이번 주 핫글 — 점수 높은 순으로 최대 30개 */
+    val hotPosts: StateFlow<List<Post>> = communityRepository.hotPosts
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     /** 댓글 창을 열어 둔 글의 id. null이면 닫혀 있다 */
     val openCommentsFor = MutableStateFlow<Long?>(null)
@@ -120,6 +145,10 @@ class CommunityViewModel(
 
     /** 알림함이 남긴 "이 댓글로" 신호 */
     val commentFocus: StateFlow<CommentTarget?> = communityRepository.commentFocus
+
+    fun selectFilter(filter: BoardFilter) {
+        boardFilter.value = filter
+    }
 
     fun openComments(postId: Long) {
         focusCommentId.value = 0L
@@ -157,10 +186,6 @@ class CommunityViewModel(
 
     fun selectTab(next: CommunityTab) {
         tab.value = next
-    }
-
-    fun selectCategory(next: PostCategory?) {
-        categoryFilter.value = next
     }
 
     fun toggleJoin(crewId: String) {

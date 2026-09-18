@@ -110,6 +110,18 @@ fun SegmentedTabs(
 // 카테고리
 // ─────────────────────────────────────────────────────────────
 
+/** 게시판 필터 칩에 쓰는 이름 */
+@Composable
+fun BoardFilter.label(): String = stringResource(
+    when (this) {
+        BoardFilter.ALL -> R.string.post_cat_all
+        BoardFilter.FLASH -> R.string.post_cat_flash
+        BoardFilter.HOT -> R.string.post_cat_hot
+        BoardFilter.FREE -> R.string.post_cat_free
+        BoardFilter.TIP -> R.string.post_cat_tip
+    }
+)
+
 @Composable
 fun PostCategory.label(): String = stringResource(
     when (this) {

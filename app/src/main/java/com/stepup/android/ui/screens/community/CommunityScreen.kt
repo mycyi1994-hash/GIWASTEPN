@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.stepup.android.R
+import com.stepup.android.data.repo.CommunityRepository
 import com.stepup.android.data.repo.Crew
 import com.stepup.android.domain.Post
 import com.stepup.android.domain.PostCategory
@@ -174,7 +175,8 @@ private fun BoardTab(
     onOpenFlash: (Long) -> Unit,
 ) {
     val posts by viewModel.boardPosts.collectAsStateWithLifecycle()
-    val filter by viewModel.categoryFilter.collectAsStateWithLifecycle()
+    val filter by viewModel.boardFilter.collectAsStateWithLifecycle()
+    val hotPosts by viewModel.hotPosts.collectAsStateWithLifecycle()
     val balance by viewModel.balance.collectAsStateWithLifecycle()
     var query by rememberSaveable { mutableStateOf("") }
 
@@ -185,7 +187,11 @@ private fun BoardTab(
     val myRank by viewModel.mySupRank.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) { viewModel.loadRanking(RankBoard.TOTAL_SUP, meLabel) }
 
-    val visible = remember(posts, filter, query) { filterPosts(posts, filter, query) }
+    val visible = remember(posts, hotPosts, filter, query) {
+        // 핫글은 이미 뽑혀 순서가 정해진 목록이라, 다시 정렬하지 않고 검색만 건다.
+        if (filter == BoardFilter.HOT) searchPosts(hotPosts, query)
+        else filterPosts(posts, filter.category, query)
+    }
     val flashWindow = remember(posts, query) {
         filterPosts(posts, PostCategory.FLASH, query)
     }
@@ -210,32 +216,51 @@ private fun BoardTab(
 
             item {
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    item {
+                    items(BoardFilter.entries.size) { index ->
+                        val option = BoardFilter.entries[index]
                         PillChip(
-                            text = stringResource(R.string.post_cat_all),
-                            selected = filter == null,
-                            onClick = { viewModel.selectCategory(null) },
-                        )
-                    }
-                    items(PostCategory.entries.size) { index ->
-                        val category = PostCategory.entries[index]
-                        PillChip(
-                            text = category.label(),
-                            selected = filter == category,
-                            onClick = { viewModel.selectCategory(category) },
+                            text = option.label(),
+                            selected = filter == option,
+                            onClick = { viewModel.selectFilter(option) },
                         )
                     }
                 }
             }
 
-            if (filter == null || filter == PostCategory.FLASH) {
+            // 핫글은 왜 이 글들이 여기 있는지 한 줄로 알려 준다. 규칙을 모르면
+            // "왜 내 글은 없지"가 남고, 그건 대개 앱이 고장 난 것으로 읽힌다.
+            if (filter == BoardFilter.HOT) {
+                item {
+                    GlowCard(contentPadding = PaddingValues(14.dp), spacing = 4.dp) {
+                        Text(
+                            text = stringResource(R.string.board_hot_title),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = Snow,
+                        )
+                        Text(
+                            text = stringResource(
+                                R.string.board_hot_rule,
+                                CommunityRepository.HOT_LIKE_POINTS,
+                                CommunityRepository.HOT_COMMENT_POINTS,
+                                CommunityRepository.HOT_LIMIT,
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            fontSize = 11.sp,
+                            color = Silver,
+                            lineHeight = 16.sp,
+                        )
+                    }
+                }
+            }
+
+            if (filter == BoardFilter.ALL || filter == BoardFilter.FLASH) {
                 item {
                     SectionHeader(title = stringResource(R.string.community_flash_nearby))
                 }
             }
 
             // 번개러닝 창내창 — 카드 2개 높이만 차지하고 안에서 스크롤한다
-            if (filter == null && flashWindow.isNotEmpty()) {
+            if (filter == BoardFilter.ALL && flashWindow.isNotEmpty()) {
                 item {
                     FlashRunWindow(
                         posts = flashWindow,
@@ -249,7 +274,7 @@ private fun BoardTab(
             }
 
             // 일반 글 목록 제목 — "가까운 번개러닝"과 짝을 이룬다
-            if (filter == null) {
+            if (filter == BoardFilter.ALL) {
                 item {
                     SectionHeader(title = stringResource(R.string.community_board_section))
                 }
@@ -306,6 +331,18 @@ private fun BoardTab(
  * 번개러닝은 가까운 순, 나머지는 최신 순.
  * 필터가 없으면 번개러닝을 위로 올려 "지금 뛸 사람"이 먼저 보이게 한다.
  */
+/** 뽑혀 온 목록에 검색어만 건다 — 순서는 건드리지 않는다 */
+private fun searchPosts(posts: List<Post>, query: String): List<Post> =
+    if (query.isBlank()) {
+        posts
+    } else {
+        posts.filter {
+            it.title.contains(query, ignoreCase = true) ||
+                it.body.contains(query, ignoreCase = true) ||
+                it.author.contains(query, ignoreCase = true)
+        }
+    }
+
 private fun filterPosts(
     posts: List<Post>,
     filter: PostCategory?,

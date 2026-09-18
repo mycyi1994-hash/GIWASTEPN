@@ -37,6 +37,14 @@ class UserPrefs(private val context: Context) {
         val BASELINE_STEPS = longPreferencesKey("baseline_steps")
         val RUNNER_UID = stringPreferencesKey("runner_uid")
         val NICKNAME = stringPreferencesKey("nickname")
+
+        // ── 핫글 ──
+        /** 이번 주 핫글 목록 (순서 있는 글 id) */
+        val HOT_POST_IDS = stringPreferencesKey("hot_post_ids")
+        /** 지금까지 한 번이라도 핫글에 오른 글 id — 다시 오르지 않게 기억한다 */
+        val HOT_FEATURED_IDS = stringPreferencesKey("hot_featured_ids")
+        /** 이 목록이 어느 갱신 시각의 것인지 (epoch millis) */
+        val HOT_ROTATED_AT = longPreferencesKey("hot_rotated_at")
         val AVATAR_ID = intPreferencesKey("avatar_id")
         val AVATAR_REV = intPreferencesKey("avatar_rev")
         val LOGIN_METHOD = stringPreferencesKey("login_method")
@@ -65,6 +73,35 @@ class UserPrefs(private val context: Context) {
      * "러너라고 정했다"를 구별할 수 없기 때문이다.
      */
     val nickname: Flow<String> = context.dataStore.data.map { it[Keys.NICKNAME] ?: "" }
+
+    // ── 핫글 ─────────────────────────────────────────────────
+
+    /** 이번 주 핫글 — 뽑힌 순서 그대로 */
+    val hotPostIds: Flow<List<Long>> =
+        context.dataStore.data.map { it[Keys.HOT_POST_IDS].toIdList() }
+
+    /** 지금까지 핫글에 올랐던 글 전부 */
+    val hotFeaturedIds: Flow<Set<Long>> =
+        context.dataStore.data.map { it[Keys.HOT_FEATURED_IDS].toIdList().toSet() }
+
+    suspend fun hotRotatedAt(): Long =
+        context.dataStore.data.first()[Keys.HOT_ROTATED_AT] ?: 0L
+
+    /**
+     * 이번 주 핫글을 확정한다.
+     *
+     * 뽑힌 글은 "이미 올랐다" 목록에도 더해진다. 같은 글이 다음 주에 또 오르면
+     * 새 글이 올라올 자리가 없어지고, 핫글은 붙박이 명예의 전당이 된다.
+     */
+    suspend fun setHotPosts(ids: List<Long>, rotatedAt: Long) {
+        context.dataStore.edit { prefs ->
+            val featured = prefs[Keys.HOT_FEATURED_IDS].toIdList().toMutableSet()
+            featured += ids
+            prefs[Keys.HOT_POST_IDS] = ids.joinToString(",")
+            prefs[Keys.HOT_FEATURED_IDS] = featured.joinToString(",")
+            prefs[Keys.HOT_ROTATED_AT] = rotatedAt
+        }
+    }
 
     /** 선택한 아바타 인덱스 (기본 0, [AVATAR_CUSTOM]이면 갤러리 사진) */
     val avatarId: Flow<Int> = context.dataStore.data.map { it[Keys.AVATAR_ID] ?: 0 }
@@ -355,6 +392,10 @@ class UserPrefs(private val context: Context) {
         const val DEFAULT_GOAL = 8000
         const val MIN_GOAL = 3000
         const val MAX_GOAL = 20000
+
+        /** 쉼표로 이어 붙인 id 문자열을 목록으로. 비었거나 깨진 값은 건너뛴다. */
+        private fun String?.toIdList(): List<Long> =
+            this?.split(",")?.mapNotNull { it.trim().toLongOrNull() } ?: emptyList()
 
         /** 닉네임 최대 길이. 순위표 한 줄에 들어가야 해서 짧게 잡는다. */
         const val NICKNAME_MAX = 16
