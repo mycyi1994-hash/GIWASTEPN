@@ -6,6 +6,9 @@ import org.junit.Test
 
 class RewardEconomyTest {
 
+    /** 앱 기본 일일 목표 (UserPrefs.DEFAULT_GOAL 과 같은 값) */
+    private val DEFAULT_GOAL = 8_000
+
     @Test
     fun `세션 적립은 에너지 한도 내 걸음만 인정한다`() {
         // 에너지 1.0 = 600보 적립 가능
@@ -47,9 +50,39 @@ class RewardEconomyTest {
 
     @Test
     fun `스트릭 보너스는 7일까지만 가산된다`() {
-        assertEquals(RewardEconomy.DAILY_GOAL_BONUS, RewardEconomy.goalBonus(1), 1e-9)
-        assertEquals(RewardEconomy.DAILY_GOAL_BONUS * 1.7, RewardEconomy.goalBonus(8), 1e-9)
-        assertEquals(RewardEconomy.goalBonus(8), RewardEconomy.goalBonus(30), 1e-9)
+        val goal = DEFAULT_GOAL
+        assertEquals(RewardEconomy.DAILY_GOAL_BONUS, RewardEconomy.goalBonus(1, goal), 1e-9)
+        assertEquals(RewardEconomy.DAILY_GOAL_BONUS * 1.7, RewardEconomy.goalBonus(8, goal), 1e-9)
+        assertEquals(RewardEconomy.goalBonus(8, goal), RewardEconomy.goalBonus(30, goal), 1e-9)
+    }
+
+    @Test
+    fun `목표를 높게 잡으면 보너스도 오른다`() {
+        // 1,000보당 2.5 SUP — 목표에 곧게 비례한다.
+        assertEquals(7.5, RewardEconomy.goalBaseBonus(3_000), 1e-9)
+        assertEquals(20.0, RewardEconomy.goalBaseBonus(8_000), 1e-9)
+        assertEquals(50.0, RewardEconomy.goalBaseBonus(20_000), 1e-9)
+    }
+
+    @Test
+    fun `기본 목표에서는 규칙을 바꾸기 전과 같은 금액이 나온다`() {
+        // 규칙을 바꾸면서 이미 쓰던 사람의 보상이 줄면 그건 개선이 아니다.
+        // 8,000 × 2.5 / 1000 = 20 = DAILY_GOAL_BONUS
+        assertEquals(
+            RewardEconomy.DAILY_GOAL_BONUS,
+            RewardEconomy.goalBaseBonus(DEFAULT_GOAL),
+            1e-9,
+        )
+    }
+
+    @Test
+    fun `목표 보너스에 스트릭이 곱해진다`() {
+        // 두 축은 서로 곱한다 — 높은 목표를 오래 지킨 사람이 가장 많이 받는다.
+        assertEquals(
+            RewardEconomy.goalBaseBonus(20_000) * 1.7,
+            RewardEconomy.goalBonus(8, 20_000),
+            1e-9,
+        )
     }
 
     @Test
