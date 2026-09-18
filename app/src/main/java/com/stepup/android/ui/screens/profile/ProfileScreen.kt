@@ -73,7 +73,6 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -1095,7 +1094,7 @@ private fun NicknameDialog(
                         value = text,
                         onValueChange = { if (it.length <= UserPrefs.NICKNAME_MAX) text = it },
                         singleLine = true,
-                        textStyle = TextStyle(color = Snow, fontSize = 14.sp),
+                        textStyle = androidx.compose.ui.text.TextStyle(color = Snow, fontSize = 14.sp),
                         cursorBrush = SolidColor(Volt),
                         modifier = Modifier.fillMaxWidth(),
                     )
