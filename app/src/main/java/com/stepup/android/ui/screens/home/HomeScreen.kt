@@ -264,7 +264,9 @@ private fun GreetingRow(
                 fontWeight = FontWeight.SemiBold,
             )
         }
-        TokenCard(balance = balance, onClick = onOpenWallet)
+        Box(Modifier.guideTarget(GuideTour.Targets.HOME_TOKEN)) {
+            TokenCard(balance = balance, onClick = onOpenWallet)
+        }
     }
 }
 

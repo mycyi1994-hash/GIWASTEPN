@@ -66,6 +66,7 @@ import com.stepup.android.ui.components.NightCanvas
 import com.stepup.android.ui.components.quietClickable
 import com.stepup.android.ui.guide.GuideOverlay
 import com.stepup.android.ui.guide.GuideTour
+import com.stepup.android.ui.guide.guideTarget
 import com.stepup.android.ui.screens.community.CommunityScreen
 import com.stepup.android.ui.screens.community.CrewBoardScreen
 import com.stepup.android.ui.screens.community.FlashRunDetailScreen
@@ -433,6 +434,8 @@ private fun NavTab(screen: Screen, selected: Boolean, onClick: () -> Unit) {
     )
     Column(
         modifier = Modifier
+            // 기능을 설명하기 전에 "그게 이 버튼 안에 있다"부터 보여준다.
+            .guideTarget(GuideTour.Targets.tab(screen.route))
             .quietClickable(onClick)
             .padding(horizontal = 10.dp, vertical = 2.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
